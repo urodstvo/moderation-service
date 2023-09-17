@@ -1,3 +1,286 @@
-:root {
-  
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@300;400;700;900&family=Roboto:wght@300;400;700;900&display=swap');
+
+
+@layer reset, init, compontens, media, util;
+
+@layer reset{
+    * {
+        padding: 0px;
+        margin: 0px;
+        border: none;
+    }
+    
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    
+    /* Links */
+    
+    a, a:link, a:visited  {
+        text-decoration: none;
+    }
+    
+    a:hover  {
+        text-decoration: none;
+    }
+    
+    /* Common */
+    
+    aside, nav, footer, header, section, main {
+        display: block;
+    }
+    
+    h1, h2, h3, h4, h5, h6, p {
+        font-size: inherit;
+        font-weight: inherit;
+    }
+    
+    ul, ul li {
+        list-style: none;
+    }
+    
+    img {
+        vertical-align: top;
+    }
+    
+    img, svg {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    address {
+      font-style: normal;
+    }
+    
+    /* Form */
+    
+    input, textarea, button, select {
+        font-family: inherit;
+        font-size: inherit;
+        color: inherit;
+        background-color: transparent;
+    }
+    
+    input::-ms-clear {
+        display: none;
+    }
+    
+    button, input[type="submit"] {
+        display: inline-block;
+        box-shadow: none;
+        background-color: transparent;
+        background: none;
+        cursor: pointer;
+    }
+    
+    input:focus, input:active,
+    button:focus, button:active {
+        outline: none;
+    }
+    
+    button::-moz-focus-inner {
+        padding: 0;
+        border: 0;
+    }
+    
+    label {
+        cursor: pointer;
+    }
+    
+    legend {
+        display: block;
+    }
+}
+
+@layer init{
+    :root {
+        --screen-width: 1300px;
+    }
+
+    html{
+        font-size: 10px;
+        color: #000;
+        font-family: 'Roboto';
+    }    
+
+    *{
+        color: #000;
+    }
+}
+
+@layer components{
+    nav{
+        width: var(--screen-width);
+        margin: 0 auto; 
+        height: 6rem;
+        padding: 0.5rem 1.5rem;
+
+        & > .navbar-content{
+            display: flex;
+            align-items: center;
+            height: 100%;
+            justify-content: space-between;
+
+            & > .navbar-router{
+                display: flex;
+                gap: 5rem;
+                align-items: center;
+
+                & > .navbar-logo{
+                    cursor: pointer;
+                    height: 5rem;
+                }
+                
+                & > .navbar-links{
+                    display: flex;
+                    align-items: flex-end;
+                    gap: 2rem;
+                    height: 5rem;
+                    
+                    & > .navbar-link{
+                        font-family: 'Overpass';
+                        font-size: 2.4rem;
+                        font-weight: 300;
+                        cursor: pointer;
+                    }
+                }
+            }
+            
+            & > .navbar-actions{
+                display: flex;
+                gap: 1rem;
+                height: 4rem;
+
+                & > .navbar-action{
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    main{   
+        min-height: calc(100dvh - 6rem); 
+
+        position: relative;
+
+        & > .main-content{
+            width: var(--screen-width);
+            padding: 4rem 1.5rem;
+            margin: 0 auto; 
+        }
+    }
+
+    .hero-container{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        background-color: #000;
+        margin: 4rem 0;
+
+        & > .hero-content{
+            width: var(--screen-width);
+            height: 100%;
+            margin: 0 auto;
+
+            position: relative;
+        }
+       
+        &.home-page{
+            height: calc(100dvh - 6rem - 8rem);
+            
+            & > .hero-content{
+                display: flex;
+                flex-direction: column;
+
+                & > .hero-title{
+                    text-align: center;
+                    color: white;
+                    font-family: Overpass;
+                    font-weight: 900;
+
+                    width: 65rem;
+                    font-size: 96px;
+
+                    margin-top: 5.5rem; 
+
+                    & > span{
+                        color: #00C2FF;
+                    }
+                }
+
+                & > .hero-description{
+                    color: #FFF;
+                    font-family: 'Roboto';
+                    font-size: 20px;
+                    font-weight: 400;
+
+                    width: 65rem;
+
+                    margin-top: 4rem;
+                }
+
+                & > .hero-actions{    
+                    margin-top: 12.5rem;
+                    
+                    width: 65rem;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                
+                & > .hero-image{
+                    position: absolute;
+
+                    top: 7rem;
+                    right: -10rem;
+
+                    width: 60rem;
+                    height: 60rem;
+
+                    background-image: url('/Robot.gif');
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    background-position: center;
+
+                    box-shadow: inset 0 0 20rem black;
+                }
+            }
+        }
+        
+    }
+
+    button{
+        height: 6rem;
+        width: 27rem;
+
+        padding: 0.5rem 2rem;
+        border-radius: 0.7rem;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        
+        &.black{
+            border: 0.2rem solid #fff;
+            color: #fff;
+            background: #000;
+        }
+        
+        &.white{
+            border: 0.2rem solid #000;
+            color: #000;
+            background: #fff;
+        }
+    }
+}
+
+@layer util{
+    .invert{
+        filter: invert();
+    }
 }
