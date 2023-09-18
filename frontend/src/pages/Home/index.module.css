@@ -11,6 +11,7 @@
         width: var(--screen-width);
         height: 100%;
         margin: 0 auto;
+        /* padding: 6rem 0; */
 
         position: relative;
 
@@ -25,6 +26,7 @@
 
             width: 65rem;
             font-size: 9.6rem;
+            /* font-size: 960%; */
 
             margin-top: 5.5rem; 
 
@@ -36,7 +38,8 @@
         & > .heroDescription{
             color: #FFF;
             font-family: 'Roboto';
-            font-size: 20px;
+            font-size: 2rem;
+            /* font-size: 200%; */
             font-weight: 400;
 
             width: 65rem;
