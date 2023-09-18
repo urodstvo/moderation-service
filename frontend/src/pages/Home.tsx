@@ -1,8 +1,10 @@
-import Button from "@/components/ui/Button"
 import { variants } from "@/interfaces";
 import { Link } from "react-router-dom";
+import Button from "@/components/ui/Button"
 
 const Home = () => {
+    document.title = "CLOUD | HOME PAGE";
+
     return (
         <>
         <div className="hero-container home-page">
