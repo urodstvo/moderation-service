@@ -1,5 +1,5 @@
-import Home from "@/pages/Home/Home";
-import Services from "./Services/Services";
+import Home from "@/pages/Home";
+import Services from "@/pages/Services";
   
 export const routes = [
   {
