@@ -1,3 +1,5 @@
+import styles from "@/pages/Home/home.module.css"
+
 import { variants } from "@/interfaces";
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button"
