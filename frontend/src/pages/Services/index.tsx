@@ -1,3 +1,5 @@
+import ServiceCard from "@/components/ServiceCard";
+import { ModerationType } from "@/interfaces";
 import styles from "@/pages/Services/index.module.css"
 
 const Services = () => {
@@ -46,6 +48,12 @@ const Services = () => {
             </div>
         </div>
         <h1>SERVICES</h1>
+        <section className={styles.servicesList}>
+            <ServiceCard title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
+            <ServiceCard title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
+            <ServiceCard title='Audio Moderation' description="Audio record moderation service" variant={ModerationType.audio} />
+            <ServiceCard title='Video Moderation' description="Video content moderation service" variant={ModerationType.video} />
+        </section>
         </>
     );
 };
