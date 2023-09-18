@@ -1,0 +1,87 @@
+.heroContainer{
+    width: 100%;
+    margin: 0;
+    height: 41rem;
+    position: relative;
+
+    &::before{
+        position: absolute;
+        content: '';
+        top: 0;
+        transform: translateX(-50%);
+
+        width: 200vw;
+        height: 100%;
+        background: #000;
+    }
+
+    & > .heroContent{
+        width: var(--screen-width);
+        height: 100%;
+        margin: 0 auto;
+
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        & > .heroTitle{
+            text-align: center;
+            color: white;
+            font-family: Overpass;
+            font-weight: 700;
+
+            width: 38rem;
+            font-size: 4rem;
+
+            margin: 14rem 5rem 0; 
+        }
+        
+        & > .heroImage{
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            height: 100%;
+            width: 100%;
+            
+            pointer-events: none;
+
+            & > .heroSky{
+                position: absolute;
+
+                &:nth-of-type(1){
+                    top: 3.2rem;
+                    left: -2.2rem;
+                }
+
+                &:nth-of-type(2){
+                    top: 16.2rem;
+                    left: 41.7rem;
+                }
+
+                &:nth-of-type(3){
+                    top: 0rem;
+                    left: 51rem;
+                }
+
+                &:nth-of-type(4){
+                    bottom: -1rem;
+                    right: 20rem;
+                }
+
+                &:nth-of-type(5){
+                    top: 6rem;
+                    right: -7rem;
+                }
+            }
+
+            & > .heroRobot{
+                position: absolute;
+
+                top: 3.2rem;
+                right: 28.4rem;
+            }
+        }
+    }
+}
