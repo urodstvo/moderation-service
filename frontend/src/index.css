@@ -221,7 +221,16 @@
         /* margin-top: 4rem; */
         color: #000;
         font-family: Overpass;
-        font-size: 40px;
+        font-size: 4rem;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+    }
+
+    h2{
+        color: #000;
+        font-family: Overpass;
+        font-size: 3.2rem;
         font-style: normal;
         font-weight: 700;
         line-height: normal;
@@ -446,6 +455,10 @@
                 }
             }
         }
+    }
+
+    p{
+        margin-bottom: 2rem;
     }
 }
 
