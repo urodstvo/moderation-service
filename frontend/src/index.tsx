@@ -9,7 +9,7 @@ import { routes } from '@/pages/index.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-      <BrowserRouter>
+      <BrowserRouter basename='/moderation-service'>
       <Navbar />
       <main className="main-container">
         <div className="main-content">
@@ -21,3 +21,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       </BrowserRouter>
   </React.StrictMode>,
 )
+
+//TODO: delete basename on prod
