@@ -1,0 +1,14 @@
+.plansContainer{
+    width: 100%;
+    height: 62rem;
+
+    & > .plansContent{
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10rem;
+    }
+}
