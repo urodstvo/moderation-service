@@ -48,7 +48,7 @@ const Services = () => {
             </div>
         </section>
         <section>
-            <h1>SERVICES</h1>
+            <h2>SERVICES</h2>
             <div className={styles.servicesList}>
                 <ServiceCard title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
                 <ServiceCard title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
