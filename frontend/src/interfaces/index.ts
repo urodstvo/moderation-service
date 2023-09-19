@@ -13,10 +13,18 @@ export enum ModerationType{
 export interface iButtonProps{
     text: string,
     variant?: ColorVariant,
+    className?: string,
 }
 
 export interface iServiceCardProps{
     title: string,
     description?: string,
     variant: ModerationType,
+}
+
+export interface iPricingCardProps{
+    name: string, 
+    price: string, 
+    offers: string[],
+    terms: string[] 
 }

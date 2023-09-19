@@ -1,8 +1,8 @@
 import { iButtonProps } from "@/interfaces";
 
-const Button = ({text, variant} : iButtonProps) => {
+const Button = ({text, variant, className} : iButtonProps) => {
     return (
-        <button className={variant}>
+        <button className={[variant, className].join(' ')}>
             {text}
         </button>
     );
