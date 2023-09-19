@@ -8,7 +8,7 @@ const Services = () => {
     // console.log(styles)
     return (
         <>
-        <div className={styles.heroContainer}>
+        <section className={styles.heroContainer}>
             <div className={styles.heroContent}>
                 <div className={styles.heroTitle}>
                     AI oriented services on a cloud platform
@@ -46,13 +46,15 @@ const Services = () => {
                     </div>
                 </div>
             </div>
-        </div>
-        <h1>SERVICES</h1>
-        <section className={styles.servicesList}>
-            <ServiceCard title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
-            <ServiceCard title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
-            <ServiceCard title='Audio Moderation' description="Audio record moderation service" variant={ModerationType.audio} />
-            <ServiceCard title='Video Moderation' description="Video content moderation service" variant={ModerationType.video} />
+        </section>
+        <section>
+            <h1>SERVICES</h1>
+            <div className={styles.servicesList}>
+                <ServiceCard title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
+                <ServiceCard title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
+                <ServiceCard title='Audio Moderation' description="Audio record moderation service" variant={ModerationType.audio} />
+                <ServiceCard title='Video Moderation' description="Video content moderation service" variant={ModerationType.video} />
+            </div>
         </section>
         </>
     );
