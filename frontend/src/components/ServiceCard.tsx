@@ -78,5 +78,3 @@ const ServiceCard = memo(({title, description, variant, path} : iServiceCardProp
 });
 
 export default ServiceCard;
-
-//TODO: ADD LINKS
