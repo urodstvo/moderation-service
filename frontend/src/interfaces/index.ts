@@ -12,13 +12,14 @@ export enum ModerationType{
 
 export interface iButtonProps{
     text: string,
-    variant?: ColorVariant,
+    variant: ColorVariant,
     className?: string,
 }
 
 export interface iServiceCardProps{
     title: string,
     description?: string,
+    path: string,
     variant: ModerationType,
 }
 
@@ -27,4 +28,12 @@ export interface iPricingCardProps{
     price: string, 
     offers: string[],
     terms: string[] 
+}
+
+export interface iServicePageHeaderProps{
+    title: string,
+    description: string,
+    tab: "INFO" | "PLAYGROUND" | "INTEGRATION",
+    variant: ModerationType,
+
 }
