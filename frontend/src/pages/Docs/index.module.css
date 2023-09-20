@@ -1,5 +1,5 @@
 .sidebarContainer{
-    background: rgba(0, 0, 0, 0.01);
+    /* background: rgba(0, 0, 0, 0.01); */
 
     position: fixed;
     top: 50%;
@@ -11,7 +11,7 @@
     padding: 1rem;
 
     & > .sidebarContent{
-        background: rgba(0, 0, 0, 0.01);
+        /* background: rgba(0, 0, 0, 0.01); */
 
         width: 100%;
         height: 100%;

@@ -1,6 +1,8 @@
 import styles from "@/pages/Docs/index.module.css"
+import { memo } from "react";
 
-const index = () => {
+const index = memo(() => {
+    document.title = "DOCS PAGE | CLOUD"
     return (
         <>
         <div className={styles.sidebarContainer}>
@@ -34,6 +36,6 @@ const index = () => {
         </div>
         </>
     );
-};
+});
 
 export default index;

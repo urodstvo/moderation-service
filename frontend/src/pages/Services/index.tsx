@@ -50,10 +50,10 @@ const Services = () => {
         <section>
             <h2>SERVICES</h2>
             <div className={styles.servicesList}>
-                <ServiceCard title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
-                <ServiceCard title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
-                <ServiceCard title='Audio Moderation' description="Audio record moderation service" variant={ModerationType.audio} />
-                <ServiceCard title='Video Moderation' description="Video content moderation service" variant={ModerationType.video} />
+                <ServiceCard path="/services/text-moderation" title='Text Moderation' description="Text information moderation service" variant={ModerationType.text} />
+                <ServiceCard path="/services/image-moderation" title='Image Moderation' description="Image content moderation service" variant={ModerationType.image} />
+                <ServiceCard path="/services/audio-moderation" title='Audio Moderation' description="Audio record moderation service" variant={ModerationType.audio} />
+                <ServiceCard path="/services/video-moderation" title='Video Moderation' description="Video content moderation service" variant={ModerationType.video} />
             </div>
         </section>
         </>

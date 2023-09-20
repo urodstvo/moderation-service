@@ -9,7 +9,7 @@ import { routes } from '@/pages/index.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-      <BrowserRouter basename='/moderation-service'>
+      <BrowserRouter basename='/'>
       <Navbar />
       <main className="main-container">
         <div className="main-content">
