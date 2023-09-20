@@ -2,6 +2,7 @@ import Home from "@/pages/Home";
 import Services from "@/pages/Services";
 import Pricing from "@/pages/Pricing";
 import Docs from "@/pages/Docs";
+import TextModeration from "@/pages/TextModeration";
   
 export const routes = [
   {
@@ -24,6 +25,10 @@ export const routes = [
     element: <Docs />,
   },
 
+  {
+    path: '/services/text-moderation',
+    element: <TextModeration />,
+  },
 
   {
     path: '*',
