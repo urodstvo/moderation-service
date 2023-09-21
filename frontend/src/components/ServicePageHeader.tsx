@@ -66,9 +66,9 @@ const ServicePageHeader = ({title, description, tab, variant} : iServicePageHead
                         </div>
                         <div className="page-header-tabs-container">
                             <div className="page-header-tabs-content">
-                                <Link to='' className={["page-header-tab", tab === "INFO" ? "selected" : ""].join(' ')}>INFO</Link>
-                                <Link to='?playground' className={["page-header-tab", tab === "PLAYGROUND" ? "selected" : ""].join(' ')}>PLAYGROUND</Link>
-                                <Link to='?integration' className={["page-header-tab", tab === "INTEGRATION" ? "selected" : ""].join(' ')}>INTEGRATION</Link>
+                                <Link to='?tab=info' className={["page-header-tab", tab === "INFO" ? "selected" : ""].join(' ')}>INFO</Link>
+                                <Link to='?tab=playground' className={["page-header-tab", tab === "PLAYGROUND" ? "selected" : ""].join(' ')}>PLAYGROUND</Link>
+                                <Link to='?tab=integration' className={["page-header-tab", tab === "INTEGRATION" ? "selected" : ""].join(' ')}>INTEGRATION</Link>
                             </div>
                         </div>
                     </div>
