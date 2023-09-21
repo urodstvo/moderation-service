@@ -19,13 +19,17 @@ const index = () => {
     
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const tab = useMemo(() => searchParams.toString().slice(0, searchParams.toString().length-1).toUpperCase() as "INFO" | "PLAYGROUND" | "INTEGRATION", [searchParams]) || "INFO";    
+    const tab = useMemo(() => {
+        return searchParams.get("tab")?.toUpperCase() as "INFO" | "PLAYGROUND" | "INTEGRATION";
+    }, [searchParams]);    
+
+    // console.log(tab || "INFO")
 
     return (
         <>
-            <ServicePageHeader tab={tab} title="TEXT MODERATION" description={pageDescription} variant={ModerationType.text}/>
+            <ServicePageHeader tab={tab || "INFO"} title="TEXT MODERATION" description={pageDescription} variant={ModerationType.text}/>
             <ServicePageContentLayout>
-                {tab === "INFO" && (
+                {(tab === "INFO" || tab === undefined) && (
                     <>
                         <ServiceInfoCard 
                         icon={<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none"><path d="M128.7 150.7L103.3 125.6L103.6 125.3C120.541 106.471 133.199 84.1925 140.7 60H170V40H100V20H80V40H10V60H121.7C115 79.2 104.4 97.5 90 113.5C80.7 103.2 73 91.9 66.9 80H46.9C54.2 96.3 64.2 111.7 76.7 125.6L25.8 175.8L40 190L90 140L121.1 171.1L128.7 150.7ZM185 100H165L120 220H140L151.2 190H198.7L210 220H230L185 100ZM158.8 170L175 126.7L191.2 170H158.8Z" fill="black"/></svg>} 
