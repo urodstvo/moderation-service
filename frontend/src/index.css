@@ -606,7 +606,43 @@
         }
     }
 
+    .modal-container{
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, .75);
 
+        position: absolute;
+        top: 0; 
+        left: 0;
+        z-index: 100;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & > .modal-close{
+            cursor: pointer;
+
+            position: absolute;
+            top: 0;
+            right: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            & > svg{
+                width: 4rem;
+                height: 4rem;
+                opacity: 0.7;
+                fill: #fff;
+
+                &:hover{
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
 }
 
 @layer util{
