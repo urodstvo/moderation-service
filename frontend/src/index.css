@@ -611,7 +611,7 @@
         height: 100vh;
         background: rgba(0, 0, 0, .75);
 
-        position: absolute;
+        position: fixed;
         top: 0; 
         left: 0;
         z-index: 100;
@@ -624,8 +624,8 @@
             cursor: pointer;
 
             position: absolute;
-            top: 0;
-            right: 0;
+            top: 2rem;
+            right: 4rem;
 
             display: flex;
             justify-content: center;
@@ -641,6 +641,19 @@
                     opacity: 0.5;
                 }
             }
+        }
+    }
+
+    .signIn-container{
+        padding: 2rem;
+        background: #fff;
+
+        .signIn-content{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+
         }
     }
 }
