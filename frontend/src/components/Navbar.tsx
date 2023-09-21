@@ -1,6 +1,14 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 
 const Navbar = () => {
+    const [searchParams, SetSearchParams] = useSearchParams();
+    
+    const signIn = () => {
+        if (!searchParams.get('modal')){
+            SetSearchParams(prev => prev + "&modal=signIn")
+        }
+    }
+
     return (
         <nav className="navbar-container">
             <div className="navbar-content">
@@ -28,7 +36,9 @@ const Navbar = () => {
                     </div>
                 </div>
                 <div className="navbar-actions">
-                    <div className="navbar-action">
+                    <div className="navbar-action"
+                    onClick={signIn}
+                    >
                         <div className="signin-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                                 <path d="M6.66665 25H9.99998V33.3333H30V6.66667H9.99998V15H6.66665V5C6.66665 4.55797 6.84224 4.13405 7.1548 3.82149C7.46736 3.50893 7.89129 3.33333 8.33331 3.33333H31.6666C32.1087 3.33333 32.5326 3.50893 32.8452 3.82149C33.1577 4.13405 33.3333 4.55797 33.3333 5V35C33.3333 35.442 33.1577 35.866 32.8452 36.1785C32.5326 36.4911 32.1087 36.6667 31.6666 36.6667H8.33331C7.89129 36.6667 7.46736 36.4911 7.1548 36.1785C6.84224 35.866 6.66665 35.442 6.66665 35V25ZM16.6666 18.3333V13.3333L25 20L16.6666 26.6667V21.6667H3.33331V18.3333H16.6666Z" fill="black"/>
