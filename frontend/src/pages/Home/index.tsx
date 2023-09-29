@@ -20,7 +20,7 @@ const Home = () => {
                 </div>
 
                 <div className={styles.heroActions}>
-                    <Button text='GET STARTED' variant={ColorVariant.black}/>
+                    <Link to='?modal=signIn'><Button text='GET STARTED' variant={ColorVariant.black}/></Link>
                     <Link to='/services'><Button text='CHECK SERVICES' variant={ColorVariant.white} /></Link>
                 </div>
                 
