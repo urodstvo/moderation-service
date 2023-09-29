@@ -46,7 +46,7 @@ class SignUpRequest(BaseModel):
 
 
 class SignInRequest(BaseModel):
-    login: Union[str, EmailStr]
+    login: str
     password: str
 
 
