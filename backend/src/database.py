@@ -12,8 +12,8 @@ async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession
 
 async def getDB() -> Generator:
     """Dependency for getting async session"""
+    session: AsyncSession = async_session()
     try:
-        session: AsyncSession = async_session
         yield session
     finally:
         await session.close()
