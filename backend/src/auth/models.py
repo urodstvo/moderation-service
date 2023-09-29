@@ -1,5 +1,7 @@
 import datetime
 import uuid
+from typing import Union
+
 from pydantic import BaseModel, EmailStr
 
 from sqlalchemy.orm import declarative_base
@@ -19,6 +21,9 @@ class User(Base):
     registered_at = Column(TIMESTAMP, server_default=func.now())
     is_verified = Column(Boolean, default=False)
 
+    # TODO: add hash to password
+    # TODO: add role field
+
 
 class TunedModel(BaseModel):
     class Config:
@@ -26,7 +31,7 @@ class TunedModel(BaseModel):
         from_attributes = True
 
 
-class ShowUser(TunedModel):
+class GetUserResponse(TunedModel):
     user_id: uuid.UUID
     username: str
     email: EmailStr
@@ -34,7 +39,22 @@ class ShowUser(TunedModel):
     registered_at: datetime.datetime
 
 
-class CreateUser(BaseModel):
+class SignUpRequest(BaseModel):
     username: str
     email: EmailStr
     password: str
+
+
+class SignInRequest(BaseModel):
+    login: Union[str, EmailStr]
+    password: str
+
+
+class Token(BaseModel):
+    token: str
+    type: str
+
+
+class AuthResponse(BaseModel):
+    token: Token
+    user: GetUserResponse
