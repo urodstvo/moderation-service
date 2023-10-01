@@ -1,13 +1,33 @@
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { logOut } from "@/store/auth";
 import { NavLink, useSearchParams } from "react-router-dom";
 
 const Navbar = () => {
     const [searchParams, SetSearchParams] = useSearchParams();
+
+    const dispatch = useAppDispatch()
+    const auth = useAppSelector(state => state.auth)
     
-    const signIn = () => {
+    const openSignInModal = () => {
         if (!searchParams.get('modal')){
             SetSearchParams(prev => prev + "&modal=signIn")
         }
     }
+
+    const openSettingsModal = () => {
+        if (!searchParams.get('modal')){
+            SetSearchParams(prev => prev + "&modal=settings")
+        }
+    }
+
+    const openNotificationModal = () => {
+        if (!searchParams.get('modal')){
+            SetSearchParams(prev => prev + "&modal=notification")
+        }
+    }
+
+
+
 
     return (
         <nav className="navbar-container">
@@ -36,8 +56,31 @@ const Navbar = () => {
                     </div>
                 </div>
                 <div className="navbar-actions">
-                    <div className="navbar-action"
-                    onClick={signIn}
+                    {auth.isAuth ? (
+                    <>
+                    <div 
+                        className="navbar-action"
+                        onClick={openNotificationModal}
+                    >
+                        notification
+                    </div>
+                    <div 
+                        className="navbar-action"
+                        onClick={openSettingsModal}
+                    >
+                        settings
+                    </div>
+                    <div 
+                        className="navbar-action"
+                        onClick={() => dispatch(logOut())}
+                    >
+                        logout
+                    </div>
+                    </>
+                    ) : (
+                    <div 
+                        className="navbar-action"
+                        onClick={openSignInModal}
                     >
                         <div className="signin-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -45,6 +88,7 @@ const Navbar = () => {
                             </svg>
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
         </nav>
