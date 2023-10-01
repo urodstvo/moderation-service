@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.manager import UserManager
-from src.auth.models import GetUserResponse, SignUpRequest, AuthResponse, Token, SignInRequest
+from src.auth.models import SignUpRequest, AuthResponse, Token, SignInRequest
 from src.auth.util import JWT
 from src.database import getDB
 
