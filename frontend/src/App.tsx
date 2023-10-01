@@ -3,10 +3,18 @@ import { routes } from '@/pages/index.tsx'
 import Navbar from '@/components/Navbar.tsx'
 import Modal from './components/Modal';
 import SignInForm from './components/SignInForm';
+import { useEffect } from 'react';
+import { useAppDispatch } from './hooks';
+import { fetchDataFromStorage } from './store/auth';
 
 const App = () => {
     const [searchParams, SetSearchParams] = useSearchParams();
     const modal = searchParams.get('modal');
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        dispatch(fetchDataFromStorage());
+    }, [])
 
     return (
     <>
