@@ -1,6 +1,6 @@
 from typing import Union
 
-from sqlalchemy import select, or_, and_
+from sqlalchemy import select, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import User, GetUserResponse, SignUpRequest, SignInRequest
@@ -59,3 +59,10 @@ class UserManager:
                         is_verified=user.is_verified,
                         registered_at=user.registered_at
                     )
+
+    @staticmethod
+    async def verifyUser(email: str, db: AsyncSession) -> None:
+        async with db as session:
+            async with session.begin():
+                query = update(User).where(User.email == email).values(is_verified=True)
+                await db.execute(query)
