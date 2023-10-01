@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '@/store'
+
 
 enum AuthStatus{
     None="None",
@@ -56,8 +55,15 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logOut: () => {
-      localStorage.removeItem('authorization_token');
+      localStorage.removeItem('auth_data');
       return initialState
+    },
+    fetchDataFromStorage: () => {
+      const user = localStorage.getItem('auth_data');
+      if (user)
+            return JSON.parse(user);
+      else 
+            console.log("No Auth Data in local storage")
     }
   },
   extraReducers(builder) {
@@ -74,11 +80,11 @@ export const authSlice = createSlice({
         state.isAuth = true;
         state.user = payload.user
         state.token = payload.token.type + ' ' + payload.token.token
-        localStorage.setItem("authorization_token", state.token as string)
+        localStorage.setItem("auth_data", JSON.stringify(state))
       })
   },
 })
 
-export const { logOut } = authSlice.actions
+export const { logOut, fetchDataFromStorage } = authSlice.actions
 
 export default authSlice.reducer
