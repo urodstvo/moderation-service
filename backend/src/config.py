@@ -1,4 +1,5 @@
 import os
+import redis
 
 from dotenv import load_dotenv, find_dotenv
 from fastapi_mail import ConnectionConfig
@@ -19,3 +20,5 @@ EmailConfig = ConnectionConfig(
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True
 )
+
+redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
