@@ -3,18 +3,18 @@ import Button from "./ui/Button";
 import TextInput from "./ui/TextInput";
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { signIn } from "@/store/auth";
+import { AuthStatus, signIn, signUp } from "@/store/auth";
 
 const SignInForm = () => {
+    const dispatch = useAppDispatch()
+    const authState = useAppSelector(state => state.auth)
+
     const [isSignIn, SetIsSignIn] = useState<boolean>(true);
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [re_password, setRePassword] = useState<string>('');
 
-    const dispatch = useAppDispatch()
-    // const authState = useAppSelector(state => state.auth)
-    // console.log(authState)
 
     const swapForms = () => {
         SetIsSignIn(prev => !prev);    
@@ -27,13 +27,14 @@ const SignInForm = () => {
 
     const signUpHandler = async (e : FormEvent) => {
         e.preventDefault();
-        // await dispatch(signIn({username, password}))
+        await dispatch(signUp({email, username, password}))
     }
 
     return (
         <>
         {isSignIn ? (
         <div className="auth-container">
+            {authState.status === AuthStatus.Loading && "Loading..."}
             <div className="form-switcher"><span onClick={swapForms}>Sign Up →</span></div>
             <form className="auth-content">
                 <TextInput 
@@ -58,6 +59,7 @@ const SignInForm = () => {
         </div>
         ) : (
         <div className="auth-container">
+            {authState.status === AuthStatus.Loading && "Loading..."}
             <div className="form-switcher"><span onClick={swapForms}>Sign In →</span></div>
             <form className="auth-content">
                 <TextInput 

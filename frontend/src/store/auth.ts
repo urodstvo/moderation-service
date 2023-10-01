@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 
-enum AuthStatus{
+export enum AuthStatus{
     None="None",
     Loading="Loading",
     Error="Error",
@@ -50,6 +50,30 @@ export const signIn = createAsyncThunk(
     }
 )
 
+export const signUp = createAsyncThunk(
+  'signUp',
+  async ({email, username, password}: {email: string, username: string, password: string}, thunkAPI) => {
+      const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          body: JSON.stringify(
+              { 
+                email,
+                username,
+                password
+              }
+          )
+      })
+      if (response.ok)
+            return response.json();
+      else 
+            thunkAPI.rejectWithValue("error");
+    }
+)
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -76,6 +100,22 @@ export const authSlice = createSlice({
         state.isAuth = false;
       }),
       builder.addCase(signIn.fulfilled, (state, {payload}) => {
+        state.status = AuthStatus.Success;
+        state.isAuth = true;
+        state.user = payload.user
+        state.token = payload.token.type + ' ' + payload.token.token
+        localStorage.setItem("auth_data", JSON.stringify(state))
+      })
+
+      builder.addCase(signUp.pending, (state) => {
+        state.status = AuthStatus.Loading;
+        state.isAuth = false;
+      }),
+      builder.addCase(signUp.rejected, (state) => {
+        state.status = AuthStatus.Error;
+        state.isAuth = false;
+      }),
+      builder.addCase(signUp.fulfilled, (state, {payload}) => {
         state.status = AuthStatus.Success;
         state.isAuth = true;
         state.user = payload.user
