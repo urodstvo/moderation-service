@@ -5,5 +5,6 @@ class EmailRequest(BaseModel):
     email: EmailStr
 
 
-class VerificationCode(BaseModel):
+class VerificationData(BaseModel):
     code: str
+    email: EmailStr
