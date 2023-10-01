@@ -1,3 +1,5 @@
+import { MouseEventHandler } from "react"
+
 export enum ColorVariant{
     black='black',
     white='white'
@@ -14,6 +16,7 @@ export interface iButtonProps{
     text: string,
     variant: ColorVariant,
     className?: string,
+    onClick: MouseEventHandler
 }
 
 export interface iServiceCardProps{
