@@ -6,6 +6,7 @@ import SignInForm from './components/SignInForm';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { fetchDataFromStorage } from './store/auth';
+import SettingsForm from './components/SettingsForm';
 
 const App = () => {
     const [searchParams, SetSearchParams] = useSearchParams();
@@ -20,6 +21,9 @@ const App = () => {
         if (!!searchParams.get('modal'))
             if (searchParams.get('modal') === "signIn")
                 return isAuth ? SetSearchParams(prev => prev.toString().replace("modal=signIn", '')) : (<Modal><SignInForm /></Modal>);
+            
+            else if (isAuth && searchParams.get('modal') === "settings")
+                return (<Modal><SettingsForm /></Modal>);
     }
 
     return (
