@@ -1,24 +1,29 @@
-import { ColorVariant } from "@/interfaces";
-import Button from "./ui/Button";
-import TextInput from "./ui/TextInput";
+import { AuthStatus, ColorVariant } from "@/interfaces";
+import Button from "@/components/ui/Button";
+import TextInput from "@/components/ui/TextInput";
+import PasswordInput from "@/components/ui/PasswordInput";
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { AuthStatus, signIn, signUp } from "@/store/auth";
+import { signIn, signUp } from "@/store/auth";
+import CheckBoxInput from "./ui/CheckBoxInput";
 
 const SignInForm = () => {
     const dispatch = useAppDispatch()
     const authState = useAppSelector(state => state.auth)
 
-    const [isSignIn, SetIsSignIn] = useState<boolean>(true);
+    const [isSignIn, setIsSignIn] = useState<boolean>(true);
+    const [showPassword, setShowPassword] = useState<boolean>(true);
+
+
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [re_password, setRePassword] = useState<string>('');
 
+    // TODO: add validate inputs
 
-    const swapForms = () => {
-        SetIsSignIn(prev => !prev);    
-    }
+
+    const swapForms = () => {setIsSignIn(prev => !prev); }
 
     const signInHandler = async (e : FormEvent) => {
         e.preventDefault();
@@ -30,6 +35,7 @@ const SignInForm = () => {
         await dispatch(signUp({email, username, password}))
     }
 
+
     return (
         <>
         {isSignIn ? (
@@ -38,16 +44,26 @@ const SignInForm = () => {
             <div className="form-switcher"><span onClick={swapForms}>Sign Up →</span></div>
             <form className="auth-content">
                 <TextInput 
-                    name="login" 
-                    placeholder="LOGIN" 
-                    onChange={setUsername}
+                    placeholder="USERNAME | EMAIL" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
 
-                <TextInput 
-                    name="password" 
+                <PasswordInput  
                     placeholder="PASSWORD" 
-                    onChange={setPassword}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isShown={showPassword}
                 />
+
+                <div className="auth-show-password">
+                    <label>Show Password</label>
+                    <CheckBoxInput 
+                        onChange={() => {setShowPassword(prev => !prev)}}
+                        checked={showPassword}
+                    /> 
+                </div>
+
 
                 <Button 
                     className="fill-container" 
@@ -63,28 +79,37 @@ const SignInForm = () => {
             <div className="form-switcher"><span onClick={swapForms}>Sign In →</span></div>
             <form className="auth-content">
                 <TextInput 
-                    name="email" 
                     placeholder="EMAIL" 
-                    onChange={setEmail}
+                    value={email}
+                    onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
                 />
 
-                <TextInput                 
-                    name="username" 
+                <TextInput            
                     placeholder="USERNAME" 
-                    onChange={setUsername}
+                    value={username}
+                    onChange={(e) => setUsername((e.target as HTMLInputElement).value)}
                 />
 
-                <TextInput 
-                    name="password" 
+                <PasswordInput 
                     placeholder="PASSWORD" 
-                    onChange={setPassword}
+                    value={password}
+                    onChange={(e) => setPassword((e.target as HTMLInputElement).value)}
+                    isShown={showPassword}
                 />
 
-                <TextInput 
-                    name="re_password" 
+                <PasswordInput 
                     placeholder="REPEAT PASSWORD" 
-                    onChange={setRePassword}
+                    value={re_password}
+                    onChange={(e) => setRePassword((e.target as HTMLInputElement).value)}
                 />
+
+                <div className="auth-show-password">
+                    <label>Show Password</label>
+                    <CheckBoxInput 
+                        onChange={() => {setShowPassword(prev => !prev)}}
+                        checked={showPassword}
+                    /> 
+                </div>
 
                 <Button 
                     className="fill-container" 

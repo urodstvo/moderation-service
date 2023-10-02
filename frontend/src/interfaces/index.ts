@@ -1,4 +1,4 @@
-import { MouseEventHandler } from "react"
+import { ChangeEventHandler, MouseEventHandler } from "react"
 
 export enum ColorVariant{
     black='black',
@@ -60,4 +60,20 @@ export interface iAuthState {
         registered_at: Date,
         is_verified: boolean
     }
+}
+
+export interface iTextInputProps{
+    value: string,
+    placeholder?: string, 
+    onChange: ChangeEventHandler<HTMLInputElement>,
+    disabled? : boolean
+}
+
+export interface iPasswordInputProps extends iTextInputProps{
+    isShown?: boolean
+}
+
+export interface iCheckBoxProps{
+    checked?: boolean,
+    onChange: ChangeEventHandler<HTMLInputElement>
 }
