@@ -1,25 +1,9 @@
+import { AuthStatus, iAuthState } from '@/interfaces';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 
-export enum AuthStatus{
-    None="None",
-    Loading="Loading",
-    Error="Error",
-    Success="Success",
-    
-}
-interface iAuthState {
-    status: AuthStatus,
-    isAuth: boolean,
-    token?: string,
-    user?:{
-        id: string,
-        username: string,
-        email: string,
-        registered_at: Date,
-        is_verified: boolean
-    }
-}
+
+
 
 // Define the initial state using that type
 const initialState: iAuthState = {

@@ -16,16 +16,15 @@ const App = () => {
         dispatch(fetchDataFromStorage());
     }, [])
 
-    const signInModal = () => {
+    const openModal = () => {
         if (!!searchParams.get('modal'))
-            if (!isAuth)
-                return (<Modal><SignInForm /></Modal>)
-            else SetSearchParams(prev => prev.toString().replace("modal=signIn", ''));
+            if (searchParams.get('modal') === "signIn")
+                return isAuth ? SetSearchParams(prev => prev.toString().replace("modal=signIn", '')) : (<Modal><SignInForm /></Modal>);
     }
 
     return (
     <>
-    {signInModal()}
+    {openModal()}
     <Navbar />
     <main className="main-container">
         <div className="main-content">

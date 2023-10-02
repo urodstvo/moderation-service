@@ -40,3 +40,24 @@ export interface iServicePageHeaderProps{
     variant: ModerationType,
 
 }
+
+export enum AuthStatus{
+    None="None",
+    Loading="Loading",
+    Error="Error",
+    Success="Success",
+    
+}
+
+export interface iAuthState {
+    status: AuthStatus,
+    isAuth: boolean,
+    token?: string,
+    user?:{
+        id: string,
+        username: string,
+        email: string,
+        registered_at: Date,
+        is_verified: boolean
+    }
+}
