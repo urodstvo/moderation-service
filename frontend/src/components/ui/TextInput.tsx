@@ -1,18 +1,13 @@
-import { ChangeEventHandler } from "react";
+import { iTextInputProps } from "@/interfaces";
 
-const TextInput = ({placeholder, validated = false, name, onChange} : {name: string, placeholder: string, validated?: boolean, onChange: Function}) => {
+const TextInput = ({placeholder = '', disabled = false, value, onChange} : iTextInputProps) => {
     return (
-        <>
         <div className="input-container">
             <div className="input-content">
-                <input type="text" placeholder=" " required name={name} onChange={(e) : ChangeEventHandler => onChange(e.target.value)}/>
-                <div className="input-placeholder" placeholder={placeholder}></div>
+                <input type="text" placeholder=" " value={value} onChange={onChange} disabled={disabled}/>
+                <div className="input-placeholder" placeholder={placeholder} />
             </div>
-            {validated && <div className="input-validation-text">
-                validate info like as A-Z, a-z, 0-9, _+*- and maybe e.t.c.
-            </div> }
         </div>
-        </>
     );
 };
 
