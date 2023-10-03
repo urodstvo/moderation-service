@@ -12,7 +12,7 @@ auth_router = APIRouter()
 @auth_router.post('/signup', response_model=AuthResponse)
 async def signUp(data: SignUpRequest, db: AsyncSession = Depends(getDB)):
     user = await UserManager.createUser(data, db)
-    token = JWT.generate_token({"username": user.username, "id": user.user_id.hex})
+    token = JWT.generate_token({"exp": "date", "username": user.username})
     return AuthResponse(
         user=user,
         token=Token(token=token, type="Bearer")

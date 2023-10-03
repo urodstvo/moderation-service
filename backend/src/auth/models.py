@@ -4,11 +4,9 @@ import uuid
 
 from pydantic import BaseModel, EmailStr
 
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Boolean, String, func, Integer, ForeignKey, event
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP, ENUM
-
-Base = declarative_base()
+from sqlalchemy import Column, Boolean, String, func, Integer, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from src.database import Base
 
 
 class RolesEnum(enum.Enum):
@@ -18,7 +16,7 @@ class RolesEnum(enum.Enum):
     admin: str = "admin"
 
 
-class Roles(Base):
+class Role(Base):
     __tablename__ = "roles"
 
     role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -34,7 +32,7 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     registered_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
-    role = Column(ForeignKey("roles.name"), default='user')
+    role = Column(ForeignKey("roles.name", ondelete="SET DEFAULT"), default='user')
 
     # TODO: add hash to password
 

@@ -59,4 +59,4 @@ async def emailVerification(
             detail="Wrong code"
         )
 
-# TODO: check if authorization token valid for input email
+# TODO: delete email field from request. Get user from token
