@@ -1,10 +1,6 @@
 import { AuthStatus, iAuthState } from '@/interfaces';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-
-
-
-
 // Define the initial state using that type
 const initialState: iAuthState = {
   status: AuthStatus.None,
@@ -58,6 +54,46 @@ export const signUp = createAsyncThunk(
     }
 )
 
+export const sendVerificationCode = async ({email, token}: {email: string, token: string}) => {
+      await fetch("http://127.0.0.1:8000/email/request", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: token
+            },
+          body: JSON.stringify(
+              {
+                  email
+              }
+          )
+      })
+    }
+
+export const verifyEmail = createAsyncThunk(
+  'verifyEmail',
+  async ({code, email, token}: {code: string, email: string, token: string}, thunkAPI) => {
+      const response = await fetch("http://127.0.0.1:8000/email/verify", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: token
+            },
+          body: JSON.stringify(
+              { 
+                code,
+                email
+              }
+          )
+      })
+      if (response.ok)
+            return "ok";
+      else 
+            thunkAPI.rejectWithValue("error");
+    }
+)
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -80,8 +116,8 @@ export const authSlice = createSlice({
         state.isAuth = false;
       }),
       builder.addCase(signIn.rejected, (state) => {
+        logOut();
         state.status = AuthStatus.Error;
-        state.isAuth = false;
       }),
       builder.addCase(signIn.fulfilled, (state, {payload}) => {
         state.status = AuthStatus.Success;
@@ -96,14 +132,27 @@ export const authSlice = createSlice({
         state.isAuth = false;
       }),
       builder.addCase(signUp.rejected, (state) => {
+        logOut()
         state.status = AuthStatus.Error;
-        state.isAuth = false;
       }),
       builder.addCase(signUp.fulfilled, (state, {payload}) => {
         state.status = AuthStatus.Success;
         state.isAuth = true;
         state.user = payload.user
         state.token = payload.token.type + ' ' + payload.token.token
+        localStorage.setItem("auth_data", JSON.stringify(state))
+      }),
+
+      builder.addCase(verifyEmail.pending, (state) => {
+        state.status = AuthStatus.Loading;
+      }),
+      builder.addCase(verifyEmail.rejected, (state) => {
+        logOut()
+        state.status = AuthStatus.Error;
+      }),
+      builder.addCase(verifyEmail.fulfilled, (state) => {
+        state.status = AuthStatus.Success;
+        state.user!.is_verified = true
         localStorage.setItem("auth_data", JSON.stringify(state))
       })
   },
