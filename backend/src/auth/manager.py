@@ -21,7 +21,8 @@ class UserManager:
                     username=user.username,
                     email=user.email,
                     is_verified=user.is_verified,
-                    registered_at=user.registered_at
+                    registered_at=user.registered_at,
+                    role=user.role
                 )
 
     @staticmethod
@@ -40,7 +41,8 @@ class UserManager:
                         username=user.username,
                         email=user.email,
                         is_verified=user.is_verified,
-                        registered_at=user.registered_at
+                        registered_at=user.registered_at,
+                        role=user.role
                     )
 
     @staticmethod
@@ -57,7 +59,8 @@ class UserManager:
                         username=user.username,
                         email=user.email,
                         is_verified=user.is_verified,
-                        registered_at=user.registered_at
+                        registered_at=user.registered_at,
+                        role=user.role
                     )
 
     @staticmethod

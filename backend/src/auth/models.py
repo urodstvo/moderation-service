@@ -1,27 +1,42 @@
 import datetime
+import enum
 import uuid
 
 from pydantic import BaseModel, EmailStr
 
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Boolean, String, func
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from sqlalchemy import Column, Boolean, String, func, Integer, ForeignKey, event
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP, ENUM
 
 Base = declarative_base()
+
+
+class RolesEnum(enum.Enum):
+    user: str = "user"
+    student: str = "student"
+    company: str = "company"
+    admin: str = "admin"
+
+
+class Roles(Base):
+    __tablename__ = "roles"
+
+    role_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    name = Column(String, primary_key=True, nullable=False, unique=True)
 
 
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
-    registered_at = Column(TIMESTAMP, server_default=func.now())
-    is_verified = Column(Boolean, default=False)
+    registered_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
+    role = Column(ForeignKey("roles.name"), default='user')
 
     # TODO: add hash to password
-    # TODO: add role field
 
 
 class TunedModel(BaseModel):
@@ -36,6 +51,7 @@ class GetUserResponse(TunedModel):
     email: EmailStr
     is_verified: bool
     registered_at: datetime.datetime
+    role: str
 
 
 class SignUpRequest(BaseModel):
