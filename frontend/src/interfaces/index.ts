@@ -25,6 +25,7 @@ export interface iServiceCardProps{
     description?: string,
     path: string,
     variant: ModerationType,
+    disabled?: boolean
 }
 
 export interface iPricingCardProps{

@@ -824,7 +824,7 @@
         height: 70vh;
 
         background-color: #fff;
-        padding: 2rem;
+        padding: 8rem 4rem;
 
         & > .settings-content{
             display: flex;

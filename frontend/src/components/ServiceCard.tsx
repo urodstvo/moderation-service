@@ -2,7 +2,7 @@ import { ModerationType, iServiceCardProps } from "@/interfaces";
 import { memo } from "react";
 import { Link } from "react-router-dom";
 
-const ServiceCard = memo(({title, description, variant, path} : iServiceCardProps) => {
+const ServiceCard = memo(({title, description, variant, path, disabled = false} : iServiceCardProps) => {
 
     let icon;
     switch (variant){
@@ -67,9 +67,15 @@ const ServiceCard = memo(({title, description, variant, path} : iServiceCardProp
                         </div>
                     </div>
                     <div className="service-card-links">
+                    {!disabled ? (
+                        <>
                         <Link to={path + "?tab=playground"} className="service-card-link">Playground</Link>
                         <Link to={path + "?tab=info"}  className="service-card-link">Info</Link>
                         <Link to={path + "?tab=integration"}  className="service-card-link">Get API Key</Link>
+                        </>
+                    ) : (
+                        <div className="service-card-link">Coming Soon</div>
+                    )}
                     </div>
                 </div>
             </div>
