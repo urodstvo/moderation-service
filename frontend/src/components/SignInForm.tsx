@@ -12,7 +12,7 @@ const SignInForm = () => {
     const authState = useAppSelector(state => state.auth)
 
     const [isSignIn, setIsSignIn] = useState<boolean>(true);
-    const [showPassword, setShowPassword] = useState<boolean>(true);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
 
     const [username, setUsername] = useState<string>('');
@@ -126,3 +126,5 @@ const SignInForm = () => {
 };
 
 export default SignInForm;
+
+// TODO: Error handler

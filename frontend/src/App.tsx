@@ -24,6 +24,9 @@ const App = () => {
             
             else if (isAuth && searchParams.get('modal') === "settings")
                 return (<Modal><SettingsForm /></Modal>);
+
+                else if (isAuth && searchParams.get('modal') === "notification")
+                return (<Modal><div /></Modal>);
     }
 
     return (
