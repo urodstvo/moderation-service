@@ -14,8 +14,9 @@ export enum ModerationType{
 
 export interface iButtonProps{
     text: string,
-    variant: ColorVariant,
+    variant?: ColorVariant,
     className?: string,
+    disabled?: boolean,
     onClick: MouseEventHandler
 }
 
@@ -63,9 +64,10 @@ export interface iAuthState {
 }
 
 export interface iTextInputProps{
-    value: string,
+    className?: string,
+    value?: string,
     placeholder?: string, 
-    onChange: ChangeEventHandler<HTMLInputElement>,
+    onChange?: ChangeEventHandler<HTMLInputElement>,
     disabled? : boolean
 }
 
@@ -75,5 +77,12 @@ export interface iPasswordInputProps extends iTextInputProps{
 
 export interface iCheckBoxProps{
     checked?: boolean,
-    onChange: ChangeEventHandler<HTMLInputElement>
+    disabled?: boolean,
+    onChange?: ChangeEventHandler<HTMLInputElement>
+}
+
+export interface iTimerProps{
+    seconds: number, 
+    className?: string,
+    callback?: () => void
 }
