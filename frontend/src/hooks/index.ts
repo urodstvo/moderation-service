@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux'
 import type { TypedUseSelectorHook } from 'react-redux'
 import type { RootState, AppDispatch } from '@/store'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react'
+import { iTextInputProps } from '@/interfaces'
 
 
 export const useAppDispatch: () => AppDispatch = useDispatch
@@ -19,5 +20,22 @@ export const useCountDown = (seconds : number) => {
     }, []);
   
     return countDown;
+}
+
+export const useTextInputProps = (props : Omit<iTextInputProps, "onChange" | "value">) : iTextInputProps => {
+  const {placeholder, disabled, className, isHidden} = props
+  const [value, setValue] = useState<string>('');
+  const handleChange : ChangeEventHandler = (e: ChangeEvent) => setValue((e.target as HTMLInputElement).value);
+
+  const inputProps : iTextInputProps =  {
+    className: className || '',
+    value: value,
+    placeholder: placeholder || '',
+    onChange: handleChange,
+    disabled: disabled || false,
+    isHidden: isHidden || false
+  }
+
+  return inputProps
 }
 

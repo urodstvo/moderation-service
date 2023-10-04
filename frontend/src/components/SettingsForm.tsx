@@ -1,41 +1,43 @@
-import { useAppDispatch, useAppSelector } from "@/hooks";
-import TextInput from "@/components/ui/TextInput";
+import { useAppDispatch, useAppSelector, useTextInputProps } from "@/hooks";
 import CheckBoxInput from "@/components/ui/CheckBoxInput";
+import TextInput from "@/components/ui/TextInput";
 import Button from "@/components/ui/Button";
+import Timer from "@/components/Timer";
 import { ColorVariant } from "@/interfaces";
 import { useEffect, useRef, useState } from "react";
-import Timer from "@/components/Timer";
 import { sendVerificationCode, verifyEmail } from "@/store/auth";
 
 const SettingsForm = () => {
     const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
     const [isChanged, setIsChanged] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
     const codeElement = useRef<HTMLDivElement>(null);
-    const { token, user } = useAppSelector(state => state.auth);
+
+    const auth = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch()
 
-    const onClick = () => {
-        {if (isVerifying) {
+    const verificationHandler = () => {
+        if (isVerifying) {
             const element = codeElement.current as HTMLDivElement
             const inputs = [...element.querySelectorAll('input')]
+            
             const code = inputs.map(el => el.value).join('')
+            
             dispatch(verifyEmail({
-                                    email: user?.email as string,
+                                    email: auth.user!.email,
                                     code: code,
-                                    token: token as string 
+                                    token: auth.token! 
                                 })
                     )
             setIsVerifying(false);
-        }}
+        }
     }
 
     useEffect(() => {
         if (isVerifying){
             const code = codeElement.current as HTMLDivElement
             const inputs = [...code.querySelectorAll('input')]
-
-            inputs.forEach(el => el.disabled = false)
 
             const backSpaceHandler = (e: KeyboardEvent) => {
                 const target = e.target as HTMLInputElement
@@ -62,9 +64,8 @@ const SettingsForm = () => {
                 }
             
                 inputs.forEach((el)=>{
-                el.disabled = false;
-                el.addEventListener('keydown', backSpaceHandler);
-                el.addEventListener('input', inputHandler)
+                    el.addEventListener('keydown', backSpaceHandler);
+                    el.addEventListener('input', inputHandler)
                 })
 
                 return () => {
@@ -76,44 +77,41 @@ const SettingsForm = () => {
             }
     }, [isVerifying])
 
+    const sendMail = () => {
+        setIsVerifying(true); 
+        sendVerificationCode({email: auth.user!.email, token: auth.token!});
+    }
+
+    const timerCallback = () => {
+        setIsVerifying(false); 
+        setError(true);
+    }
+
+
+    const username = useTextInputProps({placeholder: "USERNAME", className: "flex-1", disabled: true});
+    const email = useTextInputProps({placeholder: "EMAIL", className: "flex-1", disabled: true});
+
     return (
+        <>
+        {!!auth.user && (
         <div className="settings-container">
             <div className="settings-content">
                 <div className="settings-username">
-                    <TextInput 
-                        className="flex-1"
-                        placeholder="USERNAME"
-                        value={user?.username} 
-                        disabled
-                    />
+                    <TextInput {...username} value={auth.user.username}/>
                 </div>
 
                 <div className="settings-email">
-                    <TextInput 
-                        className="flex-1"
-                        placeholder="EMAIL"
-                        value={user?.email} 
-                        disabled
-                    />
-
-                    <CheckBoxInput 
-                        checked={user?.is_verified}
-                        disabled
-                    />
+                    <TextInput {...email} value={auth.user.email} />
+                    <CheckBoxInput checked={auth.user.is_verified} disabled />
                 </div>
 
                 <div className="settings-verification">
-                    {user?.is_verified ? "Email Verified" : (
+                    {auth.user.is_verified ? "Email Verified" : (
                         <>
                         {!isVerifying ? (
                             <>
                             <div className="verification-info">
-                                <div 
-                                    className="verification-action" 
-                                    onClick={() => {setIsVerifying(true); sendVerificationCode({email: user!.email as string, token: token as string})}}
-                                >
-                                    Verify Email
-                                </div>
+                                <div className="verification-action" onClick={sendMail}> Verify Email </div>
                                 <div>Email Is Not Verified</div>
                             </div>
                             {error && <div className="verification-error" onClick={() => setError(false)}>Sorry, you didn't have time to enter the code. Try again.</div>}
@@ -125,7 +123,7 @@ const SettingsForm = () => {
                                 <Timer
                                     className="verification-timer"
                                     seconds={60}
-                                    callback={() => {setIsVerifying(false); setError(true)}}
+                                    callback={timerCallback}
                                 />
                             </div>
                             <div className="verification-code" ref={codeElement}>
@@ -145,10 +143,11 @@ const SettingsForm = () => {
                 className="width-100"
                 text={isVerifying ? "VERIFY" : "SAVE"}
                 variant={ColorVariant.black}
-                onClick={() => onClick()}
+                onClick={verificationHandler}
                 disabled={!isChanged && !isVerifying}
             />
-        </div>
+        </div>)}
+        </>
     );
 };
 

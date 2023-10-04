@@ -17,7 +17,7 @@ export interface iButtonProps{
     variant?: ColorVariant,
     className?: string,
     disabled?: boolean,
-    onClick: MouseEventHandler
+    onClick?: MouseEventHandler
 }
 
 export interface iServiceCardProps{
@@ -51,6 +51,13 @@ export enum AuthStatus{
     
 }
 
+export enum RoleEnum{
+    User = "user",
+    Student = "student",
+    Company = "company",
+    Admin = "admin"
+}
+
 export interface iAuthState {
     status: AuthStatus,
     isAuth: boolean,
@@ -60,20 +67,18 @@ export interface iAuthState {
         username: string,
         email: string,
         registered_at: Date,
-        is_verified: boolean
+        is_verified: boolean,
+        // role: RoleEnum
     }
 }
 
 export interface iTextInputProps{
     className?: string,
-    value?: string,
+    value: string,
     placeholder?: string, 
-    onChange?: ChangeEventHandler<HTMLInputElement>,
-    disabled? : boolean
-}
-
-export interface iPasswordInputProps extends iTextInputProps{
-    isShown?: boolean
+    onChange: ChangeEventHandler<HTMLInputElement> | undefined,
+    disabled? : boolean,
+    isHidden? : boolean
 }
 
 export interface iCheckBoxProps{
