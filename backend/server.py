@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src.auth.router import auth_router
 from src.email.router import email_router
+from src.moderation.router import mod_router
 
 app = FastAPI(title="MODERATION SERVICE")
 
@@ -25,6 +26,12 @@ app.include_router(
     email_router,
     prefix="/email",
     tags=["Email"],
+)
+
+app.include_router(
+    mod_router,
+    prefix="/moderation",
+    tags=["Moderation"],
 )
 
 if __name__ == "__main__":

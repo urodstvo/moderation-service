@@ -29,31 +29,9 @@ class TunedModel(BaseModel):
         from_attributes = True
 
 
-class GetUserResponse(TunedModel):
-    user_id: uuid.UUID
-    username: str
-    email: EmailStr
-    is_verified: bool
-    registered_at: datetime.datetime
-    role: str
+class TextModerationRequest(BaseModel):
+    text: str
 
 
-class SignUpRequest(BaseModel):
-    username: str
-    email: EmailStr
-    password: str
 
 
-class SignInRequest(BaseModel):
-    login: str
-    password: str
-
-
-class Token(BaseModel):
-    token: str
-    type: str
-
-
-class AuthResponse(BaseModel):
-    token: Token
-    user: GetUserResponse

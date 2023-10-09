@@ -68,6 +68,6 @@ class Token(BaseModel):
     type: str
 
 
-class AuthResponse(BaseModel):
+class AuthResponse(TunedModel):
     token: Token
     user: GetUserResponse
