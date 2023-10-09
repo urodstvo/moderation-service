@@ -17,8 +17,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from src.database import Base
-from src.auth.models import Role, User
-from src.moderation.models import TextModeration
+from src.models import *
 target_metadata = Base.metadata
 # target_metadata = authBase.metadata
 # other values from the config, defined by the needs of env.py,

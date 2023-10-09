@@ -4,7 +4,7 @@ import uuid
 
 from pydantic import BaseModel, EmailStr
 
-from sqlalchemy import Column, Boolean, String, func, Integer, ForeignKey
+from sqlalchemy import Column, Boolean, String, func, Integer, ForeignKey, INTEGER
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from src.database import Base
 
@@ -35,6 +35,20 @@ class User(Base):
     role = Column(ForeignKey("roles.name", ondelete="SET DEFAULT"), default='user')
 
     # TODO: add hash to password
+
+
+class ModerationTable:
+    """Table for moderation service stats"""
+    request_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(ForeignKey("users.user_id", ondelete="SET NULL"), nullable=False)
+    requested_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+
+
+class TextModeration(Base, ModerationTable):
+    """table for text moderation statistic"""
+    __tablename__ = "text_moderation"
+
+    text = Column(String, nullable=False)
 
 
 class TunedModel(BaseModel):
@@ -71,3 +85,17 @@ class Token(BaseModel):
 class AuthResponse(TunedModel):
     token: Token
     user: GetUserResponse
+
+
+class EmailRequest(BaseModel):
+    email: EmailStr
+
+
+class VerificationData(BaseModel):
+    code: str
+    email: EmailStr
+
+
+class TextModerationRequest(BaseModel):
+    text: str
+

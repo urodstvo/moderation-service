@@ -1,23 +1,25 @@
+import { useEffect, useMemo } from 'react';
 import { Route, Routes, useSearchParams } from 'react-router-dom'
-import { routes } from '@/pages/index.tsx'
+import { admin_routes, public_routes } from '@/pages/index.tsx'
 import Navbar from '@/components/Navbar.tsx'
 import Modal from './components/Modal';
 import SignInForm from './components/SignInForm';
-import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { fetchDataFromStorage } from './store/auth';
 import SettingsForm from './components/SettingsForm';
+import { RoleEnum } from './interfaces';
 
 const App = () => {
     const [searchParams, SetSearchParams] = useSearchParams();
     const dispatch = useAppDispatch()
-    const { isAuth } = useAppSelector(state => state.auth)
+    const isAuth = useAppSelector(state => state.auth.isAuth)
+    const role = useAppSelector(state => state.auth.user?.role)
 
     useEffect(() => {
         dispatch(fetchDataFromStorage());
     }, [])
 
-    const openModal = () => {
+    const openModal = useMemo(() => {
         if (!!searchParams.get('modal'))
             if (searchParams.get('modal') === "signIn")
                 return isAuth ? SetSearchParams(prev => prev.toString().replace("modal=signIn", '')) : (<Modal><SignInForm /></Modal>);
@@ -27,16 +29,17 @@ const App = () => {
 
             else if (isAuth && searchParams.get('modal') === "notification")
                 return (<Modal><div /></Modal>);
-    }
+    }, [searchParams]);
 
     return (
     <>
-    {openModal()}
+    {openModal}
     <Navbar />
     <main className="main-container">
         <div className="main-content">
             <Routes>
-                {routes.map((route, ind) => <Route key={ind} path={route.path} element={route.element}/>)}
+                {public_routes.map((route, ind) => <Route key={ind} path={route.path} element={route.element}/>)}
+                {admin_routes.map((route, ind) => <Route key={ind + public_routes.length} path={route.path} element={route.element}/>)}
             </Routes>
         </div>
     </main>

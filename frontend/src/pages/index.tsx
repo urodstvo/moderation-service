@@ -3,8 +3,9 @@ import Services from "@/pages/Services";
 import Pricing from "@/pages/Pricing";
 import Docs from "@/pages/Docs";
 import TextModeration from "@/pages/TextModeration";
+import Admin from "@/pages/Admin";
   
-export const routes = [
+export const public_routes = [
   {
     path: '/',
     element: <Home />,
@@ -34,6 +35,13 @@ export const routes = [
     path: '*',
     element: <div> 404 </div>,
   }
+]
+
+export const admin_routes = [  
+  {
+    path: '/admin/dashboard',
+    element: <Admin />,
+  },
 ]
 
 

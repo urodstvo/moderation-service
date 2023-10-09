@@ -3,7 +3,7 @@ from typing import Union
 from sqlalchemy import select, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.models import User, GetUserResponse, SignUpRequest, SignInRequest
+from src.models import User, GetUserResponse, SignUpRequest, SignInRequest
 
 
 class UserManager:

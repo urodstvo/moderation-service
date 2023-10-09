@@ -68,7 +68,7 @@ export interface iAuthState {
         email: string,
         registered_at: Date,
         is_verified: boolean,
-        // role: RoleEnum
+        role: RoleEnum
     }
 }
 
