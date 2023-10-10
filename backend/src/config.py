@@ -8,6 +8,7 @@ load_dotenv(find_dotenv())
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_LIVETIME = os.getenv("JWT_LIVETIME")
 
 EmailConfig = ConnectionConfig(
     MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
