@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 
 from src.database import getDB
 from src.manager import UserManager, ModerationManager
-from src.util import JWT, Email, Redis, text_model
+from src.util import JWT, Email, Redis, text_model, checkAuthorizationToken
 from src.models import SignUpRequest, AuthResponse, Token, SignInRequest, TextModerationRequest, PredictResponse, \
     ModerationData, TextModeration, RolesEnum
 
@@ -42,21 +42,9 @@ async def signIn(data: SignInRequest, db: AsyncSession = Depends(getDB)):
 
 @auth_router.post('/verify', response_model=AuthResponse)
 async def signIn(request: Request, db: AsyncSession = Depends(getDB)):
-    token = request.headers.get("Authorization", None)
-    if token is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
+    token = checkAuthorizationToken(request)
 
-    token = token.split(' ')[1]
-    if not JWT.isValid(token):
-        raise HTTPException(
-            status_code=403,
-            detail="Access token is time over"
-        )
-
-    username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    username = JWT.get_user(token)
     user = await UserManager.getUserByUsername(username, db)
     return AuthResponse(
         user=user,
@@ -69,19 +57,9 @@ email_router = APIRouter()
 
 @email_router.post('/request')
 async def requestEmailVerification(request: Request, db: AsyncSession = Depends(getDB)) -> JSONResponse:
-    if "Authorization" not in request.headers:
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
+    token = checkAuthorizationToken(request)
 
-    if not JWT.isValid(request.headers.get("Authorization").split(' ')[1]):
-        raise HTTPException(
-            status_code=403,
-            detail="Access token is time over"
-        )
-
-    user = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    user = JWT.get_user(token)
     user = await UserManager.getUserByUsername(user, db)
 
     code = Email.generateCode()
@@ -106,18 +84,9 @@ async def emailVerification(
         code: str,
         db: AsyncSession = Depends(getDB)
 ) -> JSONResponse:
-    if "Authorization" not in request.headers:
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
-    if not JWT.isValid(request.headers.get("Authorization").split(' ')[1]):
-        raise HTTPException(
-            status_code=403,
-            detail="Access token is time over"
-        )
+    token = checkAuthorizationToken(request)
 
-    username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    username = JWT.get_user(token)
     user = await UserManager.getUserByUsername(username, db)
     valid_code = Redis.getEmailVerificationCode(user.email)
     if code == valid_code:
@@ -140,10 +109,11 @@ async def moderate_text(
         request: Request,
         db: AsyncSession = Depends(getDB)
 ) -> PredictResponse:
-    if "Authorization" not in request.headers:
+    token = request.headers.get("Authorization", None)
+    if token is None:
         Redis.addHTTPRequestCount(request.client.host)
     else:
-        username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+        username = JWT.get_user(token.split(' ')[1])
         user = await UserManager.getUserByUsername(username, db)
         now = datetime.now()
         today = datetime(now.year, now.month, now.day)

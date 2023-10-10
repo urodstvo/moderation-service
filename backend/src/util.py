@@ -133,6 +133,24 @@ class AI:
 
 text_model = AI()
 
+
 # text_model.predict("kill yourself")
 # text_model.predict("i'm so happy")
 # text_model.predict("I hate you, fucking dumb, please kill yourself, nigger")
+
+def checkAuthorizationToken(request):
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
+    token = token.split(' ')[1]
+    if not JWT.isValid(token):
+        raise HTTPException(
+            status_code=403,
+            detail="Access token is time over"
+        )
+
+    return token
