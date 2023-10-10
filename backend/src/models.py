@@ -99,3 +99,11 @@ class VerificationData(BaseModel):
 class TextModerationRequest(BaseModel):
     text: str
 
+
+class PredictResponse(BaseModel):
+    toxic: float
+    severe_toxic: float
+    obscene: float
+    threat: float
+    insult: float
+    identity_hate: float

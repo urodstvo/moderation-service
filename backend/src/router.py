@@ -5,10 +5,10 @@ from starlette.responses import JSONResponse
 
 from src.database import getDB
 from src.manager import UserManager
-from src.util import JWT, addRequestCount, send_mail, generateVerificationCode, htmlForVerification, setVerificationCode, \
-    getVerificationCode
+from src.util import JWT, addRequestCount, send_mail, generateVerificationCode, htmlForVerification, \
+    setVerificationCode, getVerificationCode, text_model
 from src.models import SignUpRequest, AuthResponse, Token, SignInRequest, EmailRequest, VerificationData, \
-    TextModerationRequest
+    TextModerationRequest, PredictResponse
 
 auth_router = APIRouter()
 
@@ -37,8 +37,6 @@ async def signIn(data: SignInRequest, db: AsyncSession = Depends(getDB)):
         user=user,
         token=Token(token=token, type="Bearer")
     )
-
-
 
 
 email_router = APIRouter()
@@ -98,15 +96,19 @@ async def emailVerification(
 mod_router = APIRouter()
 
 
-@mod_router.post("/text")
+@mod_router.post("/text", response_model=PredictResponse)
 async def moderate_text(
         APIToken: str,
         data: TextModerationRequest,
         request: Request,
         db: AsyncSession = Depends(getDB)
-):
+) -> PredictResponse:
     if "Authorization" not in request.headers:
         addRequestCount(request.client.host)
     else:
         ...
-    return {APIToken, data.text}
+    text = data.text
+    predictions = text_model.predict(text)
+    values = predictions.values()
+    return PredictResponse(**predictions)
+
