@@ -40,7 +40,7 @@ class User(Base):
 class ModerationTable:
     """Table for moderation service stats"""
     request_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
-    user_id = Column(ForeignKey("users.user_id", ondelete="SET NULL"), nullable=False)
+    user_id = Column(ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True)
     requested_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
 
 
@@ -91,11 +91,6 @@ class EmailRequest(BaseModel):
     email: EmailStr
 
 
-class VerificationData(BaseModel):
-    code: str
-    email: EmailStr
-
-
 class TextModerationRequest(BaseModel):
     text: str
 
@@ -107,3 +102,10 @@ class PredictResponse(BaseModel):
     threat: float
     insult: float
     identity_hate: float
+
+
+class ModerationData(BaseModel):
+    table: type.__class__
+    id: int
+    user_id: uuid.UUID
+    requested_at: datetime.datetime

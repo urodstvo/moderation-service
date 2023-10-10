@@ -1,16 +1,17 @@
+import uuid
 from typing import Union
 
 from sqlalchemy import select, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import User, GetUserResponse, SignUpRequest, SignInRequest
+from src.models import User, GetUserResponse, SignUpRequest, SignInRequest, ModerationData, TextModeration
 
 
 class UserManager:
     """Class for interacting with User Model"""
 
     @staticmethod
-    async def createUser(data: SignUpRequest, db) -> GetUserResponse:
+    async def createUser(data: SignUpRequest, db: AsyncSession) -> GetUserResponse:
         async with db as session:
             async with session.begin():
                 user = User(username=data.username, password=data.password, email=data.email)
@@ -46,7 +47,7 @@ class UserManager:
                     )
 
     @staticmethod
-    async def getUserByUsername(username: str, db: AsyncSession) -> Union[GetUserResponse, None]:
+    async def getUserByUsername(username: str, db: AsyncSession) -> Union[User, None]:
         async with db as session:
             async with session.begin():
                 query = select(User).where(User.username == username)
@@ -64,8 +65,45 @@ class UserManager:
                     )
 
     @staticmethod
-    async def verifyUser(email: str, db: AsyncSession) -> None:
+    async def verifyUser(user_id: uuid.UUID, db: AsyncSession) -> None:
         async with db as session:
             async with session.begin():
-                query = update(User).where(User.email == email).values(is_verified=True)
+                query = update(User).where(User.id == user_id).values(is_verified=True)
                 await db.execute(query)
+
+
+class ModerationManager:
+    """Class for interacting with Moderation Table Model"""
+
+    @staticmethod
+    async def addRequest(data: ModerationData, db: AsyncSession, **kwargs):
+        async with db as session:
+            async with session.begin():
+                request = data.table(user_id=data.user_id)
+                if "text" in kwargs:
+                    request.text = kwargs['text']
+                # request = TextModeration(user_id=data.user_id, text=data.text)
+
+                session.add(request)
+                await session.flush()
+
+                # TODO: check if working that
+
+    @staticmethod
+    async def getCount(data: ModerationData, db: AsyncSession, **kwargs) -> int:
+        """kwargs contains fields for filter select"""
+        async with db as session:
+            async with session.begin():
+                query = select(TextModeration)
+                if data.user_id is not None:
+                    query = query.where(data.table.user_id == data.user_id)
+
+                if 'date_start' in kwargs:
+                    query = query.where(data.table.requested_at >= kwargs['date_start'])
+
+                if 'date_end' in kwargs:
+                    query = query.where(data.table.requested_at <= kwargs['date_end'])
+
+                result = await session.execute(query)
+                rows = result.fetchall()
+                return len(rows) if rows is not None else 0

@@ -7,85 +7,104 @@ from keras.src.preprocessing.text import Tokenizer, tokenizer_from_json
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import load_model
 
-from src.config import JWT_SECRET
+from src.config import JWT_SECRET, JWT_LIVETIME
 from fastapi import HTTPException
 import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 from fastapi_mail import FastMail, MessageSchema
 from src.config import EmailConfig, redis
+from src.manager import UserManager
+from src.models import GetUserResponse
+
+
+class Email:
+    """class for email operations"""
+
+    @staticmethod
+    def getHTML(code: str) -> str:
+        return f"""
+        <html>
+            <body>
+                <style>
+
+                </style>
+                <table>
+                    <tr>
+                        {' '.join([f"<td>{symbol}</td>" for symbol in code])}
+                    </tr>
+                </table>
+            </body>
+        </html>
+    """
+
+    @staticmethod
+    def generateCode() -> str:
+        return ''.join([str(random.randint(0, 9)) for _ in range(4)])
+
+    @staticmethod
+    async def sendMail(message: MessageSchema):
+        fm = FastMail(EmailConfig)
+        await fm.send_message(message)
 
 
 class JWT:
     """util class for jwt operations"""
 
     @staticmethod
-    def generate_token(payload):
+    def generate(username: str):
+        payload = dict()
+        payload['exp'] = datetime.now().timestamp()
+        payload['username'] = username
         return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
-    # TODO: add expires time param
+    @staticmethod
+    def isValid(token: str):
+        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
+        exp = int(payload['exp'])
+        return datetime.now().timestamp() - exp < JWT_LIVETIME
 
     @staticmethod
-    def verify_token(token: str):
-        return jwt.decode(token, JWT_SECRET, algorithm="HS256")
+    async def get_user(token: str, db) -> GetUserResponse:
+        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
+        username = payload["username"]
+        return await UserManager.getUserByUsername(username, db)
 
 
-async def send_mail(message: MessageSchema):
-    fm = FastMail(EmailConfig)
-    await fm.send_message(message)
+class Redis:
+    """class for redis operations"""
 
+    @staticmethod
+    def setEmailVerificationCode(email: str, code: str):
+        email = email[:email.find('@')]
+        redis.set("verification_code_" + email, code)
+        redis.expire("verification_code_" + email, timedelta(seconds=60))
 
-def generateVerificationCode() -> str:
-    return ''.join([str(random.randint(0, 9)) for _ in range(4)])
+    @staticmethod
+    def getEmailVerificationCode(email: str) -> str:
+        email = email[:email.find('@')]
+        return redis.get("verification_code_" + email)
 
+    @staticmethod
+    def addHTTPRequestCount(host: str) -> None:
+        key = "text_request_count_" + host
+        count = redis.get(key)
+        if count is None:
+            redis.set(key, 1, ex=timedelta(days=1))
+            return
 
-def setVerificationCode(email: str, code: str):
-    email = email[:email.find('@')]
-    redis.set("verification_code_" + email, code)
-    redis.expire("verification_code_" + email, timedelta(seconds=60))
+        if int(count) + 1 > 50:
+            raise HTTPException(
+                status_code=423,
+                detail="Rate limit"
+            )
 
+        redis.set(key, int(count) + 1)
 
-def getVerificationCode(email: str) -> str:
-    email = email[:email.find('@')]
-    return redis.get("verification_code_" + email)
-
-
-def htmlForVerification(code: str) -> str:
-    return f"""
-    <html>
-        <body>
-            <style>
-
-            </style>
-            <table>
-                <tr>
-                    {' '.join([f"<td>{symbol}</td>" for symbol in code])}
-                </tr>
-            </table>
-        </body>
-    </html>
-"""
-
-
-def addRequestCount(host: str) -> None:
-    key = "text_request_count_" + host
-    count = redis.get(key)
-    if count is None:
-        redis.set(key, 1, ex=timedelta(days=1))
-        return
-
-    if int(count) + 1 > 50:
-        raise HTTPException(
-            status_code=423,
-            detail="Rate limit"
-        )
-
-    redis.set(key, int(count) + 1)
-
-
-async def get_requests_count(host: str) -> Union[int, None]:
-    key = "text_request_count_" + host
-    count = redis.get(key)
-    return int(count) if count else None
+    @staticmethod
+    async def getHTTPRequestsCount(host: str) -> Union[int, None]:
+        key = "text_request_count_" + host
+        count = redis.get(key)
+        return int(count) if count else None
 
 
 class AI:
