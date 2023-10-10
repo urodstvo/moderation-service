@@ -61,13 +61,12 @@ class JWT:
     def isValid(token: str):
         payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
         exp = int(payload['exp'])
-        return datetime.utcnow().timestamp() - exp < JWT_LIVETIME
+        return datetime.utcnow().timestamp() - exp < int(JWT_LIVETIME)
 
     @staticmethod
     def get_user(token: str) -> str:
         payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
         return payload["username"]
-
 
 
 class Redis:

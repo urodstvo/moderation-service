@@ -40,6 +40,30 @@ async def signIn(data: SignInRequest, db: AsyncSession = Depends(getDB)):
     )
 
 
+@auth_router.post('/verify', response_model=AuthResponse)
+async def signIn(request: Request, db: AsyncSession = Depends(getDB)):
+    token = request.headers.get("Authorization", None)
+    if token is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
+    token = token.split(' ')[1]
+    if not JWT.isValid(token):
+        raise HTTPException(
+            status_code=403,
+            detail="Access token is time over"
+        )
+
+    username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    user = await UserManager.getUserByUsername(username, db)
+    return AuthResponse(
+        user=user,
+        token=Token(token=token, type="Bearer")
+    )
+
+
 email_router = APIRouter()
 
 
@@ -144,3 +168,5 @@ async def moderate_text(
 
     predictions = text_model.predict(data.text)
     return PredictResponse(**predictions)
+
+# TODO: Check rate limit
