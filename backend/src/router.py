@@ -51,13 +51,14 @@ async def requestEmailVerification(request: Request, db: AsyncSession = Depends(
             detail="Unauthorized"
         )
 
-    if not JWT.isValid(request.headers["Authorization"]):
+    if not JWT.isValid(request.headers.get("Authorization").split(' ')[1]):
         raise HTTPException(
             status_code=403,
             detail="Access token is time over"
         )
 
-    user = await JWT.get_user(request.headers["Authorization"], db)
+    user = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    user = await UserManager.getUserByUsername(user, db)
 
     code = Email.generateCode()
     html = Email.getHTML(code)
@@ -86,13 +87,14 @@ async def emailVerification(
             status_code=401,
             detail="Unauthorized"
         )
-    if not JWT.isValid(request.headers["Authorization"]):
+    if not JWT.isValid(request.headers.get("Authorization").split(' ')[1]):
         raise HTTPException(
             status_code=403,
             detail="Access token is time over"
         )
 
-    user = await JWT.get_user(request.headers["Authorization"], db)
+    username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+    user = await UserManager.getUserByUsername(username, db)
     valid_code = Redis.getEmailVerificationCode(user.email)
     if code == valid_code:
         await UserManager.verifyUser(user.id, db)
@@ -117,7 +119,8 @@ async def moderate_text(
     if "Authorization" not in request.headers:
         Redis.addHTTPRequestCount(request.client.host)
     else:
-        user = await JWT.get_user(request.headers["Authorization"], db)
+        username = JWT.get_user(request.headers.get("Authorization").split(' ')[1])
+        user = await UserManager.getUserByUsername(username, db)
         now = datetime.now()
         today = datetime(now.year, now.month, now.day)
         tomorrow = datetime(now.year, now.month, now.day + 1)

@@ -53,21 +53,21 @@ class JWT:
     @staticmethod
     def generate(username: str):
         payload = dict()
-        payload['exp'] = datetime.now().timestamp()
+        payload['exp'] = datetime.utcnow().timestamp()
         payload['username'] = username
         return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
     @staticmethod
     def isValid(token: str):
-        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
+        payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
         exp = int(payload['exp'])
-        return datetime.now().timestamp() - exp < JWT_LIVETIME
+        return datetime.utcnow().timestamp() - exp < JWT_LIVETIME
 
     @staticmethod
-    async def get_user(token: str, db) -> GetUserResponse:
-        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
-        username = payload["username"]
-        return await UserManager.getUserByUsername(username, db)
+    def get_user(token: str) -> str:
+        payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
+        return payload["username"]
+
 
 
 class Redis:
@@ -129,7 +129,6 @@ class AI:
         for ind, value in enumerate(self.__labels):
             result[value] = predictions[ind]
 
-        print(result)
         return result
 
 

@@ -1,6 +1,7 @@
 import datetime
 import enum
 import uuid
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -106,6 +107,6 @@ class PredictResponse(BaseModel):
 
 class ModerationData(BaseModel):
     table: type.__class__
-    id: int
+    id: Optional[int] = None
     user_id: uuid.UUID
-    requested_at: datetime.datetime
+    requested_at: Optional[datetime.datetime] = None
