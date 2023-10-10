@@ -84,26 +84,20 @@ class Redis:
         return redis.get("verification_code_" + email)
 
     @staticmethod
-    def addHTTPRequestCount(host: str) -> None:
-        key = "text_request_count_" + host
+    def addHTTPRequestCount(name: str) -> None:
+        key = "text_request_count_" + name
         count = redis.get(key)
         if count is None:
             redis.set(key, 1, ex=timedelta(days=1))
             return
 
-        if int(count) + 1 > 50:
-            raise HTTPException(
-                status_code=423,
-                detail="Rate limit"
-            )
-
         redis.set(key, int(count) + 1)
 
     @staticmethod
-    async def getHTTPRequestsCount(host: str) -> Union[int, None]:
-        key = "text_request_count_" + host
+    def getHTTPRequestsCount(name: str) -> int:
+        key = "text_request_count_" + name
         count = redis.get(key)
-        return int(count) if count else None
+        return int(count) if count else 0
 
 
 class AI:

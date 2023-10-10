@@ -111,7 +111,12 @@ async def moderate_text(
 ) -> PredictResponse:
     token = request.headers.get("Authorization", None)
     if token is None:
-        Redis.addHTTPRequestCount(request.client.host)
+        count = Redis.getHTTPRequestsCount(request.client.host)
+        if count < 50: Redis.addHTTPRequestCount(request.client.host)
+        else: raise HTTPException(
+            status_code=429,
+            detail="Rate limit"
+        )
     else:
         username = JWT.get_user(token.split(' ')[1])
         user = await UserManager.getUserByUsername(username, db)
@@ -124,10 +129,10 @@ async def moderate_text(
             date_start=today,
             date_end=tomorrow
         )
-        if user.role == RolesEnum.student and count >= 1000:
+        if user.role == RolesEnum.student and count > 1000:
             raise HTTPException(
                 status_code=429,
-                detail="Your request limit is gone up"
+                detail="Rate limit"
             )
 
         await ModerationManager.addRequest(
@@ -139,4 +144,12 @@ async def moderate_text(
     predictions = text_model.predict(data.text)
     return PredictResponse(**predictions)
 
+
 # TODO: Check rate limit
+
+v1_api_router = APIRouter()
+
+
+@v1_api_router.get('/http/')
+async def generateHTTPtoken():
+    ...
