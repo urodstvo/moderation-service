@@ -1,11 +1,29 @@
-import { AuthStatus, iAuthState } from '@/interfaces';
+import { StateStatus, iAuthState } from '@/interfaces';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 // Define the initial state using that type
 const initialState: iAuthState = {
-  status: AuthStatus.None,
+  status: StateStatus.None,
   isAuth: false,
 }
+
+export const authVerify = createAsyncThunk(
+  'authVerify',
+  async ({token}: {token: string}, thunkAPI) => {
+      const response = await fetch("http://127.0.0.1:8000/auth/verify", {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: token
+            },
+          })
+      if (response.ok)
+            return response.json();
+      else 
+            thunkAPI.rejectWithValue("error");
+    }
+)
 
 export const signIn = createAsyncThunk(
   'signIn',
@@ -99,65 +117,72 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logOut: () => {
-      localStorage.removeItem('auth_data');
+      localStorage.removeItem('token');
       return initialState
     },
-    fetchDataFromStorage: () => {
-      const user = localStorage.getItem('auth_data');
-      if (user)
-            return JSON.parse(user);
-      else 
-            console.log("No Auth Data in local storage")
-    }
   },
   extraReducers(builder) {
       builder.addCase(signIn.pending, (state) => {
-        state.status = AuthStatus.Loading;
+        state.status = StateStatus.Loading;
         state.isAuth = false;
       }),
       builder.addCase(signIn.rejected, (state) => {
         logOut();
-        state.status = AuthStatus.Error;
+        state.status = StateStatus.Error;
       }),
       builder.addCase(signIn.fulfilled, (state, {payload}) => {
-        state.status = AuthStatus.Success;
+        state.status = StateStatus.Success;
         state.isAuth = true;
         state.user = payload.user
         state.token = payload.token.type + ' ' + payload.token.token
-        localStorage.setItem("auth_data", JSON.stringify(state))
+        localStorage.setItem("token", state.token)
       })
 
       builder.addCase(signUp.pending, (state) => {
-        state.status = AuthStatus.Loading;
+        state.status = StateStatus.Loading;
         state.isAuth = false;
       }),
       builder.addCase(signUp.rejected, (state) => {
         logOut()
-        state.status = AuthStatus.Error;
+        state.status = StateStatus.Error;
       }),
       builder.addCase(signUp.fulfilled, (state, {payload}) => {
-        state.status = AuthStatus.Success;
+        state.status = StateStatus.Success;
         state.isAuth = true;
         state.user = payload.user
         state.token = payload.token.type + ' ' + payload.token.token
-        localStorage.setItem("auth_data", JSON.stringify(state))
+        localStorage.setItem("token", state.token)
       }),
 
       builder.addCase(verifyEmail.pending, (state) => {
-        state.status = AuthStatus.Loading;
+        state.status = StateStatus.Loading;
       }),
       builder.addCase(verifyEmail.rejected, (state) => {
         logOut()
-        state.status = AuthStatus.Error;
+        state.status = StateStatus.Error;
       }),
       builder.addCase(verifyEmail.fulfilled, (state) => {
-        state.status = AuthStatus.Success;
+        state.status = StateStatus.Success;
         state.user!.is_verified = true
-        localStorage.setItem("auth_data", JSON.stringify(state))
+      })
+
+      builder.addCase(authVerify.pending, (state) => {
+        state.status = StateStatus.Loading;
+      }),
+      builder.addCase(authVerify.rejected, (state) => {
+        logOut();
+        state.status = StateStatus.Error;
+      }),
+      builder.addCase(authVerify.fulfilled, (state, {payload}) => {
+        state.status = StateStatus.Success;
+        state.isAuth = true;
+        state.user = payload.user;
+        state.token = payload.token.type + ' ' + payload.token.token;
+        localStorage.setItem("token", state.token);
       })
   },
 })
 
-export const { logOut, fetchDataFromStorage } = authSlice.actions
+export const { logOut } = authSlice.actions
 
 export default authSlice.reducer

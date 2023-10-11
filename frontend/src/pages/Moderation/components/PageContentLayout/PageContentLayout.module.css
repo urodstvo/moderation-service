@@ -1,0 +1,11 @@
+.pageContentContainer{
+    width: 100%;
+    padding: 2rem 0;
+
+    & > .pageContentContent{
+        width: 100%;
+
+        display: flex;
+        gap: 3.5rem;
+    }
+}

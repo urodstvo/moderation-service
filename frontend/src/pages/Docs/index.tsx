@@ -1,7 +1,6 @@
 import styles from "@/pages/Docs/index.module.css"
-import { memo } from "react";
 
-const index = memo(() => {
+export const Docs = () => {
     document.title = "DOCS PAGE | CLOUD"
     return (
         <>
@@ -36,6 +35,4 @@ const index = memo(() => {
         </div>
         </>
     );
-});
-
-export default index;
+};

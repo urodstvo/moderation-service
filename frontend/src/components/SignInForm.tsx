@@ -1,4 +1,4 @@
-import { AuthStatus, ColorVariant } from "@/interfaces";
+import { StateStatus, ColorVariant } from "@/interfaces";
 import Button from "@/components/ui/Button";
 import TextInput from "@/components/ui/TextInput";
 import { FormEvent, useState } from "react";
@@ -36,7 +36,7 @@ const SignInForm = () => {
 
     return (
         <div className="auth-container">
-            {authState.status === AuthStatus.Loading && "Loading..."}
+            {authState.status === StateStatus.Loading && "Loading..."}
             <div className="form-switcher"><span onClick={swapForms}>{isSignInForm ? "Sign Up →" : "Sign In →"}</span></div>
             <form className="auth-content">
             

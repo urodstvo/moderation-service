@@ -1,6 +1,6 @@
 import { ModerationType } from "@/interfaces";
 
-const ModerationServiceIcon = ({variant} : {variant: ModerationType}) => {
+export const ModTypeIcon = ({variant} : {variant: ModerationType}) => {
     return (
         <>
         {variant === ModerationType.video && (
@@ -28,5 +28,3 @@ const ModerationServiceIcon = ({variant} : {variant: ModerationType}) => {
         </>
     );
 };
-
-export default ModerationServiceIcon;

@@ -3,10 +3,10 @@ import styles from "@/pages/Home/index.module.css"
 import { ColorVariant } from "@/interfaces";
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button"
-import { useAppSelector } from "@/hooks";
+import { useAppSelector, usePageTitle } from "@/hooks";
 
-const Home = () => {
-    document.title = "CLOUD | HOME PAGE";
+export const Home = () => {
+    usePageTitle("CLOUD | HOME PAGE");
 
     const { isAuth } = useAppSelector(state => state.auth)
 
@@ -23,11 +23,8 @@ const Home = () => {
                 </div>
 
                 <div className={styles.heroActions}>
-                    {!isAuth ? (
-                    <Link to='?modal=signIn'><Button text='GET STARTED' variant={ColorVariant.black} /></Link>
-                    ) : (
-                        <Link to='/docs'><Button text='READ DOCS' variant={ColorVariant.black} /></Link>
-                    )}
+                    {!isAuth ? (<Link to='?modal=signIn'><Button text='GET STARTED' variant={ColorVariant.black} /></Link>) 
+                             : (<Link to='/docs'><Button text='READ DOCS' variant={ColorVariant.black} /></Link>)}
                     <Link to='/services'><Button text='CHECK SERVICES' variant={ColorVariant.white} /></Link>
                 </div>
                 
@@ -37,7 +34,5 @@ const Home = () => {
         </>
     );
 };
-
-export default Home;
 
 //TODO: ADD RESPONSIVE TO HERO

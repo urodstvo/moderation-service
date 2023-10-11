@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import type { TypedUseSelectorHook } from 'react-redux'
 import type { RootState, AppDispatch } from '@/store'
-import { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, useEffect,  useState } from 'react'
 import { iTextInputProps } from '@/interfaces'
 
 
@@ -39,3 +39,4 @@ export const useTextInputProps = (props : Omit<iTextInputProps, "onChange" | "va
   return inputProps
 }
 
+export const usePageTitle = (title: string) => {useEffect(() => {document.title = title}, [])}

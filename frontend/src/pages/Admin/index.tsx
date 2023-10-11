@@ -1,9 +1,7 @@
-const index = () => {
+export const AdminDashboard = () => {
     return (
         <div>
             admin
         </div>
     );
 };
-
-export default index;

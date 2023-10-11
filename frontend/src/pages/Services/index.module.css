@@ -61,23 +61,23 @@
                 }
 
                 &:nth-of-type(2){
-                    top: 16.2rem;
+                    top: 21rem;
                     left: 41.7rem;
                 }
 
                 &:nth-of-type(3){
                     top: 0rem;
-                    left: 51rem;
+                    left: 55rem;
                 }
 
                 &:nth-of-type(4){
-                    bottom: -1rem;
+                    bottom: -8rem;
                     right: 20rem;
                 }
 
                 &:nth-of-type(5){
                     top: 6rem;
-                    right: -7rem;
+                    right: -10rem;
                 }
             }
 
@@ -85,7 +85,7 @@
                 position: absolute;
 
                 top: 3.2rem;
-                right: 28.4rem;
+                right: 24rem;
             }
         }
     }

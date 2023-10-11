@@ -49,7 +49,7 @@ const SettingsForm = () => {
                 const target = e.target
                 const ind: number = parseInt(target.classList.toString())
 
-                const [first,...rest] = target.value
+                const [first, ...rest] = target.value
                 
                 target.value = first ?? '' 
                 
@@ -90,6 +90,7 @@ const SettingsForm = () => {
 
     const username = useTextInputProps({placeholder: "USERNAME", className: "flex-1", disabled: true});
     const email = useTextInputProps({placeholder: "EMAIL", className: "flex-1", disabled: true});
+    const role = useTextInputProps({placeholder: "ROLE", className: "flex-1", disabled: true});
 
     return (
         <>
@@ -106,7 +107,7 @@ const SettingsForm = () => {
                 </div>
 
                 <div className="settings-verification">
-                    {auth.user.is_verified ? "Email Verified" : (
+                    {!auth.user.is_verified && (
                         <>
                         {!isVerifying ? (
                             <>
@@ -137,7 +138,11 @@ const SettingsForm = () => {
                         </>
                     )}
                 </div>
+                <div className="settings-role">
+                        <TextInput {...role} value={auth.user.role}/>
+                </div>
             </div>
+
 
             <Button 
                 className="width-100"

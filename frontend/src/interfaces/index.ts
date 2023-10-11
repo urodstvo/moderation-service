@@ -35,15 +35,22 @@ export interface iPricingCardProps{
     terms: string[] 
 }
 
+export enum ModPageTab{
+    info = "INFO",
+    playground = "PLAYGROUND",
+    integration = "INTEGRATION"
+
+}
+
 export interface iServicePageHeaderProps{
     title: string,
     description: string,
-    tab: "INFO" | "PLAYGROUND" | "INTEGRATION",
+    tab: ModPageTab,
     variant: ModerationType,
 
 }
 
-export enum AuthStatus{
+export enum StateStatus{
     None="None",
     Loading="Loading",
     Error="Error",
@@ -59,7 +66,7 @@ export enum RoleEnum{
 }
 
 export interface iAuthState {
-    status: AuthStatus,
+    status: StateStatus,
     isAuth: boolean,
     token?: string,
     user?:{
@@ -91,4 +98,17 @@ export interface iTimerProps{
     seconds: number, 
     className?: string,
     callback?: () => void
+}
+
+export interface iModState {
+    status: StateStatus,
+    text: string,
+    response: {
+      toxic: string,
+      severe_toxic: string,
+      insult: string,
+      obscene: string,
+      identity_hate: string,
+      threat: string
+    }
 }

@@ -1,9 +1,9 @@
-import Home from "@/pages/Home";
-import Services from "@/pages/Services";
-import Pricing from "@/pages/Pricing";
-import Docs from "@/pages/Docs";
-import TextModeration from "@/pages/TextModeration";
-import Admin from "@/pages/Admin";
+import { Home } from "@/pages/Home";
+import { Services } from "@/pages/Services";
+import { Pricing } from "@/pages/Pricing";
+import { Docs } from "@/pages/Docs";
+import { TextModeration } from "@/pages/Moderation/TextModeration";
+import { AdminDashboard } from "@/pages/Admin";
   
 export const public_routes = [
   {
@@ -40,7 +40,7 @@ export const public_routes = [
 export const admin_routes = [  
   {
     path: '/admin/dashboard',
-    element: <Admin />,
+    element: <AdminDashboard />,
   },
 ]
 
