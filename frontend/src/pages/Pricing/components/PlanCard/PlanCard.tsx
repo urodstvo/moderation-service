@@ -1,8 +1,10 @@
 import styles from "./PlanCard.module.css"
 import { ColorVariant, iPricingCardProps } from "@/interfaces";
 import Button from "@/components/ui/Button";
+import { useAppSelector } from "@/hooks";
 
 export const PlanCard = ({name, price, offers, terms } : iPricingCardProps) => {
+    const {user} = useAppSelector(state => state.auth)
     return (
         <div className={styles.pricingCardContainer}>
             <div className={styles.pricingCardContent}>
@@ -18,7 +20,7 @@ export const PlanCard = ({name, price, offers, terms } : iPricingCardProps) => {
                     {terms.map((text, ind) => <li key={ind} className={styles.pricingCardTerm}>{text}</li>)}
                 </ul>
                 <div className={styles.pricingCardButton}>
-                    <Button className="fill-container" text="CHOOSE PLAN" variant={ColorVariant.white} />
+                    <Button className="fill-container" text="CHOOSE PLAN" variant={ColorVariant.white} disabled={!user?.is_verified}/>
                 </div>
             </div>
         </div>

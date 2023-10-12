@@ -1,13 +1,15 @@
+import styles from "@/pages/Moderation/TextModeration/index.module.css"
+
 import { FormEvent, useEffect, useMemo, useState} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { PageHeader } from "@/pages/Moderation/components/PageHeader/PageHeader";
 import { PageContentLayout } from "@/pages/Moderation/components/PageContentLayout/PageContentLayout";
 import { InfoCard } from "@/pages/Moderation/components/InfoCard/InfoCard";
-import { ModPageTab, ModerationType } from "@/interfaces";
 
-import styles from "@/pages/Moderation/TextModeration/index.module.css"
+import { ModPageTab, ModerationType } from "@/interfaces";
 import { useAppSelector, usePageTitle } from "@/hooks";
+
 import debounce from "lodash.debounce"
 
 
@@ -20,6 +22,7 @@ export const TextModeration = () => {
         identity_hate: string,
         threat: string
     }
+
     usePageTitle("TEXT MODERATION | CLOUD");
 
     const { token } = useAppSelector(state => state.auth)
@@ -111,12 +114,15 @@ export const TextModeration = () => {
                 <div className={styles.playgroundSection}>
                     <div className={styles.responseContainer}>
                         <div className={styles.responseContent}>
-                            <table>
-                                <tbody>
-                                    {/* @ts-ignore-error */}
-                                    {Object.getOwnPropertyNames(response).map((prop, ind) => (<tr key={ind}><td>{prop}</td><td>{parseFloat(response[prop]).toFixed(4)}</td></tr>))}
-                                </tbody>
-                            </table>
+                            <div className={styles.responseDataContainer}>
+                                response.json
+                                <div className={styles.responseDataContent}>
+                                    {"BODY: {"}
+                                        {/* @ts-ignore-error */}
+                                        {Object.getOwnPropertyNames(response).map((prop, ind) => (<div className={styles.responseDataField} key={ind}><div>{prop}:</div><div>{parseFloat(response[prop]).toFixed(4)},</div></div>))}
+                                    {"}"}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

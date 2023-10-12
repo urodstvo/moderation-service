@@ -9,7 +9,7 @@ export const ServiceCard = memo(({title, description, variant, path, disabled = 
         <Link to={disabled ? '' : path} >
             <div className={[styles.serviceCardContainer, !!disabled && styles.disabled].join(' ')}>
                 <div className={styles.serviceCardContent}>
-                    <div className={styles.serviceCardIcon}>
+                    <div className={styles.serviceCardIcon + ' icon'}>
                         <ModTypeIcon variant={variant} />
                     </div>
                     <div className={styles.serviceCardInfo}>

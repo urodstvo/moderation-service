@@ -93,6 +93,10 @@
             &.disabled{
                 opacity: 0.75;
                 cursor: not-allowed;
+                
+                & > .serviceCardContent{
+                    background: #000;
+                }
             }
 
             background: transparent;

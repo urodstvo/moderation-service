@@ -45,37 +45,56 @@
                 width: 100%;
                 height: 100%;
                 
-                & > table{
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2rem;
+                & > .responseDataContainer{
+                    font-style: italic;
+                    font-weight: thick;
+                    font-size: 2rem;
+                    color: #aaa;
 
-                    & tr{
-                        display: flex;
-                        gap: 1rem;
-                        height: 3rem;
-                        margin-bottom: 1.5rem;
-                        /* border-bottom: 0.2rem solid #000; */
+                    width: 100%;
+                    height: 100%;
+                    
+                    padding: 1rem 1rem 2rem;
+
+                    background: rgba(0, 0, 0, 1);
+
+                    display: flex;
+                    flex-direction: column-reverse;
+                    justify-content: space-between;
+                    
+                    & > .responseDataContent{
+                        font-style: normal;
+                        color: rgba(255, 255, 255, 0.5);
                         
-                        & > td{
-                            padding: 0 1rem;
-                            /* border-bottom: 0.2rem solid #000; */
-                            
-                            &:first-of-type{
-                                font-size: 2.4rem;
+                        background: rgba(255, 255, 255, .15);
+                        padding: 1rem 2rem;
+
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+
+                        font-size: 1.6rem;
+
+                        border-radius: 0 0 2rem 2rem;
+
+                        & > .responseDataField{
+                            & * {
+                                color: #fff;
+                            }
+                            width: 100%;
+                            display: flex;
+
+                            & > div:first-of-type{
                                 flex: 1;
                             }
-                            
-                            &:last-of-type{
-                                font-size: 2rem;
-                                border: 0.2rem solid #000;
+
+                            & > div:last-of-type{
                                 text-align: center;
-                                padding: 0 0.2rem;
-                                width: 10rem;
-                                overflow: hidden;
-                                
+                                width: 7rem;
                             }
                         }
+
+                        
                     }
                 }
             }

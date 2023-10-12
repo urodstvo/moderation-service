@@ -582,4 +582,31 @@
         opacity: 0.8;
         /* font-weight: 700; */
       }
+
+    /* .icon{
+        width: 4rem !important; 
+        height: 4rem !important;
+      } */
+}
+
+@layer media{
+    @media screen and (max-width: 1300px) {
+        :root {
+            --screen-width: 1080px;
+        }
+    
+        html{
+            font-size: 7px;
+        } 
+    }
+
+    @media screen and (max-width: 1080px) {
+        :root {
+            --screen-width: 760px;
+        }
+    
+        html{
+            font-size: 5px;
+        } 
+    }
 }
