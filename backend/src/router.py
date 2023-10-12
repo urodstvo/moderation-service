@@ -146,6 +146,7 @@ async def changeRole(role: str, request: Request, db: AsyncSession = Depends(get
         detail="Error. Invalid input role."
     )
 
+
 @api_router.get('/token')
 async def generateAPIToken(request: Request, db: AsyncSession = Depends(getDB)):
     token = checkAuthorizationToken(request)
