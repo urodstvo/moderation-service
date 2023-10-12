@@ -1,20 +1,18 @@
 import json
 import os.path
-from typing import Union
+import uuid
 
 import jwt
 from keras.src.preprocessing.text import Tokenizer, tokenizer_from_json
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import load_model
 
-from src.config import JWT_SECRET, JWT_LIVETIME
+from src.config import JWT_SECRET, JWT_LIVETIME, AUTH_TOKEN_TYPE
 from fastapi import HTTPException
 import random
 from datetime import timedelta, datetime
 from fastapi_mail import FastMail, MessageSchema
 from src.config import EmailConfig, redis
-from src.manager import UserManager
-from src.models import GetUserResponse
 
 
 class Email:
@@ -58,13 +56,16 @@ class JWT:
         return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
     @staticmethod
-    def isValid(token: str):
-        payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
-        exp = int(payload['exp'])
-        return datetime.utcnow().timestamp() - exp < int(JWT_LIVETIME)
+    def verify(token: str):
+        try:
+            payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
+            exp = int(payload['exp'])
+            return datetime.utcnow().timestamp() - exp < int(JWT_LIVETIME)
+        except:
+            raise HTTPException(status_code=400, detail="Invalid token")
 
     @staticmethod
-    def get_user(token: str) -> str:
+    def getUser(token: str) -> str:
         payload = jwt.decode(token, JWT_SECRET, ["HS256"], options={"verify_exp": False})
         return payload["username"]
 
@@ -128,10 +129,6 @@ class AI:
 text_model = AI()
 
 
-# text_model.predict("kill yourself")
-# text_model.predict("i'm so happy")
-# text_model.predict("I hate you, fucking dumb, please kill yourself, nigger")
-
 def checkAuthorizationToken(request):
     token = request.headers.get("Authorization", None)
     if token is None:
@@ -140,10 +137,18 @@ def checkAuthorizationToken(request):
             detail="Unauthorized"
         )
 
-    token = token.split(' ')[1]
-    if not JWT.isValid(token):
+    token_type = token.split(' ')[0]
+    if not token_type == AUTH_TOKEN_TYPE:
         raise HTTPException(
-            status_code=403,
+            status_code=400,
+            detail="Invalid token type"
+        )
+
+    token = token.split(' ')[1]
+    is_valid = JWT.verify(token)
+    if not is_valid:
+        raise HTTPException(
+            status_code=401,
             detail="Access token is time over"
         )
 

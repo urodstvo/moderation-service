@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, status, Depends, Request
@@ -9,7 +10,7 @@ from src.database import getDB
 from src.manager import UserManager, ModerationManager
 from src.util import JWT, Email, Redis, text_model, checkAuthorizationToken
 from src.models import SignUpRequest, AuthResponse, Token, SignInRequest, TextModerationRequest, PredictResponse, \
-    ModerationData, TextModeration, RolesEnum
+    RolesEnum, TextPredictRequest, ModerationData, TextModeration, ClientPredictResponse
 
 auth_router = APIRouter()
 
@@ -26,7 +27,13 @@ async def signUp(data: SignUpRequest, db: AsyncSession = Depends(getDB)):
 
 @auth_router.post('/signin', response_model=AuthResponse)
 async def signIn(data: SignInRequest, db: AsyncSession = Depends(getDB)):
-    user = await UserManager.getUser(data, db)
+    user_data = {"password": data.password}
+    if "@" in data.login:
+        user_data["email"] = data.login
+    else:
+        user_data["username"] = data.login
+
+    user = await UserManager.getUser(user_data, db)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,12 +47,12 @@ async def signIn(data: SignInRequest, db: AsyncSession = Depends(getDB)):
     )
 
 
-@auth_router.post('/verify', response_model=AuthResponse)
-async def signIn(request: Request, db: AsyncSession = Depends(getDB)):
+@auth_router.get('/verify', response_model=AuthResponse)
+async def verify(request: Request, db: AsyncSession = Depends(getDB)):
     token = checkAuthorizationToken(request)
 
-    username = JWT.get_user(token)
-    user = await UserManager.getUserByUsername(username, db)
+    username = JWT.getUser(token)
+    user = await UserManager.getUser({"username": username}, db)
     return AuthResponse(
         user=user,
         token=Token(token=token, type="Bearer")
@@ -55,12 +62,14 @@ async def signIn(request: Request, db: AsyncSession = Depends(getDB)):
 email_router = APIRouter()
 
 
+# TODO: Check if token having BEARER TYPE
+
 @email_router.post('/request')
 async def requestEmailVerification(request: Request, db: AsyncSession = Depends(getDB)) -> JSONResponse:
     token = checkAuthorizationToken(request)
 
-    user = JWT.get_user(token)
-    user = await UserManager.getUserByUsername(user, db)
+    username = JWT.getUser(token)
+    user = await UserManager.getUser({"username": username}, db)
 
     code = Email.generateCode()
     html = Email.getHTML(code)
@@ -86,11 +95,12 @@ async def emailVerification(
 ) -> JSONResponse:
     token = checkAuthorizationToken(request)
 
-    username = JWT.get_user(token)
-    user = await UserManager.getUserByUsername(username, db)
+    username = JWT.getUser(token)
+    user = await UserManager.getUser({"username": username}, db)
+
     valid_code = Redis.getEmailVerificationCode(user.email)
     if code == valid_code:
-        await UserManager.verifyUser(user.id, db)
+        await UserManager.updateUser({"user_id": user.user_id}, {"is_verified": True}, db)
         return JSONResponse(status_code=200, content={"message": "Email verified"})
 
     raise HTTPException(
@@ -103,53 +113,77 @@ mod_router = APIRouter()
 
 
 @mod_router.post("/text", response_model=PredictResponse)
-async def moderate_text(
-        APIToken: str,
-        data: TextModerationRequest,
-        request: Request,
-        db: AsyncSession = Depends(getDB)
-) -> PredictResponse:
+async def moderate_text(data: TextModerationRequest) -> PredictResponse:
+    predictions = text_model.predict(data.text)
+    return ClientPredictResponse(**predictions, text=data.text)
+
+
+api_router = APIRouter()
+
+
+@api_router.get('/token')
+async def generateAPIToken(request: Request, db: AsyncSession = Depends(getDB)):
+    token = checkAuthorizationToken(request)
+    username = JWT.getUser(token)
+    user = await UserManager.getUser({"username": username}, db)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+    if user.role == RolesEnum.user.value:
+        raise HTTPException(
+            status_code=403,
+            detail="This func doesnt acceptable for you"
+        )
+
+    api_token = user.api_token
+
+    if not api_token:
+        api_token = uuid.uuid4()
+        await UserManager.updateUser({"user_id": user.user_id}, {"api_token": api_token}, db)
+
+    return JSONResponse({"api_token": str(api_token)}, status_code=200)
+
+
+v1_api_router = APIRouter()
+
+
+@v1_api_router.post('/text')
+async def apiTextModeration(data: TextPredictRequest, request: Request, db: AsyncSession = Depends(getDB)):
+    text = data.text
     token = request.headers.get("Authorization", None)
     if token is None:
-        count = Redis.getHTTPRequestsCount(request.client.host)
-        if count < 50: Redis.addHTTPRequestCount(request.client.host)
-        else: raise HTTPException(
-            status_code=429,
-            detail="Rate limit"
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
         )
-    else:
-        username = JWT.get_user(token.split(' ')[1])
-        user = await UserManager.getUserByUsername(username, db)
+
+    user = await UserManager.getUser({"api_token": token.split(' ')[1]}, db)
+
+    if user.role == RolesEnum.student.value:
         now = datetime.now()
         today = datetime(now.year, now.month, now.day)
         tomorrow = datetime(now.year, now.month, now.day + 1)
         count = await ModerationManager.getCount(
             ModerationData(table=TextModeration, user_id=user.user_id),
-            db,
-            date_start=today,
-            date_end=tomorrow
+            db, date_start=today, date_end=tomorrow
         )
-        if user.role == RolesEnum.student and count > 1000:
+
+        if count > 1000:
             raise HTTPException(
                 status_code=429,
                 detail="Rate limit"
             )
 
-        await ModerationManager.addRequest(
-            ModerationData(table=TextModeration, user_id=user.user_id),
-            db,
-            text=data.text
-        )
+    await ModerationManager.addRequest(
+        ModerationData(table=TextModeration, user_id=user.user_id),
+        db,
+        text=text
+    )
 
     predictions = text_model.predict(data.text)
     return PredictResponse(**predictions)
 
 
-# TODO: Check rate limit
-
-v1_api_router = APIRouter()
-
-
-@v1_api_router.get('/http/')
-async def generateHTTPtoken():
-    ...
+# TODO: pricing plan changer
