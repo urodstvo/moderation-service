@@ -1,7 +1,7 @@
 import datetime
 import enum
 import uuid
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, EmailStr
 
@@ -34,7 +34,19 @@ class User(Base):
     registered_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     role = Column(ForeignKey("roles.name", ondelete="SET DEFAULT"), default='user')
+    api_token = Column(String, default=None, nullable=True)
 
+    def as_dict(self):
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "password": self.password,
+            "email": self.email,
+            "registered_at": self.registered_at,
+            "is_verified": self.is_verified,
+            "role": self.role,
+            "api_token": self.api_token
+        }
     # TODO: add hash to password
 
 
@@ -52,19 +64,38 @@ class TextModeration(Base, ModerationTable):
     text = Column(String, nullable=False)
 
 
+class GetUser(BaseModel):
+    user_id: Optional[uuid.UUID]
+    username: Optional[str]
+    email: Optional[EmailStr]
+    password: Optional[str]
+    is_verified: Optional[bool]
+    role: Optional[str]
+
+
+class UpdateUser(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    is_verified: Optional[bool] = None
+    role: Optional[str] = None
+    api_token: Optional[str] = None
+
+
 class TunedModel(BaseModel):
     class Config:
         """Convert all data(not dict too) to json"""
         from_attributes = True
 
 
-class GetUserResponse(TunedModel):
+class UserResponse(TunedModel):
     user_id: uuid.UUID
     username: str
     email: EmailStr
     is_verified: bool
     registered_at: datetime.datetime
     role: str
+    api_token: Union[str, None]
 
 
 class SignUpRequest(BaseModel):
@@ -85,7 +116,7 @@ class Token(BaseModel):
 
 class AuthResponse(TunedModel):
     token: Token
-    user: GetUserResponse
+    user: UserResponse
 
 
 class EmailRequest(BaseModel):
@@ -103,6 +134,7 @@ class PredictResponse(BaseModel):
     threat: float
     insult: float
     identity_hate: float
+    text: str
 
 
 class ModerationData(BaseModel):
