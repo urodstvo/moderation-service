@@ -34,7 +34,7 @@ class User(Base):
     registered_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     role = Column(ForeignKey("roles.name", ondelete="SET DEFAULT"), default='user')
-    api_token = Column(String, default=None, nullable=True)
+    api_token = Column(UUID(as_uuid=True), default=None, nullable=True)
 
     def as_dict(self):
         return {
@@ -64,24 +64,6 @@ class TextModeration(Base, ModerationTable):
     text = Column(String, nullable=False)
 
 
-class GetUser(BaseModel):
-    user_id: Optional[uuid.UUID]
-    username: Optional[str]
-    email: Optional[EmailStr]
-    password: Optional[str]
-    is_verified: Optional[bool]
-    role: Optional[str]
-
-
-class UpdateUser(BaseModel):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    is_verified: Optional[bool] = None
-    role: Optional[str] = None
-    api_token: Optional[str] = None
-
-
 class TunedModel(BaseModel):
     class Config:
         """Convert all data(not dict too) to json"""
@@ -95,7 +77,7 @@ class UserResponse(TunedModel):
     is_verified: bool
     registered_at: datetime.datetime
     role: str
-    api_token: Union[str, None]
+    api_token: Union[uuid.UUID, None]
 
 
 class SignUpRequest(BaseModel):
@@ -134,6 +116,13 @@ class PredictResponse(BaseModel):
     threat: float
     insult: float
     identity_hate: float
+
+
+class ClientPredictResponse(PredictResponse):
+    text: str
+
+
+class TextPredictRequest(BaseModel):
     text: str
 
 
