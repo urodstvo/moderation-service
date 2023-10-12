@@ -62,8 +62,6 @@ async def verify(request: Request, db: AsyncSession = Depends(getDB)):
 email_router = APIRouter()
 
 
-# TODO: Check if token having BEARER TYPE
-
 @email_router.post('/request')
 async def requestEmailVerification(request: Request, db: AsyncSession = Depends(getDB)) -> JSONResponse:
     token = checkAuthorizationToken(request)
@@ -87,12 +85,8 @@ async def requestEmailVerification(request: Request, db: AsyncSession = Depends(
     return JSONResponse(status_code=200, content={"message": "Email has been sent"})
 
 
-@email_router.post('/verify')
-async def emailVerification(
-        request: Request,
-        code: str,
-        db: AsyncSession = Depends(getDB)
-) -> JSONResponse:
+@email_router.patch('/verify')
+async def emailVerification(request: Request, code: str, db: AsyncSession = Depends(getDB)) -> JSONResponse:
     token = checkAuthorizationToken(request)
 
     username = JWT.getUser(token)
@@ -112,14 +106,45 @@ async def emailVerification(
 mod_router = APIRouter()
 
 
-@mod_router.post("/text", response_model=PredictResponse)
-async def moderate_text(data: TextModerationRequest) -> PredictResponse:
+@mod_router.post("/text", response_model=ClientPredictResponse)
+async def moderateText(data: TextModerationRequest) -> ClientPredictResponse:
     predictions = text_model.predict(data.text)
     return ClientPredictResponse(**predictions, text=data.text)
 
 
 api_router = APIRouter()
 
+
+@api_router.patch('/role/{role}')
+async def changeRole(role: str, request: Request, db: AsyncSession = Depends(getDB)):
+    role = role.lower()
+    token = checkAuthorizationToken(request)
+    username = JWT.getUser(token)
+    user = await UserManager.getUser({"username": username}, db)
+    if role == RolesEnum.student.value:
+        if user.is_verified:
+            await UserManager.updateUser({"user_id": user.user_id}, {"role": role}, db)
+            return JSONResponse("Role was successfully changed to STUDENT")
+        else:
+            raise HTTPException(
+                status_code=403,
+                detail="Error. Your account doesnt verified."
+            )
+
+    # TODO: figure out func with COMPANY
+    # if role == RolesEnum.company.value:
+    #     if user.is_verified:
+    #         await UserManager.updateUser({"user_id": user.user_id}, {"role": role}, db)
+    #         return JSONResponse("Role was successfully changed to STUDENT")
+    #     else:
+    #         raise HTTPException(
+    #             status_code=403,
+    #             detail="Error. Your account doesnt verified."
+    #         )
+    raise HTTPException(
+        status_code=400,
+        detail="Error. Invalid input role."
+    )
 
 @api_router.get('/token')
 async def generateAPIToken(request: Request, db: AsyncSession = Depends(getDB)):
@@ -149,7 +174,7 @@ async def generateAPIToken(request: Request, db: AsyncSession = Depends(getDB)):
 v1_api_router = APIRouter()
 
 
-@v1_api_router.post('/text')
+@v1_api_router.post('/text', response_model=PredictResponse)
 async def apiTextModeration(data: TextPredictRequest, request: Request, db: AsyncSession = Depends(getDB)):
     text = data.text
     token = request.headers.get("Authorization", None)
@@ -184,6 +209,5 @@ async def apiTextModeration(data: TextPredictRequest, request: Request, db: Asyn
 
     predictions = text_model.predict(data.text)
     return PredictResponse(**predictions)
-
 
 # TODO: pricing plan changer
