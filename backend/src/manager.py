@@ -4,8 +4,7 @@ from typing import Union
 from sqlalchemy import select, or_, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import User, UserResponse, SignUpRequest, SignInRequest, ModerationData, TextModeration, GetUser, \
-    UpdateUser
+from src.models import User, UserResponse, SignUpRequest, SignInRequest, ModerationData, TextModeration
 
 
 class UserManager:
@@ -25,20 +24,22 @@ class UserManager:
         async with db as session:
             async with session.begin():
                 user = await session.execute(select(User).filter_by(**user_data))
-                user = user.first()[0]
-                return None if user is None else UserResponse(**user.as_dict())
+                user = user.first()
+                if user is None: return None
+
+                return UserResponse(**user[0].as_dict())
 
     @staticmethod
     async def updateUser(user_data: dict, update_data: dict, db: AsyncSession) -> None:
         async with db as session:
             async with session.begin():
                 user = await session.execute(select(User).filter_by(**user_data))
-                user = user.first()
+                user = user.first()[0]
                 if user is None:
                     raise Exception("User doesn't exist")
 
-                user.update(**update_data)
-                await db.commit()
+                await session.execute(update(User).filter_by(**user_data).values(**update_data))
+                await session.commit()
 
 
 class ModerationManager:
