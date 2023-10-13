@@ -33,7 +33,8 @@ export const useTextInputProps = (props : Omit<iTextInputProps, "onChange" | "va
     placeholder: placeholder || '',
     onChange: handleChange,
     disabled: disabled || false,
-    isHidden: isHidden || false
+    isHidden: isHidden || false,
+    validation: props.validation
   }
 
   return inputProps

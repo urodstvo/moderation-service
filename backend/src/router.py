@@ -17,6 +17,11 @@ auth_router = APIRouter()
 
 @auth_router.post('/signup', response_model=AuthResponse)
 async def signUp(data: SignUpRequest, db: AsyncSession = Depends(getDB)):
+    if data.username == '' or data.email == '' or data.password == '':
+        raise HTTPException(
+            status_code=400,
+            detail="Wrong input data"
+        )
     user = await UserManager.createUser(data, db)
     token = JWT.generate(user.username)
     return AuthResponse(
@@ -95,7 +100,7 @@ async def emailVerification(request: Request, code: str, db: AsyncSession = Depe
     valid_code = Redis.getEmailVerificationCode(user.email)
     if code == valid_code:
         await UserManager.updateUser({"user_id": user.user_id}, {"is_verified": True}, db)
-        return JSONResponse(status_code=200, content={"Email verified"})
+        return JSONResponse(status_code=200, content={"message": "Email verified"})
 
     raise HTTPException(
         status_code=422,

@@ -14,10 +14,10 @@ const SignInForm = () => {
     const [isSignInForm, setIsSignInForm] = useState<boolean>(true);
     const [hidePassword, setHidePassword] = useState<boolean>(true);
 
-    const username = useTextInputProps({placeholder: "USERNAME"});
-    const email = useTextInputProps({placeholder: "EMAIL"})
-    const password = useTextInputProps({placeholder: "PASSWORD", isHidden: hidePassword})
-    const verify_password = useTextInputProps({placeholder: "REPEAT PASSWORD", isHidden: true})
+    const username = useTextInputProps({placeholder: "USERNAME", validation: {rule: /^[a-zA-Z0-9]{8,}$/, error: "Wrong username. Username must contain at least 8 symbols [a-Z][0-9]"}});
+    const email = useTextInputProps({placeholder: "EMAIL", validation: {rule: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, error: "Wrong email."}});
+    const password = useTextInputProps({placeholder: "PASSWORD", isHidden: hidePassword, validation: {rule: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_-])(?=\S+$).{8,}$/, error: "Wrong Password. Must contain at least 8 symbols ([a-Z], at least 1 digit and spec symbol)"}});
+    const verify_password = useTextInputProps({placeholder: "REPEAT PASSWORD", isHidden: true, validation: {rule: RegExp(`^${password.value}$`), error: "Password not matched."}});
 
     // TODO: add validate inputs
 
@@ -31,8 +31,17 @@ const SignInForm = () => {
 
     const signUpHandler =  (e : FormEvent) => {
         e.preventDefault();
-        dispatch(signUp({email: email.value, username: username.value, password: password.value}))
+        const usernameValid: boolean = (!!username.validation && username.validation.rule.test(username.value))
+        const emailValid: boolean = (!!email.validation && email.validation.rule.test(email.value))
+        const passwordValid: boolean = (!!password.validation && password.validation.rule.test(password.value))
+        const rePasswordValid: boolean = (!!verify_password.validation && verify_password.validation.rule.test(verify_password.value))
+
+        const isValid = usernameValid && emailValid && passwordValid && rePasswordValid
+        console.log({email: email.value, username: username.value, password: password.value})
+        if (isValid) dispatch(signUp({email: email.value, username: username.value, password: password.value}))
+        else dispatch(signUp({email: '', username: '', password: ''}))
     }
+
 
     
     return (
@@ -44,8 +53,8 @@ const SignInForm = () => {
             {isSignInForm ? (
                 <>
                 {authState.status === StateStatus.Error && showAlert("Error: Invalid input data")}
-                <TextInput {...username} />
-                <TextInput {...password} />
+                <TextInput {...username} validation={undefined}/>
+                <TextInput {...password} validation={undefined}/>
                 </>
             ) : (
                 <>

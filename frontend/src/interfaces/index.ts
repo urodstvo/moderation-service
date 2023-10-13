@@ -46,7 +46,7 @@ export enum ModPageTab{
 
 export interface iServicePageHeaderProps{
     title: string,
-    description: string,
+    description?: string,
     tab: ModPageTab,
     variant: ModerationType,
 
@@ -57,6 +57,7 @@ export enum StateStatus{
     Loading="Loading",
     Error="Error",
     Success="Success",
+    Verified="Verified"
     
 }
 
@@ -88,7 +89,11 @@ export interface iTextInputProps{
     placeholder?: string, 
     onChange: ChangeEventHandler<HTMLInputElement> | undefined,
     disabled? : boolean,
-    isHidden? : boolean
+    isHidden? : boolean,
+    validation? : {
+        rule: RegExp,
+        error: string
+    }
 }
 
 export interface iCheckBoxProps{

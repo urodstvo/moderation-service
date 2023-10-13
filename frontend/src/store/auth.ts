@@ -162,7 +162,7 @@ export const authSlice = createSlice({
         state.status = StateStatus.Error;
       }),
       builder.addCase(verifyEmail.fulfilled, (state) => {
-        state.status = StateStatus.Success;
+        state.status = StateStatus.Verified;
         state.user!.is_verified = true
       })
 
@@ -174,7 +174,7 @@ export const authSlice = createSlice({
         state.status = StateStatus.Error;
       }),
       builder.addCase(authVerify.fulfilled, (state, {payload}) => {
-        state.status = StateStatus.Success;
+        state.status = StateStatus.Verified;
         state.isAuth = true;
         state.user = payload.user;
         state.token = payload.token.type + ' ' + payload.token.token;
