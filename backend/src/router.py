@@ -95,7 +95,7 @@ async def emailVerification(request: Request, code: str, db: AsyncSession = Depe
     valid_code = Redis.getEmailVerificationCode(user.email)
     if code == valid_code:
         await UserManager.updateUser({"user_id": user.user_id}, {"is_verified": True}, db)
-        return JSONResponse(status_code=200, content={"message": "Email verified"})
+        return JSONResponse(status_code=200, content={"Email verified"})
 
     raise HTTPException(
         status_code=422,

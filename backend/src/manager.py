@@ -34,7 +34,7 @@ class UserManager:
         async with db as session:
             async with session.begin():
                 user = await session.execute(select(User).filter_by(**user_data))
-                user = user.first()[0]
+                user = user.first()
                 if user is None:
                     raise Exception("User doesn't exist")
 
