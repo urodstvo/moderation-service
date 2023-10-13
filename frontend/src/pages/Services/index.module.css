@@ -49,6 +49,8 @@
 
             & > .heroSky{
                 position: absolute;
+                width: 29rem;
+                height: 16rem;
 
                 & svg{
                     filter: drop-shadow(0 0 0.5rem #fff);

@@ -28,8 +28,8 @@ export const Home = () => {
                     <Link to='/services'><Button text='CHECK SERVICES' variant={ColorVariant.white} /></Link>
                 </div>
                 
-                <div className={styles.heroImage} />
             </div>
+            <div className={styles.heroImage} />
         </header>
         </>
     );

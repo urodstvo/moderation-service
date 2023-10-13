@@ -4,6 +4,9 @@ import { ModTypeIcon } from "@/components/icon/ModTypeIcon";
 import styles from "./PageHeader.module.css"
 
 export const PageHeader = ({title, description, tab, variant} : iServicePageHeaderProps) => {
+    description = `Lorem ipsum dolor sit amet consectetur. Pretium nunc fermentum mattis velit nunc nibh leo gravida amet. Aliquet vitae in sagittis turpis ut urna sed. Malesuada sodales mattis commodo pretium fermentum cras etiam sed sed. Amet mauris viverra gravida vulputate sit leo ipsum.
+    Nunc interdum duis non eget pellentesque odio pellentesque rhoncus. Ultricies lacus condimentum ipsum mattis proin urna. Dui sapien tellus quis eu sit eget tristique. Cras curabitur praesent fusce quis amet nibh dolor velit id. Aliquet leo in sit sit lacinia massa metus in vulputate. `
+    
     return (
         <div className={styles.pageHeaderContainer}>
                 <div className={styles.pageHeaderContent}>

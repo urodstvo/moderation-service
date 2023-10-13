@@ -1,7 +1,4 @@
 .serviceCardContainer{
-
-    display: inline-block;
-
     width: 41rem;
     height: 16rem;
     padding: 0.5rem;
@@ -23,6 +20,8 @@
         & > .serviceCardIcon{
             width: 4rem;
             height: 4rem;
+
+            padding: 0.5rem;
     
             border-radius: 2rem;
     
@@ -117,8 +116,22 @@
                 & > .serviceCardInfo{    
                     & *{
                         color: #fff;
-                    }
                 }
             }
         }
     }
+}
+
+
+/* @media screen and (max-width: 1300px) {
+    .serviceCardContainer{
+        width: 48.8rem;
+        height: ;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    .serviceCardContainer{
+        width: 20.5rem;
+    }
+} */
