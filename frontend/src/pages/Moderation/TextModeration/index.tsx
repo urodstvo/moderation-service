@@ -1,16 +1,18 @@
 import styles from "@/pages/Moderation/TextModeration/index.module.css"
 
-import { FormEvent, useEffect, useMemo, useState} from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { PageHeader } from "@/pages/Moderation/components/PageHeader/PageHeader";
 import { PageContentLayout } from "@/pages/Moderation/components/PageContentLayout/PageContentLayout";
 import { InfoCard } from "@/pages/Moderation/components/InfoCard/InfoCard";
 
-import { ModPageTab, ModerationType } from "@/interfaces";
-import { useAppSelector, usePageTitle } from "@/hooks";
+import { ColorVariant, ModPageTab, ModerationType, RoleEnum } from "@/interfaces";
+import { useAppDispatch, useAppSelector, usePageTitle } from "@/hooks";
+import { generateAPIToken } from "@/store/auth";
 
 import debounce from "lodash.debounce"
+import Button from "@/components/ui/Button";
 
 
 export const TextModeration = () => {
@@ -25,7 +27,9 @@ export const TextModeration = () => {
 
     usePageTitle("TEXT MODERATION | CLOUD");
 
-    const { token } = useAppSelector(state => state.auth)
+    const dispatch = useAppDispatch();
+    const apiField = useRef<HTMLDivElement>(null)
+    const { token, user } = useAppSelector(state => state.auth)
     const [response, setResponse] = useState<Response>({
         toxic: '-',
         severe_toxic: '-',
@@ -39,16 +43,12 @@ export const TextModeration = () => {
     const debouncedSetRequestText = debounce(setRequestText, 1000);
 
     const sendRequest = async (text: string) => {
-        let headers: any = {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        }
-
-        if (token) headers.Authorization = token
-
-        const res = await fetch("http://127.0.0.1:8000/moderation/text?APIToken=None", {
+        const res = await fetch("http://127.0.0.1:8000/moderation/text", {
             method: "POST",
-            headers,
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
             body: JSON.stringify({text})
         })
         const obj = await res.json()
@@ -58,6 +58,7 @@ export const TextModeration = () => {
     }
 
     useEffect(() => {if (requestText.length > 0) sendRequest(requestText)}, [requestText])
+
 
 
     const infoDescription = `Lorem ipsum dolor sit amet consectetur. Faucibus sed magna libero leo. 
@@ -72,6 +73,20 @@ export const TextModeration = () => {
         const tab = searchParams.get("tab")?.toUpperCase();
         return tab ?? "INFO";
     }, [searchParams]);    
+
+    const showAPIKey = () =>{
+        let isVisible = false; 
+
+        return () => { 
+            if (!isVisible){ 
+                (apiField.current as HTMLDivElement).innerText = user!.api_token; 
+                isVisible = !isVisible
+            } else { 
+                (apiField.current as HTMLDivElement).innerText = "API TOKEN"; 
+                isVisible = !isVisible
+            }
+        }
+    }
 
 
     return (
@@ -130,13 +145,44 @@ export const TextModeration = () => {
             </>
             )}
 
-            {tab === "INTEGRATION" && (
-            <>
-            <div>
-                integration
+            {tab === "INTEGRATION" && user && (
+            <div className={styles.integrationWrapper}>
+                <div className={styles.integrationSection}>
+                    <div className={styles.apiInfo}>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a magna bibendum, vestibulum eros et, accumsan urna. Etiam cursus sodales fringilla. Aenean a lectus nec ipsum lobortis euismod. Suspendisse potenti. Vestibulum viverra libero a blandit lacinia. Suspendisse accumsan nibh a purus fringilla, vel consectetur mi mollis. Maecenas et sem mi. Nam auctor pulvinar interdum.</p>
+
+                        <p>Nulla aliquet, lacus hendrerit vestibulum fringilla, lorem tortor finibus leo, tristique mollis erat nisi venenatis metus. Quisque eu congue odio. Duis non mollis ex, in luctus nisi. Donec sed odio laoreet, porta sem ac, egestas ante. Donec auctor rhoncus leo. Phasellus quis placerat augue. Suspendisse in ante ut odio cursus blandit nec in nulla. Sed sed urna non quam ornare pulvinar.</p>
+                    </div>
+                    {user.api_token ? (
+                        <div className={styles.apiContainer}>
+                            <div className={styles.apiContent}>
+                                <div className={styles.apiData} ref={apiField}>API TOKEN</div>
+                                <div className={styles.apiActions}>
+                                    <div className={styles.apiAction} onClick={showAPIKey()}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 9C11.2044 9 10.4413 9.31607 9.87868 9.87868C9.31607 10.4413 9 11.2044 9 12C9 12.7956 9.31607 13.5587 9.87868 14.1213C10.4413 14.6839 11.2044 15 12 15C12.7956 15 13.5587 14.6839 14.1213 14.1213C14.6839 13.5587 15 12.7956 15 12C15 11.2044 14.6839 10.4413 14.1213 9.87868C13.5587 9.31607 12.7956 9 12 9ZM12 17C10.6739 17 9.40215 16.4732 8.46447 15.5355C7.52678 14.5979 7 13.3261 7 12C7 10.6739 7.52678 9.40215 8.46447 8.46447C9.40215 7.52678 10.6739 7 12 7C13.3261 7 14.5979 7.52678 15.5355 8.46447C16.4732 9.40215 17 10.6739 17 12C17 13.3261 16.4732 14.5979 15.5355 15.5355C14.5979 16.4732 13.3261 17 12 17ZM12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5Z" fill="white"/>
+                                        </svg>
+                                    </div>
+                                    <div className={styles.apiAction} onClick={() => {navigator.clipboard.writeText(user.api_token)}}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M2.625 22.5H17.625C17.9234 22.5 18.2095 22.3815 18.4205 22.1705C18.6315 21.9595 18.75 21.6734 18.75 21.375V6C18.75 5.80109 18.671 5.61032 18.5303 5.46967C18.3897 5.32902 18.1989 5.25 18 5.25H2.625C2.32663 5.25 2.04048 5.36853 1.82951 5.5795C1.61853 5.79048 1.5 6.07663 1.5 6.375V21.375C1.5 21.6734 1.61853 21.9595 1.82951 22.1705C2.04048 22.3815 2.32663 22.5 2.625 22.5Z" fill="white"/>
+                                            <path d="M18.75 3.75H5.25V2.625C5.25 2.32663 5.36853 2.04048 5.57951 1.8295C5.79048 1.61853 6.07663 1.5 6.375 1.5H21.1875C21.5356 1.5 21.8694 1.63828 22.1156 1.88442C22.3617 2.13056 22.5 2.4644 22.5 2.8125V17.625C22.5 17.9234 22.3815 18.2095 22.1705 18.4205C21.9595 18.6315 21.6734 18.75 21.375 18.75H20.25V5.25C20.25 4.85218 20.092 4.47064 19.8107 4.18934C19.5294 3.90804 19.1478 3.75 18.75 3.75Z" fill="white"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        ) : (
+                        <div className={styles.apiGenerateButton}>
+                            <Button text="Generate API Key" variant={ColorVariant.black} className="width-100" onClick={token ? () => {dispatch(generateAPIToken({token}))} : () => {}} disabled={!(user.role !== RoleEnum.User)}/>
+                        </div>
+                    )}
+                </div>
+                <div className={styles.playgroundSection}>
+                </div>
             </div>
-            </>
             )}
+            
         </PageContentLayout>
         </>
     );

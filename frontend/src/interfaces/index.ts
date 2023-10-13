@@ -32,7 +32,9 @@ export interface iPricingCardProps{
     name: string, 
     price: string, 
     offers: string[],
-    terms: string[] 
+    terms: string[],
+    disabled?: boolean,
+    onChoose?: MouseEventHandler
 }
 
 export enum ModPageTab{
@@ -75,7 +77,8 @@ export interface iAuthState {
         email: string,
         registered_at: Date,
         is_verified: boolean,
-        role: RoleEnum
+        role: RoleEnum,
+        api_token: string
     }
 }
 
