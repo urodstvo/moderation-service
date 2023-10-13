@@ -4,7 +4,8 @@ import TextInput from "@/components/ui/TextInput";
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector, useTextInputProps } from "@/hooks";
 import { signIn, signUp } from "@/store/auth";
-import CheckBoxInput from "./ui/CheckBoxInput";
+import CheckBoxInput from "@/components/ui/CheckBoxInput";
+import { showAlert } from "@/components/ui/Alert";
 
 const SignInForm = () => {
     const dispatch = useAppDispatch()
@@ -23,17 +24,17 @@ const SignInForm = () => {
     const swapForms = () => {setIsSignInForm(prev => !prev); }
     const hidePasswordHandler = () => {setHidePassword(prev => !prev); }
 
-    const signInHandler = async (e : FormEvent) => {
+    const signInHandler = (e : FormEvent) => {
         e.preventDefault();
-        await dispatch(signIn({username: username.value, password: password.value}))
+        dispatch(signIn({username: username.value, password: password.value}))
     }
 
-    const signUpHandler = async (e : FormEvent) => {
+    const signUpHandler =  (e : FormEvent) => {
         e.preventDefault();
-        await dispatch(signUp({email: email.value, username: username.value, password: password.value}))
+        dispatch(signUp({email: email.value, username: username.value, password: password.value}))
     }
 
-
+    
     return (
         <div className="auth-container">
             {authState.status === StateStatus.Loading && "Loading..."}
@@ -42,11 +43,13 @@ const SignInForm = () => {
             
             {isSignInForm ? (
                 <>
+                {authState.status === StateStatus.Error && showAlert("Error: Invalid input data")}
                 <TextInput {...username} />
                 <TextInput {...password} />
                 </>
             ) : (
                 <>
+                {authState.status === StateStatus.Error && showAlert("Error: Validation error")}
                 <TextInput {...email} />
                 <TextInput {...username} />
                 <TextInput {...password} />
@@ -65,9 +68,10 @@ const SignInForm = () => {
             {isSignInForm ? (
                 <Button 
                     className="fill-container" 
-                    text="SIGN IN" 
+                    text={authState.status === StateStatus.Loading ? "LOADING" : "SIGN IN" }
                     variant={ColorVariant.black} 
                     onClick={(e) => {signInHandler(e)}}
+                    disabled={authState.status === StateStatus.Loading}
                 />
             ) : (
                 <Button 

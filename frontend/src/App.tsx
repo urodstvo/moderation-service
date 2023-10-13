@@ -1,18 +1,19 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { Route, Routes, useSearchParams } from 'react-router-dom'
 import { admin_routes, public_routes } from '@/pages/index.tsx'
 import Navbar from '@/components/Navbar.tsx'
 import Modal from '@/components/Modal';
-import SignInForm from './components/SignInForm';
+import SettingsForm from '@/components/SettingsForm';
+import SignInForm from '@/components/SignInForm';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { authVerify } from './store/auth';
-import SettingsForm from './components/SettingsForm';
-import { RoleEnum } from './interfaces';
+import { RoleEnum, StateStatus } from './interfaces';
+import { showAlert } from './components/ui/Alert';
 
 const App = () => {
     const [searchParams, SetSearchParams] = useSearchParams();
     const dispatch = useAppDispatch()
-    const isAuth = useAppSelector(state => state.auth.isAuth)
+    const auth = useAppSelector(state => state.auth)
     const role = useAppSelector(state => state.auth.user?.role)
 
     useEffect(() => {
@@ -23,17 +24,19 @@ const App = () => {
     const openModal = useMemo(() => {
         if (!!searchParams.get('modal'))
             if (searchParams.get('modal') === "signIn")
-                return isAuth ? SetSearchParams(prev => prev.toString().replace("modal=signIn", '')) : (<Modal><SignInForm /></Modal>);
+                return auth.isAuth ? SetSearchParams(prev => prev.toString().replace("modal=signIn", '')) : (<Modal><SignInForm /></Modal>);
             
-            else if (isAuth && searchParams.get('modal') === "settings")
+            else if (auth.isAuth && searchParams.get('modal') === "settings")
                 return (<Modal><SettingsForm /></Modal>);
 
-            else if (isAuth && searchParams.get('modal') === "notification")
+            else if (auth.isAuth && searchParams.get('modal') === "notification")
                 return (<Modal><div /></Modal>);
-    }, [searchParams, isAuth]);
+        else return null;
+    }, [searchParams, auth]);
 
     return (
-    <>
+    <>    
+    {auth.status === StateStatus.Success && showAlert(`Welcome to our platform, ${auth.user?.username}!`)}
     {openModal}
     <Navbar />
     <main className="main-container">

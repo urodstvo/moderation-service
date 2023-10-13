@@ -18,10 +18,8 @@ export const authVerify = createAsyncThunk(
               Authorization: token
             },
           })
-      if (response.ok)
-            return response.json();
-      else 
-            thunkAPI.rejectWithValue("error");
+      if (response.ok) return response.json();
+      else return thunkAPI.rejectWithValue("");
     }
 )
 
@@ -41,10 +39,8 @@ export const signIn = createAsyncThunk(
               }
           )
       })
-      if (response.ok)
-            return response.json();
-      else 
-            thunkAPI.rejectWithValue("error");
+      if (response.status === 200) return response.json();
+      else return thunkAPI.rejectWithValue('')
     }
 )
 
@@ -65,14 +61,12 @@ export const signUp = createAsyncThunk(
               }
           )
       })
-      if (response.ok)
-            return response.json();
-      else 
-            thunkAPI.rejectWithValue("error");
+      if (response.ok) return response.json();
+      else return thunkAPI.rejectWithValue("error");
     }
 )
 
-export const sendVerificationCode = async ({email, token}: {email: string, token: string}) => {
+export const sendVerificationCode = async ({token}: {token: string}) => {
       await fetch("http://127.0.0.1:8000/email/request", {
           method: "POST",
           headers: {
@@ -80,35 +74,37 @@ export const sendVerificationCode = async ({email, token}: {email: string, token
               Accept: "application/json",
               Authorization: token
             },
-          body: JSON.stringify(
-              {
-                  email
-              }
-          )
       })
     }
 
 export const verifyEmail = createAsyncThunk(
   'verifyEmail',
-  async ({code, email, token}: {code: string, email: string, token: string}, thunkAPI) => {
-      const response = await fetch("http://127.0.0.1:8000/email/verify", {
-          method: "POST",
+  async ({code, token}: {code: string, token: string}, thunkAPI) => {
+      const response = await fetch(`http://127.0.0.1:8000/email/verify?code=${code}`, {
+          method: "PATCH",
           headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
               Authorization: token
             },
-          body: JSON.stringify(
-              { 
-                code,
-                email
-              }
-          )
       })
-      if (response.ok)
-            return "ok";
-      else 
-            thunkAPI.rejectWithValue("error");
+      if (response.ok) return "ok";
+      else return thunkAPI.rejectWithValue("");
+    }
+)
+
+export const generateAPIToken = createAsyncThunk(
+  'genAPIToken',
+  async ({token}: {token: string}, thunkAPI) => {
+    const response = await fetch("http://localhost:8000/api/token",{
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: token as string
+      }})
+      if (response.ok) return response.json();
+      else return thunkAPI.rejectWithValue("");
     }
 )
 
@@ -116,6 +112,9 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setRole: (state, {payload}) => {
+      state.user!.role = payload.role
+    },
     logOut: () => {
       localStorage.removeItem('token');
       return initialState
@@ -145,6 +144,7 @@ export const authSlice = createSlice({
       builder.addCase(signUp.rejected, (state) => {
         logOut()
         state.status = StateStatus.Error;
+   
       }),
       builder.addCase(signUp.fulfilled, (state, {payload}) => {
         state.status = StateStatus.Success;
@@ -180,9 +180,15 @@ export const authSlice = createSlice({
         state.token = payload.token.type + ' ' + payload.token.token;
         localStorage.setItem("token", state.token);
       })
+
+      builder.addCase(generateAPIToken.fulfilled, (state, {payload}) => {
+        state.status = StateStatus.Success;
+        state.user!.api_token = payload.api_token
+
+      })
   },
 })
 
-export const { logOut } = authSlice.actions
+export const { logOut, setRole } = authSlice.actions
 
 export default authSlice.reducer

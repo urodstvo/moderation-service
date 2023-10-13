@@ -379,7 +379,7 @@
                 font-size: 0.1rem;
                 
                 border: 0.2rem solid #000;
-                border-radius: 2rem;
+                border-radius: 0.5rem;
                 
                 padding: 1.7rem 2rem 0.3rem;
                 
@@ -478,15 +478,43 @@
 
             gap: 2rem;
 
-            & > .settings-username, & > .settings-role{
+            & > .settings-username, & > .settings-role, & > .settings-api-key, & > .settings-email{
                 display: flex;
-                align-items: center;
+                align-items: center;                
+                gap: 2rem;
             }
 
-            & > .settings-email{
-                display: flex;
-                align-items: center;
-                gap: 3rem;
+            & > .settings-api-key{
+                & > .settings-api-key-actions{
+                    height: 100%;
+                    display: flex;
+        
+                    & > .settings-api-key-action{
+                        width: 4rem;
+                        height: 4rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+        
+                        cursor: pointer;
+        
+                        & *{
+                            transition: all 0.1s;
+                            fill: #000;
+                            width: 75%;
+                            height: 75%;
+                        }
+        
+                        &:hover *{
+                            fill: #333;
+                        }
+        
+                        &:active *{
+                            width: 50%;
+                            height: 50%;
+                        }
+                    }
+                }
             }
 
             & > .settings-verification{
@@ -557,6 +585,57 @@
             }
         }
     }
+
+    .alert-container{
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+
+        z-index: 1000000;
+        position: absolute;
+        bottom: 2rem;
+        right: 2rem;
+
+        width: 25rem;
+        height: 8rem;
+
+        border: 0.2rem solid #000;
+        border-radius: 1rem;
+        padding: 0.5rem;
+
+        overflow: hidden;
+
+        & > .alert-content{
+            flex: 1;
+            font-size: 1.6rem;
+
+            display: flex;
+            align-items: center;
+        }
+        
+        & > .alert-timer{
+            border-radius: 0 0 0.5rem 0.5rem;
+            height: 0.75rem;
+            background-color: #000;
+            animation-name: timer;
+            animation-duration: 3.2s;
+            animation-timing-function: ease;
+            width: 100%;
+
+        }
+
+        
+    }
+
+    @keyframes timer{
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0;
+        }
+    } 
 }
 
 @layer util{
