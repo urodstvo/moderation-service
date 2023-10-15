@@ -37,8 +37,12 @@ const IntegrationTab = () => {
         <div className={styles.integrationWrapper}>
                 <div className={styles.integrationSection}>
                     <div className={styles.apiInfo}>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a magna bibendum, vestibulum eros et, accumsan urna. Etiam cursus sodales fringilla. Aenean a lectus nec ipsum lobortis euismod. Suspendisse potenti. Vestibulum viverra libero a blandit lacinia. Suspendisse accumsan nibh a purus fringilla, vel consectetur mi mollis. Maecenas et sem mi. Nam auctor pulvinar interdum.</p>
-                        <p>Nulla aliquet, lacus hendrerit vestibulum fringilla, lorem tortor finibus leo, tristique mollis erat nisi venenatis metus. Quisque eu congue odio. Duis non mollis ex, in luctus nisi. Donec sed odio laoreet, porta sem ac, egestas ante. Donec auctor rhoncus leo. Phasellus quis placerat augue. Suspendisse in ante ut odio cursus blandit nec in nulla. Sed sed urna non quam ornare pulvinar.</p>
+                        <p>Integrating a text moderation service via an API is a convenient and efficient way to automate and improve the process of controlling and filtering text content transmitted or displayed on a web platform, application or other online service.</p>
+                        <p>The main benefits of integrating a text moderation service through an API include:</p>
+                        <p>1. Saving time and effort;</p>
+                        <p>2. Improved content quality;</p>
+                        <p>3. Improved security;</p>
+                        <p>4. Scalability;</p>
                     </div>
                     {user && (
                     <>

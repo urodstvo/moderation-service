@@ -4,8 +4,9 @@ import { ModTypeIcon } from "@/components/icon/ModTypeIcon";
 import styles from "./PageHeader.module.css"
 
 export const PageHeader = ({title, description, tab, variant} : iServicePageHeaderProps) => {
-    description = `Lorem ipsum dolor sit amet consectetur. Pretium nunc fermentum mattis velit nunc nibh leo gravida amet. Aliquet vitae in sagittis turpis ut urna sed. Malesuada sodales mattis commodo pretium fermentum cras etiam sed sed. Amet mauris viverra gravida vulputate sit leo ipsum.
-    Nunc interdum duis non eget pellentesque odio pellentesque rhoncus. Ultricies lacus condimentum ipsum mattis proin urna. Dui sapien tellus quis eu sit eget tristique. Cras curabitur praesent fusce quis amet nibh dolor velit id. Aliquet leo in sit sit lacinia massa metus in vulputate. `
+    description = `A powerful text content moderation tool that provides options for safe and effective content control and management. 
+    The service is based on advanced algorithms and machine learning technologies that allow us to automatically detect and classify different types of unwanted content, categorising it into 6 main classes: toxicity, excessive toxicity, threats, personal hatred, insults and non-protest.
+    One of the key features of our service is the ability to integrate using APIs. This means you can easily integrate our moderation system into your application. `
     
     return (
         <div className={styles.pageHeaderContainer}>

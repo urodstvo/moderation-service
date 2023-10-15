@@ -63,6 +63,11 @@
                     justify-content: space-between;
                     
                     & > .responseDataContent{
+                        &.responseDataLoading{
+                            & *{
+                                color:rgba(255, 255, 255, 0.3) !important;
+                            }
+                        }
                         font-style: normal;
                         color: rgba(255, 255, 255, 0.5);
                         

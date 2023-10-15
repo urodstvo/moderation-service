@@ -34,7 +34,7 @@
             display: flex;
             align-items: center;
 
-            &:hover{
+            &.sidebarTabSelected, &:hover{
                 color: #fff;
                 border-left: 2px solid #000;
                 background: rgba(0, 0, 0, 0.75);
@@ -66,6 +66,7 @@
             }
 
             & > .sidebarTab{
+
                 border-bottom: 0.1rem solid #000;
             }
 
@@ -99,7 +100,7 @@
     & > .docsContent{
         width: 100%;
 
-        font-size: 2rem;
+        font-size: 1.6rem;
 
     }
 }

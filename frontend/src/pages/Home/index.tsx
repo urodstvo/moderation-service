@@ -19,7 +19,7 @@ export const Home = () => {
                 </div>
                 
                 <div className={styles.heroDescription}>
-                    Lorem ipsum dolor sit amet consectetur. Netus tortor tortor facilisis ut. Vulputate turpis auctor tempor amet purus non id gravida odio. 
+                    We use advanced artificial intelligence technologies to intelligently analyse and effectively filter user-generated content
                 </div>
 
                 <div className={styles.heroActions}>

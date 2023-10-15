@@ -8,7 +8,7 @@ app = FastAPI(title="MODERATION SERVICE")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "0.0.0.0"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "0.0.0.0", "https://srg9fnqj-5173.euw.devtunnels.ms"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

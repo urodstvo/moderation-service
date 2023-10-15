@@ -1,2 +1,28 @@
-# moderation-service
-coursework ( 4/1 )
+# Moderation service platform
+coursework ( 4 / 1 )
+
+# .env content
+```
+DATABASE_URL=...
+
+JWT_SECRET=...
+JWT_LIVETIME=...
+
+AUTH_TOKEN_TYPE=...
+
+MAIL_USERNAME=...
+MAIL_PASSWORD=...
+MAIL_FROM=...
+MAIL_PORT=...
+MAIL_SERVER=...
+```
+
+# System running
+
+```
+git clone https://github.com/CLOWNAKIO/moderation-service
+cd moderation-service
+make run
+```
+
+edit backend/alembic.ini

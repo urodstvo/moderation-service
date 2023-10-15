@@ -245,6 +245,15 @@
         line-height: normal;
         padding: 0 4.5rem;
     }
+    
+    h3{
+        color: #000;
+        font-family: Overpass;
+        font-size: 2.5rem;
+        font-style: normal;
+        font-weight: bold;
+        line-height: normal;
+    }
 
     section{
         margin: 4rem 0;
@@ -252,6 +261,45 @@
 
     p{
         margin-bottom: 2rem;
+    }
+
+    .code{
+        width: 100%;
+        background: #444;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+
+        & > code{
+            color: #fff;
+            width: 100%;
+        }
+    }
+
+    .response-table{
+        width: 100%;
+        border: 0.1rem dashed #000;
+        border-collapse: collapse;
+        
+        & td, & th{
+            padding: 0.5rem 0;
+            border: 0.1rem dashed #000;
+            
+        }
+
+        & th{
+            color: #fff;
+            background: #444;
+        }
+        
+        & > tr{
+            & td{
+                &:first-of-type{
+                    width: 20%;
+                    text-align: center;
+                }
+            }
+        }
     }
 
     .modal-container{
