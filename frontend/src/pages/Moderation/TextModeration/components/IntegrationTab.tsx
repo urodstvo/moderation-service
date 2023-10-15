@@ -7,14 +7,15 @@ import Button from "@/components/ui/Button";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { ColorVariant, RoleEnum } from "@/interfaces";
 import { generateAPIToken } from "@/store/auth";
-import { useRef, useState } from "react";
-import { showAlert } from "@/components/ui/Alert";
+import { useRef } from "react";
+import { AlertInfo } from "@/components/ui/Alert";
 
 
 const IntegrationTab = () => {
     const dispatch = useAppDispatch()
     
-    const { token, user } = useAppSelector(state => state.auth)
+    const { user } = useAppSelector(state => state.auth)
+    const token = localStorage.getItem('token')
     const apiField = useRef<HTMLDivElement>(null)
 
     const showAPIKey = () =>{
@@ -27,12 +28,9 @@ const IntegrationTab = () => {
         }
     }
 
-    const [copied, setCopied] = useState<boolean>(false)
-
     const copyAPIKey = () => {
         navigator.clipboard.writeText(user!.api_token); 
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000)
+        AlertInfo("API Key copied to clipboard.")
     }
 
     return (
@@ -44,7 +42,6 @@ const IntegrationTab = () => {
                     </div>
                     {user && (
                     <>
-                    {copied && showAlert("API Key copied to clipboard.")}
                     {user.api_token ? (
                         <div className={styles.apiContainer}>
                             <div className={styles.apiContent}>
@@ -68,7 +65,7 @@ const IntegrationTab = () => {
                                 text="Generate API Key" 
                                 variant={ColorVariant.black} 
                                 className="width-100" 
-                                onClick={token ? () => {dispatch(generateAPIToken({token}))} : () => {}} 
+                                onClick={token ? async () => {dispatch(generateAPIToken({token}))} : () => {}} 
                                 disabled={!(user.role !== RoleEnum.User)}
                             />
                         </div>

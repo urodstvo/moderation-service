@@ -2,8 +2,9 @@
 import styles from "@/pages/Moderation/TextModeration/index.module.css"
 
 import { FormEvent, useEffect, useState } from "react";
-
 import debounce from "lodash.debounce"
+import { useTextModerationMutation } from "@/api/moderationAPI";
+import { AlertError } from "@/components/ui/Alert";
 
 
 const PlaygroundTab = () => {
@@ -25,25 +26,20 @@ const PlaygroundTab = () => {
         identity_hate: '-',
     }) 
 
+    const [moderate, {isSuccess, isError, data, error}] = useTextModerationMutation()
     const [requestText, setRequestText] = useState<string>('');
     const debouncedSetRequestText = debounce(setRequestText, 1000);
 
-    const sendRequest = async (text: string) => {
-        const res = await fetch("http://127.0.0.1:8000/moderation/text", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify({text})
-        })
-        const obj = await res.json()
-        delete obj.text
-        setResponse(obj);
+    useEffect(() => {if (isSuccess) { 
+        const {text, ...response} = data; 
+        setResponse(response)
+    }}, [isSuccess])
+    useEffect(() => {if (isError && error) AlertError(error.toString())}, [isError])
 
-    }
+    const sendRequest = async (text: string) => { await moderate(text) }
 
-    useEffect(() => {if (requestText.length > 0) sendRequest(requestText)}, [requestText])
+    useEffect(() => {
+        if (requestText.length > 0)  sendRequest(requestText);}, [requestText])
 
     return (
         <>
@@ -63,10 +59,10 @@ const PlaygroundTab = () => {
                     <div className={styles.responseContent}>
                         <div className={styles.responseDataContainer}>
                             response.json
-                            <div className={styles.responseDataContent}>
+                            <div className={[styles.responseDataContent].join(' ')}>
                                 {"BODY: {"}
                                     {/* @ts-ignore-error */}
-                                    {Object.getOwnPropertyNames(response).map((prop, ind) => (<div className={styles.responseDataField} key={ind}><div>{prop}:</div><div>{parseFloat(response[prop]).toFixed(4)},</div></div>))}
+                                    {Object.getOwnPropertyNames(response).map((prop, ind) => (<div className={styles.responseDataField} key={ind}><div>{prop}:</div><div>{(parseFloat(response[prop])).toFixed(4)},</div></div>))}
                                 {"}"}
                             </div>
                         </div>

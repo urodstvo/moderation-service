@@ -1,7 +1,9 @@
 import { iTextInputProps } from "@/interfaces";
+import debounce from "lodash.debounce";
 import { ChangeEvent, memo, useEffect, useId, useState } from "react";
 
-const TextInput = memo(({
+const TextInput = ({
+    name,
     className = '',
     value, 
     placeholder = '', 
@@ -12,28 +14,26 @@ const TextInput = memo(({
 } : iTextInputProps) => {
     const id = useId();
     const [isValid, setIsValid] = useState<boolean>(true);
-   
-    let debouncedValidate = () => {};
-    // if (validation) debouncedValidate = debounce(() => {setIsValid(validation.rule.test(value))}, 1000);
 
-    useEffect(() => {if (!!validation) setIsValid(validation.rule.test(value))}, [value])
+    useEffect(() => {if (!!validation && value !== '') setIsValid(validation.rule.test(value))}, [value])
 
     return (
-        <div className ={["input-container", className, disabled ? "input-disabled" : ''].join(' ')}>
+        <div className ={["input-container", className, disabled ? "input-disabled" : '', isValid ? '' : 'not-valid'].join(' ')}>
             <div className="input-content">
                 <input
                     type={!isHidden ? "text" : "password"} 
                     placeholder=" " 
                     value={value} 
-                    onChange={(e : ChangeEvent<HTMLInputElement>) => {onChange(e); debouncedValidate()}}
+                    onChange={(e : ChangeEvent<HTMLInputElement>) => {onChange(e)}}
                     disabled={disabled} 
                     id={id}
+                    name={name}
                 />
                 <label htmlFor={id}> {placeholder} </label>
             </div>
             {!!validation && !isValid && <div className="input-validation-error">{validation.error}</div>}
         </div>
     );
-});
+};
 
 export default TextInput;

@@ -6,6 +6,7 @@ import { useAppSelector } from "@/hooks";
 export const PlanCard = ({name, price, offers, terms, disabled = false, onChoose } : iPricingCardProps) => {
     const { user } = useAppSelector(state => state.auth)
     const choosen = name.toLowerCase() === user?.role
+    
     return (
         <div className={styles.pricingCardContainer}>
             <div className={styles.pricingCardContent}>
@@ -33,5 +34,3 @@ export const PlanCard = ({name, price, offers, terms, disabled = false, onChoose
         </div>
     );
 };
-
-// TODO: Add func if use not authed, user not verified and etc.

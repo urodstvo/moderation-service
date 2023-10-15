@@ -5,35 +5,49 @@ import Timer from "@/components/Timer";
 import { useAppDispatch, useAppSelector, usePageTitle, useTextInputProps } from "@/hooks";
 import { ColorVariant } from "@/interfaces";
 import { useEffect, useRef, useState } from "react";
-import { sendVerificationCode, verifyEmail } from "@/store/auth";
 import ClipboardCopyIcon from "./icon/ClipboardCopyIcon";
 import VisibilityIcon from "./icon/VisibilityIcon";
-import { showAlert } from "./ui/Alert";
+import { AlertError, AlertInfo, AlertSuccess } from "./ui/Alert";
+import { useSendCodeMutation, useVerifyEmailMutation } from "@/api/emailAPI";
+import { verify } from "@/store/auth";
 
 const SettingsForm = () => {
     usePageTitle("SETTINGS | CLOUD");
-    
-    const dispatch = useAppDispatch()
-    const { token, user } = useAppSelector(state => state.auth);
-    const codeElement = useRef<HTMLDivElement>(null);
-    
-    const [changes, setChanges] = useState<number>(0)
-    
-    const [isVerifying, setIsVerifying] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
 
+    const dispatch = useAppDispatch()
+    const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+    const [verifyEmail, {isSuccess : emailVerified}] = useVerifyEmailMutation() 
+    const [requestEmail, {isSuccess : emailSended, isLoading: emailSending} ] = useSendCodeMutation()
+    
+    useEffect(()=>{
+        if (emailVerified) {
+            dispatch(verify()); 
+            AlertSuccess("Your email was verified")
+        }
+    }, [emailVerified])
+
+    useEffect(()=>{
+        if (emailSended) setIsVerifying(true); 
+    }, [emailSended])
+
+    const { user } = useAppSelector(state => state.auth);
+    const codeElement = useRef<HTMLDivElement>(null);
+
+    const sendMail = async () => {
+        await requestEmail()
+    }
 
     const verificationHandler = async () => {
-        if (isVerifying && token) {
+        if (isVerifying) {
             const element = codeElement.current as HTMLDivElement
             const inputs = [...element.querySelectorAll('input')]
             
             const code = inputs.map(el => el.value).join('')
             
-            await dispatch(verifyEmail({code: code, token: token}))
+            await verifyEmail(code)
 
-            setTimeout(() => setIsVerifying(false), 1000)
-            setChanges(0);
+            setIsVerifying(false);
         }
     }
 
@@ -80,37 +94,25 @@ const SettingsForm = () => {
             }
     }, [isVerifying])
 
-    const sendMail = () => {
-        setChanges(prev => prev + 1);
-        setIsVerifying(true); 
-        sendVerificationCode({token: token!});
-    }
-
     const timerCallback = () => {
         setIsVerifying(false); 
-        setError(true);
+        AlertError("Sorry, you didn't have time to enter the code. Try again.")
     }
 
     const [shownAPIKey, setShownAPIKey] = useState<boolean>(false)
-
-
 
     const username = useTextInputProps({placeholder: "USERNAME", className: "flex-1", disabled: true});
     const email = useTextInputProps({placeholder: "EMAIL", className: "flex-1", disabled: true});
     const role = useTextInputProps({placeholder: "ROLE", className: "flex-1", disabled: true});
     const api_token = useTextInputProps({placeholder: "API KEY", className: "flex-1", disabled: true, isHidden: !shownAPIKey});
 
-    const [copied, setCopied] = useState<boolean>(false)
-
     const copyAPIKey = () => {
         navigator.clipboard.writeText(user!.api_token); 
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000)
+        AlertInfo("API Key copied to clipboard.")
     }
 
     return (
         <>
-        {copied && showAlert("API Key copied to clipboard.")}
         {!!user && (        
         <div className="settings-container">
             <div className="settings-content">
@@ -129,10 +131,15 @@ const SettingsForm = () => {
                         {!isVerifying ? (
                             <>
                             <div className="verification-info">
+                                {!emailSending ? (
+                                <>
                                 <div className="verification-action" onClick={sendMail}> Verify Email </div>
                                 <div>Email Is Not Verified</div>
+                                </>
+                                ) : (
+                                <div>Sending the code to your email </div>
+                                )}
                             </div>
-                            {error && <div className="verification-error" onClick={() => setError(false)}>Sorry, you didn't have time to enter the code. Try again.</div>}
                             </>
                         ) : (
                             <>
@@ -174,14 +181,13 @@ const SettingsForm = () => {
             </div>
 
 
-            {!!changes && (
             <Button 
                 className="width-100"
                 text={isVerifying ? "VERIFY" : "SAVE"}
                 variant={ColorVariant.black}
                 onClick={verificationHandler}
                 disabled={!isVerifying}
-            />)}
+            />
         </div>)}
         </>
     );

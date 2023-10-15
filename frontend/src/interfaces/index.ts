@@ -69,9 +69,7 @@ export enum RoleEnum{
 }
 
 export interface iAuthState {
-    status: StateStatus,
     isAuth: boolean,
-    token?: string,
     user?:{
         id: string,
         username: string,
@@ -84,6 +82,7 @@ export interface iAuthState {
 }
 
 export interface iTextInputProps{
+    name?: string,
     className?: string,
     value: string,
     placeholder?: string, 

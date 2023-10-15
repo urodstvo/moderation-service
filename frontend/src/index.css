@@ -179,7 +179,7 @@
         }
     }
 
-    button{
+    .button{
         &:disabled{
             cursor: not-allowed !important;
             opacity: 0.75;
@@ -291,50 +291,15 @@
         }
     }
 
-    .auth-container{
-        padding: 4rem;
-        background: #fff;
-
-        & > .form-switcher{
-            font-size: 1.6rem;
-            margin-bottom: 2rem;
-            text-align: end;
-            
-            & > span{
-                cursor: pointer;
-                transition: font-size 0.15s ease-in-out;
-
-                &:active{
-                    font-size: 1.4rem;
-                }
-            }
-        }
-
-        & > .auth-content{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-
-            & > .auth-show-password{
-                width: 100%;
-
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 2rem;
-                padding: 0 2rem;
-                font-size: 1.6rem;
-
-                & > label{
-                    pointer-events: none;
-                }
-            }
-        }
-    }
-
     .input-container{
         width: 30rem;
+
+        &.not-valid{
+            & input
+            {
+                border-color: tomato !important;
+            }
+        }
 
         &.input-disabled{
             & *{
@@ -348,11 +313,17 @@
             }
         }
 
+        & > .input-validation-error{
+            color: tomato;
+            font-size: 1.2rem;
+        }
+
         & > .input-content{
             position: relative;
             vertical-align: bottom;
 
             width: 100%;
+
              
             & > label{
                 transition: all 0.4s;
@@ -586,56 +557,6 @@
         }
     }
 
-    .alert-container{
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-
-        z-index: 1000000;
-        position: absolute;
-        bottom: 2rem;
-        right: 2rem;
-
-        width: 25rem;
-        height: 8rem;
-
-        border: 0.2rem solid #000;
-        border-radius: 1rem;
-        padding: 0.5rem;
-
-        overflow: hidden;
-
-        & > .alert-content{
-            flex: 1;
-            font-size: 1.6rem;
-
-            display: flex;
-            align-items: center;
-        }
-        
-        & > .alert-timer{
-            border-radius: 0 0 0.5rem 0.5rem;
-            height: 0.75rem;
-            background-color: #000;
-            animation-name: timer;
-            animation-duration: 3.2s;
-            animation-timing-function: ease;
-            width: 100%;
-
-        }
-
-        
-    }
-
-    @keyframes timer{
-        from {
-            width: 100%;
-        }
-
-        to {
-            width: 0;
-        }
-    } 
 }
 
 @layer util{

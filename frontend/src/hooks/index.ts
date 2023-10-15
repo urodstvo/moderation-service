@@ -28,6 +28,7 @@ export const useTextInputProps = (props : Omit<iTextInputProps, "onChange" | "va
   const handleChange : ChangeEventHandler = (e: ChangeEvent) => setValue((e.target as HTMLInputElement).value);
 
   const inputProps : iTextInputProps =  {
+    name: props.name,
     className: className || '',
     value: value,
     placeholder: placeholder || '',
