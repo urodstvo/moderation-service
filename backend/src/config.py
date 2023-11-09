@@ -1,8 +1,12 @@
 import os
+
+import pytesseract
 import redis
 
 from dotenv import load_dotenv, find_dotenv
 from fastapi_mail import ConnectionConfig
+
+pytesseract.pytesseract.tesseract_cmd = r'D:\Tesseract-OCR\tesseract'
 
 load_dotenv(find_dotenv())
 

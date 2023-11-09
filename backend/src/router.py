@@ -1,7 +1,12 @@
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, status, Depends, Request
+import cv2
+import numpy as np
+import pytesseract
+from PIL import Image
+from deep_translator import GoogleTranslator
+from fastapi import APIRouter, HTTPException, status, Depends, Request, File, UploadFile
 from fastapi_mail import MessageSchema, MessageType
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
@@ -111,10 +116,25 @@ async def emailVerification(request: Request, code: str, db: AsyncSession = Depe
 mod_router = APIRouter()
 
 
-@mod_router.post("/text", response_model=ClientPredictResponse)
-async def moderateText(data: TextModerationRequest) -> ClientPredictResponse:
-    predictions = text_model.predict(data.text)
-    return ClientPredictResponse(**predictions, text=data.text)
+@mod_router.post("/text", response_model=PredictResponse)
+async def moderateText(data: TextModerationRequest) -> PredictResponse:
+    en_text = GoogleTranslator(source='auto', target='en').translate(data.text)
+    predictions = text_model.predict(en_text)
+    return PredictResponse(**predictions)
+
+
+@mod_router.post("/image", response_model=PredictResponse)
+async def moderateImage(file: UploadFile = File(...)) -> PredictResponse:
+    image = Image.open(file.file)
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    _, image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
+    image = cv2.medianBlur(image, 3)
+    image = cv2.filter2D(image, -1, kernel=np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]))
+    text = pytesseract.image_to_string(image, lang='rus')
+    # TODO: figure out how to recognize different langs better
+    en_text = GoogleTranslator(source='auto', target='en').translate(text)
+    predictions = text_model.predict(en_text)
+    return PredictResponse(**predictions)
 
 
 api_router = APIRouter()
@@ -215,5 +235,3 @@ async def apiTextModeration(data: TextPredictRequest, request: Request, db: Asyn
 
     predictions = text_model.predict(data.text)
     return PredictResponse(**predictions)
-
-# TODO: pricing plan changer
