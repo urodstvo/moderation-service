@@ -2,11 +2,15 @@ import os
 
 import pytesseract
 import redis
+import speech_recognition as sr
 
 from dotenv import load_dotenv, find_dotenv
 from fastapi_mail import ConnectionConfig
 
 pytesseract.pytesseract.tesseract_cmd = r'D:\Tesseract-OCR\tesseract'
+TEMP_DIR = 'D:/practice-frontend-projects/moderation-service/backend/src/temp/'
+
+speech_recognizer = sr.Recognizer()
 
 load_dotenv(find_dotenv())
 

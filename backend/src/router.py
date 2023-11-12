@@ -1,21 +1,25 @@
+import os
 import uuid
 from datetime import datetime
 
 import cv2
 import numpy as np
 import pytesseract
+import speech_recognition
 from PIL import Image
 from deep_translator import GoogleTranslator
 from fastapi import APIRouter, HTTPException, status, Depends, Request, File, UploadFile
 from fastapi_mail import MessageSchema, MessageType
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
+from src.config import speech_recognizer, TEMP_DIR
 from src.database import getDB
 from src.manager import UserManager, ModerationManager
 from src.util import JWT, Email, Redis, text_model, checkAuthorizationToken
 from src.models import SignUpRequest, AuthResponse, Token, SignInRequest, TextModerationRequest, PredictResponse, \
-    RolesEnum, TextPredictRequest, ModerationData, TextModeration, ClientPredictResponse
+    RolesEnum, TextPredictRequest, ModerationData, TextModeration
 
 auth_router = APIRouter()
 
@@ -123,6 +127,7 @@ async def moderateText(data: TextModerationRequest) -> PredictResponse:
     return PredictResponse(**predictions)
 
 
+# TODO: figure out how to recognize different langs better
 @mod_router.post("/image", response_model=PredictResponse)
 async def moderateImage(file: UploadFile = File(...)) -> PredictResponse:
     image = Image.open(file.file)
@@ -131,10 +136,58 @@ async def moderateImage(file: UploadFile = File(...)) -> PredictResponse:
     image = cv2.medianBlur(image, 3)
     image = cv2.filter2D(image, -1, kernel=np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]))
     text = pytesseract.image_to_string(image, lang='rus')
-    # TODO: figure out how to recognize different langs better
     en_text = GoogleTranslator(source='auto', target='en').translate(text)
     predictions = text_model.predict(en_text)
     return PredictResponse(**predictions)
+
+
+@mod_router.post("/audio", response_model=PredictResponse)
+async def moderateAudio(file: UploadFile = File(...)) -> PredictResponse:
+    try:
+        # support wav format
+        with speech_recognition.AudioFile(file.file) as source:
+            audio = speech_recognizer.record(source)
+    except:
+        raise HTTPException(
+            status_code=400,
+            detail='Wrong audio format'
+        )
+    try:
+        text = speech_recognizer.recognize_google(audio, language='ru-RU')
+        en_text = GoogleTranslator(source='auto', target='en').translate(text)
+        predictions = text_model.predict(en_text)
+        return PredictResponse(**predictions)
+    except speech_recognition.UnknownValueError:
+        raise HTTPException(
+            status_code=400,
+            detail='Could not understand audio'
+        )
+
+
+@mod_router.post("/video", response_model=PredictResponse)
+async def moderateVideo(file: UploadFile = File(...)) -> PredictResponse:
+    video_path = os.path.join(TEMP_DIR, file.filename)
+    audio_path = os.path.join(TEMP_DIR, f"{file.filename.split('.')[0]}.wav")
+
+    with open(video_path, "wb") as video_file:
+        video_file.write(await file.read())
+
+    video = VideoFileClip(video_path)
+    video.audio.write_audiofile(audio_path)
+    video.close()
+
+    audio = speech_recognition.AudioFile(audio_path)
+    with audio as audio_file:
+        audio = speech_recognizer.record(audio_file)
+
+    text = speech_recognizer.recognize_google(audio, language="ru-RU")
+    en_text = GoogleTranslator(source='auto', target='en').translate(text)
+    predictions = text_model.predict(en_text)
+
+    os.remove(video_path)
+    os.remove(audio_path)
+    return PredictResponse(**predictions)
+
 
 
 api_router = APIRouter()
@@ -157,15 +210,6 @@ async def changeRole(role: str, request: Request, db: AsyncSession = Depends(get
             )
 
     # TODO: figure out func with COMPANY
-    # if role == RolesEnum.company.value:
-    #     if user.is_verified:
-    #         await UserManager.updateUser({"user_id": user.user_id}, {"role": role}, db)
-    #         return JSONResponse("Role was successfully changed to STUDENT")
-    #     else:
-    #         raise HTTPException(
-    #             status_code=403,
-    #             detail="Error. Your account doesnt verified."
-    #         )
     raise HTTPException(
         status_code=400,
         detail="Error. Invalid input role."
