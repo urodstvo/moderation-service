@@ -1,6 +1,5 @@
 import json
 import os.path
-import uuid
 
 import jwt
 from keras.src.preprocessing.text import Tokenizer, tokenizer_from_json
@@ -153,3 +152,10 @@ def checkAuthorizationToken(request):
         )
 
     return token
+
+
+lang_map = {
+    # "lang" : tuple of (pytesseract_code, google_recognizer_code)
+    "en": ("eng", "en-US"),
+    "rus": ("rus", "ru"),
+}
