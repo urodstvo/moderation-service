@@ -2,7 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from src.router import auth_router, email_router, mod_router, v1_api_router, api_router
+from src.handlers.router import auth_router, email_router, mod_router, api_router
+from src.handlers.v1_api import v1_api_router
 
 app = FastAPI(title="MODERATION SERVICE")
 

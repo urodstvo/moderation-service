@@ -18,6 +18,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_LIVETIME = os.getenv("JWT_LIVETIME")
 AUTH_TOKEN_TYPE = os.getenv("AUTH_TOKEN_TYPE")
+API_TOKEN_TYPE = os.getenv("API_TOKEN_TYPE")
 
 EmailConfig = ConnectionConfig(
     MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
