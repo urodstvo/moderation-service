@@ -165,8 +165,8 @@ async def moderateAudio(file: UploadFile = File(...), lang: str = Form('rus')) -
 
 @mod_router.post("/video", response_model=PredictResponse)
 async def moderateVideo(file: UploadFile = File(...), lang: str = Form('rus')) -> PredictResponse:
-    video_path = os.path.join(TEMP_DIR, file.filename)
-    audio_path = os.path.join(TEMP_DIR, f"{file.filename.split('.')[0]}.wav")
+    video_path = os.path.join(TEMP_DIR, f"{file.filename}-{uuid.uuid4()}")
+    audio_path = os.path.join(TEMP_DIR, f"{file.filename.split('.')[0]}-{uuid.uuid4()}.wav")
 
     with open(video_path, "wb") as video_file:
         video_file.write(await file.read())

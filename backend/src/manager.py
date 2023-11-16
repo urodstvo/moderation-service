@@ -50,7 +50,7 @@ class ModerationManager:
         async with db as session:
             async with session.begin():
                 request = data.table(user_id=data.user_id)
-                if "text" in kwargs:
+                if "text" in kwargs and data.table == TextModeration:
                     request.text = kwargs['text']
 
                 session.add(request)
