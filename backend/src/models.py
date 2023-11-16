@@ -63,6 +63,20 @@ class TextModeration(Base, ModerationTable):
 
     text = Column(String, nullable=False)
 
+class ImageModeration(Base, ModerationTable):
+    """table for image moderation statistic"""
+    __tablename__ = "image_moderation"
+
+
+class AudioModeration(Base, ModerationTable):
+    """table for audio moderation statistic"""
+    __tablename__ = "audio_moderation"
+
+
+class VideoModeration(Base, ModerationTable):
+    """table for video moderation statistic"""
+    __tablename__ = "video_moderation"
+
 
 class TunedModel(BaseModel):
     class Config:
