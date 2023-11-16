@@ -1,77 +1,80 @@
-.pageHeaderContainer{
+.pageHeaderContainer {
+  width: 100%;
+  height: 40rem;
+
+  & > .pageHeaderContent {
     width: 100%;
-    height: 40rem;
+    height: 100%;
 
-    & > .pageHeaderContent{
-        width: 100%;
-        height: 100%;
+    padding: 0 4rem;
 
-        padding: 0 4rem;
+    display: flex;
+    justify-content: space-between;
+
+    & > .pageHeaderSection {
+      &:first-of-type {
+        width: 60rem;
 
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
 
-        & > .pageHeaderSection{
-            &:first-of-type{
-                width: 60rem;
+        & > .pageHeaderWrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
 
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-
-                & > .pageHeaderWrapper{
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2rem;
-
-                    & > .pageHeaderDescription{
-                        font-size: 1.6rem;
-                    }
-                }
-
-                & > .pageHeaderTabsContainer{
-                    height: 5rem;
-                    border-bottom: 0.2rem solid #000;
-                    
-                    & > .pageHeaderTabsContent{
-                        display: flex;
-                        align-items: flex-start;
-
-                        & > .pageHeaderTab{
-                            flex: 1;
-                            font-size: 2.4rem;
-                            height: 4rem;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-
-
-                            &.selected{
-                                color: #fff;
-                                background: #000;
-                            }
-                        }
-                    }
-                }
-            }
-
-            &:last-of-type{
-                width: 40rem;
-                background: #000;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                & *{
-                    width: 100%;
-                    height: 100%;
-
-                    padding: 2.5rem;
-
-                    fill: #fff;
-                }
-            }
+          & > .pageHeaderDescription {
+            font-size: 1.6rem;
+          }
         }
+
+        & > .pageHeaderTabsContainer {
+          height: 5rem;
+          border-bottom: 0.2rem solid #000;
+
+          & > .pageHeaderTabsContent {
+            display: flex;
+            align-items: flex-start;
+
+            & > .pageHeaderTab {
+              flex: 1;
+              font-size: 2.4rem;
+              height: 4rem;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              &.selected {
+                color: #fff;
+                background: #000;
+              }
+            }
+          }
+        }
+      }
+
+      &:last-of-type {
+        width: 40rem;
+        background: #000;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & * {
+          width: 100%;
+          height: 100%;
+
+          padding: 2.5rem;
+
+          fill: #fff;
+        }
+
+        & rect {
+          fill: none;
+        }
+      }
     }
+  }
 }

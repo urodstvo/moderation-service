@@ -1,44 +1,57 @@
-import { useDispatch, useSelector } from 'react-redux'
-import type { TypedUseSelectorHook } from 'react-redux'
-import type { RootState, AppDispatch } from '@/store'
-import { ChangeEvent, ChangeEventHandler, useEffect,  useState } from 'react'
-import { iTextInputProps } from '@/interfaces'
+import { useDispatch, useSelector } from "react-redux";
+import type { TypedUseSelectorHook } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import { ModPageTab, iTextInputProps } from "@/interfaces";
+import { useSearchParams } from "react-router-dom";
 
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export const useCountDown = (seconds: number) => {
+  const [countDown, setCountDown] = useState(seconds);
 
-export const useCountDown = (seconds : number) => {
-    const [countDown, setCountDown] = useState(seconds);
-  
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCountDown(prev => prev - 1);
-      }, 1000);
-  
-      return () => clearInterval(interval);
-    }, []);
-  
-    return countDown;
-}
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountDown((prev) => prev - 1);
+    }, 1000);
 
-export const useTextInputProps = (props : Omit<iTextInputProps, "onChange" | "value">) : iTextInputProps => {
-  const {placeholder, disabled, className, isHidden} = props
-  const [value, setValue] = useState<string>('');
-  const handleChange : ChangeEventHandler = (e: ChangeEvent) => setValue((e.target as HTMLInputElement).value);
+    return () => clearInterval(interval);
+  }, []);
 
-  const inputProps : iTextInputProps =  {
+  return countDown;
+};
+
+export const useTextInputProps = (
+  props: Omit<iTextInputProps, "onChange" | "value">
+): iTextInputProps => {
+  const { placeholder, disabled, className, isHidden } = props;
+  const [value, setValue] = useState<string>("");
+  const handleChange: ChangeEventHandler = (e: ChangeEvent) =>
+    setValue((e.target as HTMLInputElement).value);
+
+  const inputProps: iTextInputProps = {
     name: props.name,
-    className: className || '',
+    className: className || "",
     value: value,
-    placeholder: placeholder || '',
+    placeholder: placeholder || "",
     onChange: handleChange,
     disabled: disabled || false,
     isHidden: isHidden || false,
-    validation: props.validation
-  }
+    validation: props.validation,
+  };
 
-  return inputProps
-}
+  return inputProps;
+};
 
-export const usePageTitle = (title: string) => {useEffect(() => {document.title = title}, [])}
+export const usePageTitle = (title: string) => {
+  useEffect(() => {
+    document.title = title;
+  }, []);
+};
+
+export const useModerationPageTab = () => {
+  const [searchParams, _] = useSearchParams();
+
+  return searchParams.get("tab")?.toUpperCase() ?? ("INFO" as ModPageTab);
+};

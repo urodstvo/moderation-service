@@ -8,19 +8,17 @@ import InfoTab from "../components/InfoTab";
 import PlaygroundTab from "./components/PlaygroundTab";
 import IntegrationTab from "../components/IntegrationTab";
 
-export const TextModeration = () => {
-  usePageTitle("TEXT MODERATION | CLOUD");
+export const ImageModeration = () => {
+  usePageTitle("IMAGE MODERATION | CLOUD");
 
   const tab = useModerationPageTab();
 
   const pageInfo = {
     header: {
       tab: tab as ModPageTab,
-      title: "TEXT MODERATION",
-      description: `A powerful text content moderation tool that provides options for safe and effective content control and management. 
-            The service is based on advanced algorithms and machine learning technologies that allow us to automatically detect and classify different types of unwanted content, categorising it into 6 main classes: toxicity, excessive toxicity, threats, personal hatred, insults and non-protest.
-            One of the key features of our service is the ability to integrate using APIs. This means you can easily integrate our moderation system into your application. `,
-      variant: ModerationType.text,
+      title: "IMAGE MODERATION",
+      description: ``,
+      variant: ModerationType.image,
     },
     info: [
       {
@@ -79,12 +77,7 @@ export const TextModeration = () => {
         description: `Co-operation with service users on text moderation is an important and effective tool for ensuring a safe and quality communication environment. This co-operation between users and the service allows to effectively combat unwanted content such as offensive language, threats, spam and other types of inappropriate content.`,
       },
     ],
-    integration: `Integrating a text moderation service via an API is a convenient and efficient way to automate and improve the process of controlling and filtering text content transmitted or displayed on a web platform, application or other online service.
-        The main benefits of integrating a text moderation service through an API include:
-        1. Saving time and effort;
-        2. Improved content quality;
-        3. Improved security;
-        4. Scalability.`,
+    integration: ``,
   };
 
   return (
