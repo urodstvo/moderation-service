@@ -1,7 +1,8 @@
-import styles from "@/pages/Moderation/TextModeration/index.module.css";
+import styles from "@/pages/Moderation/styles/Playground.module.css";
 
-import { useEffect, useState } from "react";
-import { useImageModerationMutation } from "@/api/moderationAPI";
+import { FormEvent, useEffect, useState } from "react";
+import debounce from "lodash.debounce";
+import { useTextModerationMutation } from "@/api/moderationAPI";
 import { AlertError } from "@/components/ui/Alert";
 
 const PlaygroundTab = () => {
@@ -24,7 +25,9 @@ const PlaygroundTab = () => {
   });
 
   const [moderate, { isSuccess, isError, data, error }] =
-    useImageModerationMutation();
+    useTextModerationMutation();
+  const [requestText, setRequestText] = useState<string>("");
+  const debouncedSetRequestText = debounce(setRequestText, 1000);
 
   useEffect(() => {
     if (isSuccess) {
@@ -32,25 +35,32 @@ const PlaygroundTab = () => {
       setResponse(response);
     }
   }, [isSuccess]);
-
   useEffect(() => {
     if (isError && error) AlertError(error.toString());
   }, [isError]);
 
-  //   const sendRequest = async (text: string) => {
-  //     await moderate(text);
-  //   };
+  const sendRequest = async (text: string) => {
+    await moderate(text);
+  };
 
-  //   useEffect(() => {
-  //     if (requestText.length > 0) sendRequest(requestText);
-  //   }, [requestText]);
+  useEffect(() => {
+    if (requestText.length > 0) sendRequest(requestText);
+  }, [requestText]);
 
   return (
     <>
       <div className={styles.playgroundWrapper}>
         <div className={styles.playgroundSection}>
           <div className={styles.requestContainer}>
-            <input type="file" />
+            <div
+              className={styles.requestContent}
+              placeholder="Type Request Text"
+              contentEditable
+              suppressContentEditableWarning
+              onInput={(e: FormEvent<HTMLDivElement>) => {
+                debouncedSetRequestText(e.currentTarget.textContent ?? "");
+              }}
+            />
           </div>
         </div>
         <div className={styles.playgroundSection}>
@@ -64,7 +74,6 @@ const PlaygroundTab = () => {
                   {Object.getOwnPropertyNames(response).map((prop, ind) => (
                     <div className={styles.responseDataField} key={ind}>
                       <div>{prop}:</div>
-                      {/* @ts-ignore-error */}
                       <div>{parseFloat(response[prop]).toFixed(4)},</div>
                     </div>
                   ))}

@@ -67,30 +67,10 @@ export const Services = () => {
         <h2>SERVICES</h2>
         <div className={styles.servicesList}>
           <ServiceCard
-            path="/services/text-moderation"
-            title="Text Moderation"
-            description="Text information moderation service"
+            path="/services/moderation/info"
+            title="Moderation Service"
+            description="Moderation service for text moderation from text, image, audio and video"
             variant={ModerationType.text}
-          />
-          <ServiceCard
-            path="/services/image-moderation"
-            title="Image Moderation"
-            description="Image content moderation service"
-            variant={ModerationType.image}
-          />
-          <ServiceCard
-            path="/services/audio-moderation"
-            title="Audio Moderation"
-            description="Audio record moderation service"
-            variant={ModerationType.audio}
-            disabled
-          />
-          <ServiceCard
-            path="/services/video-moderation"
-            title="Video Moderation"
-            description="Video content moderation service"
-            variant={ModerationType.video}
-            disabled
           />
         </div>
       </section>

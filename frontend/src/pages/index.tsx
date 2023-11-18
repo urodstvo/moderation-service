@@ -1,51 +1,72 @@
-import { Home } from "@/pages/Home";
+import { useRoutes } from "react-router-dom";
+import { Moderation } from "@/pages/Moderation";
 import { Services } from "@/pages/Services";
-import { Pricing } from "@/pages/Pricing";
 import { Docs } from "@/pages/Docs";
-import { TextModeration } from "@/pages/Moderation/TextModeration";
-import { AdminDashboard } from "@/pages/Admin";
-import { ImageModeration } from "@/pages/Moderation/ImageModeration";
+import { Pricing } from "@/pages/Pricing";
+import { Home } from "@/pages/Home";
+import App from "@/App";
+import InfoTab from "./Moderation/components/InfoTab";
+import IntegrationTab from "./Moderation/components/IntegrationTab";
+import PlaygroundTab from "./Moderation/components/PlaygroundTab";
+import { NotFound } from "./404";
 
-export const public_routes = [
-  {
-    path: "/",
-    element: <Home />,
-  },
+const Index = () => {
+  const router = useRoutes([
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        {
+          index: true,
+          element: <Home />,
+        },
 
-  {
-    path: "/services",
-    element: <Services />,
-  },
+        {
+          path: "pricing",
+          element: <Pricing />,
+        },
 
-  {
-    path: "/pricing",
-    element: <Pricing />,
-  },
+        {
+          path: "docs",
+          element: <Docs />,
+        },
 
-  {
-    path: "/docs",
-    element: <Docs />,
-  },
+        {
+          path: "services",
+          element: <Services />,
+        },
 
-  {
-    path: "/services/text-moderation",
-    element: <TextModeration />,
-  },
+        {
+          path: "services/moderation",
+          element: <Moderation />,
+          children: [
+            {
+              path: "info",
+              index: true,
+              element: <InfoTab />,
+            },
 
-  {
-    path: "/services/image-moderation",
-    element: <ImageModeration />,
-  },
+            {
+              path: "integration",
+              element: <IntegrationTab />,
+            },
 
-  {
-    path: "*",
-    element: <div> 404 </div>,
-  },
-];
+            {
+              path: "playground/:type",
+              element: <PlaygroundTab />,
+            },
+          ],
+        },
 
-export const admin_routes = [
-  {
-    path: "/admin/dashboard",
-    element: <AdminDashboard />,
-  },
-];
+        {
+          path: "*",
+          element: <NotFound />,
+        },
+      ],
+    },
+  ]);
+
+  return router;
+};
+
+export default Index;

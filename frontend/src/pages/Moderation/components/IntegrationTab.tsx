@@ -1,4 +1,4 @@
-import styles from "@/pages/Moderation/TextModeration/index.module.css";
+import styles from "@/pages/Moderation/styles/Playground.module.css";
 
 import ClipboardCopyIcon from "@/components/icon/ClipboardCopyIcon";
 import VisibilityIcon from "@/components/icon/VisibilityIcon";
@@ -10,7 +10,14 @@ import { generateAPIToken } from "@/store/auth";
 import { useRef } from "react";
 import { AlertInfo } from "@/components/ui/Alert";
 
-const IntegrationTab = ({ text }: { text: string }) => {
+const IntegrationTab = () => {
+  const text = `Integrating a text moderation service via an API is a convenient and efficient way to automate and improve the process of controlling and filtering text content transmitted or displayed on a web platform, application or other online service.
+  The main benefits of integrating a text moderation service through an API include:
+  1. Saving time and effort;
+  2. Improved content quality;
+  3. Improved security;
+  4. Scalability.`;
+
   const dispatch = useAppDispatch();
   const parsedText = text.split("\n").map((el, ind) => <p key={ind}>{el}</p>);
 
