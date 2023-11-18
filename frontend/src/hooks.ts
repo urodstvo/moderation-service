@@ -2,8 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { TypedUseSelectorHook } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
 import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
-import { ModPageTab, iTextInputProps } from "@/interfaces";
-import { useSearchParams } from "react-router-dom";
+import { iTextInputProps } from "@/interfaces";
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
@@ -48,10 +47,4 @@ export const usePageTitle = (title: string) => {
   useEffect(() => {
     document.title = title;
   }, []);
-};
-
-export const useModerationPageTab = () => {
-  const [searchParams, _] = useSearchParams();
-
-  return searchParams.get("tab")?.toUpperCase() ?? ("INFO" as ModPageTab);
 };
