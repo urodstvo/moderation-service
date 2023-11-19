@@ -9,7 +9,7 @@ import { useLoginMutation } from "@/api/authAPI";
 import styles from "./AuthForm.module.css";
 
 export const SignInForm = () => {
-  const [signin, { isLoading, isSuccess, isError }] = useLoginMutation();
+  const [signin, { isLoading }] = useLoginMutation();
 
   const [hidePassword, setHidePassword] = useState<boolean>(true);
 
@@ -52,12 +52,12 @@ export const SignInForm = () => {
 
       <Button
         className="fill-container"
-        text={isLoading && (!isSuccess || !isError) ? "LOADING" : "SIGN IN"}
+        text={isLoading ? "LOADING" : "SIGN IN"}
         variant={ColorVariant.black}
         onClick={(e) => {
           signInHandler(e);
         }}
-        disabled={isLoading && (!isSuccess || !isError)}
+        disabled={isLoading}
       />
     </>
   );

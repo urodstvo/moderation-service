@@ -234,6 +234,4 @@ const SettingsForm = () => {
   );
 };
 
-// TODO: Error handler
-
 export default SettingsForm;
