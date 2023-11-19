@@ -10,7 +10,7 @@ const Navbar = () => {
 
   const openSignInModal = () => {
     if (!searchParams.get("modal")) {
-      SetSearchParams((prev) => prev + "&modal=signIn");
+      SetSearchParams((prev) => prev + "&modal=auth");
     }
   };
 

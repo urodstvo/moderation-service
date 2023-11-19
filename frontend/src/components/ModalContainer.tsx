@@ -11,30 +11,33 @@ const ModalContainer = () => {
 
   useEffect(() => {
     if (user)
-      SetSearchParams((prev) => prev.toString().replace("modal=signIn", ""));
+      SetSearchParams((prev) => prev.toString().replace("modal=auth", ""));
   }, [user]);
 
   const modal = searchParams.get("modal");
-  if (!user && modal === "signIn")
-    return (
-      <Modal>
-        <AuthForm />
-      </Modal>
-    );
-
-  if (user && modal === "settings")
-    return (
-      <Modal>
-        <SettingsForm />
-      </Modal>
-    );
-
-  if (user && modal === "notification")
-    return (
-      <Modal>
-        <div>notifications</div>
-      </Modal>
-    );
+  if (user) {
+    switch (modal) {
+      case "notification":
+        return (
+          <Modal>
+            <div>notifications</div>
+          </Modal>
+        );
+      case "settings":
+        return (
+          <Modal>
+            <SettingsForm />
+          </Modal>
+        );
+    }
+  } else {
+    if (modal === "auth")
+      return (
+        <Modal>
+          <AuthForm />
+        </Modal>
+      );
+  }
 };
 
 export default ModalContainer;
