@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { ModPageTab, ModerationType } from "@/interfaces";
 import { usePageTitle } from "@/hooks";
 
@@ -10,6 +10,7 @@ import stylesLayout from "@/pages/Moderation/styles/PageContentLayout.module.css
 export const Moderation = () => {
   usePageTitle("MODERATION SERVICE PAGE");
 
+  const { type } = useParams();
   const { pathname } = useLocation();
   const tab = pathname.split("/")[3];
 
@@ -69,7 +70,7 @@ export const Moderation = () => {
           </div>
           <div className={stylesHeader.pageHeaderSection}>
             <div>
-              <ModTypeIcon variant={ModerationType.text} />
+              <ModTypeIcon variant={type as ModerationType} />
             </div>
           </div>
         </div>

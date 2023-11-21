@@ -3,11 +3,14 @@ import styles from "@/pages/Moderation/styles/Playground.module.css";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 import {
+  useAudioModerationMutation,
   useImageModerationMutation,
   useTextModerationMutation,
+  useVideoModerationMutation,
 } from "@/api/moderationAPI";
 import { AlertError } from "@/components/ui/Alert";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ModerationType } from "@/interfaces";
 
 const TextRequest = ({ onResponse }: { onResponse: any }) => {
   const [moderate, { isSuccess, isError, data, error }] =
@@ -127,8 +130,161 @@ const ImageRequest = ({ onResponse }: { onResponse: any }) => {
   );
 };
 
+const AudioRequest = ({ onResponse }: { onResponse: any }) => {
+  const [requested, setRequested] = useState<boolean>(false);
+  const input = useRef<HTMLInputElement>(null);
+  const audio = useRef<HTMLAudioElement>(null);
+
+  const [moderate, { isSuccess, isError, data, error }] =
+    useAudioModerationMutation();
+  const [requestAudio, setRequestAudio] = useState<File | null>(null);
+  const [requestLanguage, setRequestLanguage] = useState<string>("rus");
+
+  useEffect(() => {
+    if (isSuccess) {
+      onResponse(data);
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (error) AlertError(error.toString());
+  }, [isError]);
+
+  const sendAudioRequest = async (file: File, lang: string) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("lang", lang);
+    await moderate(data);
+  };
+
+  useEffect(() => {
+    if (input.current && input.current.files?.length) {
+      sendAudioRequest(input.current!.files[0], requestLanguage);
+    }
+  }, [requestAudio, requestLanguage]);
+
+  return (
+    <div className={styles.requestContainer}>
+      <select
+        className={styles.requestLanguage}
+        onChange={(e) => setRequestLanguage(e.currentTarget.value)}
+      >
+        <option value="rus">rus</option>
+        <option value="eng">eng</option>
+      </select>
+      <input
+        type="file"
+        accept=".wav"
+        className={styles.requestContent}
+        ref={input}
+        onInput={(e) => {
+          if (e.currentTarget.files) {
+            audio.current!.src = window.URL.createObjectURL(
+              e.currentTarget.files[0]
+            );
+            setRequestAudio(e.currentTarget.files[0]);
+          }
+        }}
+        onChange={() => setRequested(true)}
+      />
+      <div
+        className={styles.requestFile}
+        style={{ display: requested ? "block" : "none" }}
+      >
+        <audio controls className={styles.requestAudio} src="" ref={audio} />
+        <button
+          className={styles.requestBtn}
+          onClick={() => input.current?.click()}
+        >
+          Load another audio
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const VideoRequest = ({ onResponse }: { onResponse: any }) => {
+  const [requested, setRequested] = useState<boolean>(false);
+  const input = useRef<HTMLInputElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
+
+  const [moderate, { isSuccess, isError, data, error }] =
+    useVideoModerationMutation();
+  const [requestVideo, setRequestVideo] = useState<File | null>(null);
+  const [requestLanguage, setRequestLanguage] = useState<string>("rus");
+
+  useEffect(() => {
+    if (isSuccess) {
+      onResponse(data);
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (error) AlertError(error.toString());
+  }, [isError]);
+
+  const sendVideoRequest = async (file: File, lang: string) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("lang", lang);
+    await moderate(data);
+  };
+
+  useEffect(() => {
+    if (input.current && input.current.files?.length) {
+      sendVideoRequest(input.current!.files[0], requestLanguage);
+    }
+  }, [requestVideo, requestLanguage]);
+
+  return (
+    <div className={styles.requestContainer}>
+      <select
+        className={styles.requestLanguage}
+        onChange={(e) => setRequestLanguage(e.currentTarget.value)}
+      >
+        <option value="rus">rus</option>
+        <option value="eng">eng</option>
+      </select>
+      <input
+        type="file"
+        accept="video/*"
+        className={styles.requestContent}
+        ref={input}
+        onInput={(e) => {
+          if (e.currentTarget.files) {
+            video.current!.src = window.URL.createObjectURL(
+              e.currentTarget.files[0]
+            );
+            setRequestVideo(e.currentTarget.files[0]);
+          }
+        }}
+        onChange={() => setRequested(true)}
+      />
+      <div
+        className={styles.requestFile}
+        style={{ display: requested ? "block" : "none" }}
+      >
+        <video controls className={styles.requestImage} src="" ref={video} />
+        <button
+          className={styles.requestBtn}
+          onClick={() => input.current?.click()}
+        >
+          Load another video
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const PlaygroundTab = () => {
+  const navigate = useNavigate();
   const { type } = useParams();
+
+  useEffect(() => {
+    if (!type || !(type in ModerationType)) {
+      navigate("/page-not-found");
+    }
+  }, []);
 
   type Response = {
     toxic: string;
@@ -150,10 +306,48 @@ const PlaygroundTab = () => {
 
   return (
     <>
+      <div className={styles.playgroundSwitcher}>
+        <menu className={styles.playgroundMenu}>
+          <li
+            className={[
+              styles.playgroundMenuItem,
+              type === "text" ? styles.active : "",
+            ].join(" ")}
+          >
+            <Link to="/services/moderation/playground/text">TEXT</Link>
+          </li>
+          <li
+            className={[
+              styles.playgroundMenuItem,
+              type === "image" ? styles.active : "",
+            ].join(" ")}
+          >
+            <Link to="/services/moderation/playground/image">IMAGE</Link>
+          </li>
+          <li
+            className={[
+              styles.playgroundMenuItem,
+              type === "audio" ? styles.active : "",
+            ].join(" ")}
+          >
+            <Link to="/services/moderation/playground/audio">AUDIO</Link>
+          </li>
+          <li
+            className={[
+              styles.playgroundMenuItem,
+              type === "video" ? styles.active : "",
+            ].join(" ")}
+          >
+            <Link to="/services/moderation/playground/video">VIDEO</Link>
+          </li>
+        </menu>
+      </div>
       <div className={styles.playgroundWrapper}>
         <div className={styles.playgroundSection}>
           {type === "text" && <TextRequest onResponse={setResponse} />}
           {type === "image" && <ImageRequest onResponse={setResponse} />}
+          {type === "audio" && <AudioRequest onResponse={setResponse} />}
+          {type === "video" && <VideoRequest onResponse={setResponse} />}
         </div>
         <div className={styles.playgroundSection}>
           <div className={styles.responseContainer}>
