@@ -2,6 +2,7 @@ import { ServiceCard } from "@/pages/Services/components/ServiceCard/ServiceCard
 import { usePageTitle } from "@/hooks";
 import { ModerationType } from "@/interfaces";
 import styles from "@/pages/Services/index.module.css";
+import { useTranslation } from "react-i18next";
 
 const HeroSky = () => {
   return (
@@ -44,15 +45,14 @@ const HeroRobot = () => {
 };
 
 export const Services = () => {
+  const { t } = useTranslation();
   usePageTitle("SERVICES PAGE | CLOUD");
 
   return (
     <>
       <section className={styles.heroContainer}>
         <div className={styles.heroContent}>
-          <div className={styles.heroTitle}>
-            AI oriented services on a cloud platform
-          </div>
+          <div className={styles.heroTitle}>{t("services.heroTitle")}</div>
           <div className={styles.heroImage}>
             <HeroSky />
             <HeroSky />
@@ -64,12 +64,12 @@ export const Services = () => {
         </div>
       </section>
       <section>
-        <h2>SERVICES</h2>
+        <h2>{t("services.servicesTitle")}</h2>
         <div className={styles.servicesList}>
           <ServiceCard
             path="/services/moderation/info"
-            title="Moderation Service"
-            description="Moderation service for text moderation from text, image, audio and video"
+            title={t("services.modetationCard.title")}
+            description={t("services.modetationCard.description")}
             variant={ModerationType.text}
           />
         </div>

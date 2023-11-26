@@ -11,8 +11,10 @@ import {
 import { AlertError } from "@/components/ui/Alert";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ModerationType } from "@/interfaces";
+import { useTranslation } from "react-i18next";
 
 const TextRequest = ({ onResponse }: { onResponse: any }) => {
+  const { t } = useTranslation();
   const [moderate, { isSuccess, isError, data, error }] =
     useTextModerationMutation();
   const [requestText, setRequestText] = useState<string>("");
@@ -25,7 +27,7 @@ const TextRequest = ({ onResponse }: { onResponse: any }) => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (error) AlertError(error.toString());
+    if (error) AlertError("Cannot send request");
   }, [isError]);
 
   const sendTextRequest = async (text: string) => {
@@ -43,7 +45,7 @@ const TextRequest = ({ onResponse }: { onResponse: any }) => {
     <div className={styles.requestContainer}>
       <textarea
         className={styles.requestContent}
-        placeholder="Type Request Text"
+        placeholder={t("services.moderationService.textPlaceholder")}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
           debouncedSetRequestText(e.currentTarget.value ?? "");
         }}
@@ -69,7 +71,7 @@ const ImageRequest = ({ onResponse }: { onResponse: any }) => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (error) AlertError(error.toString());
+    if (error) AlertError("Cannot send request");
   }, [isError]);
 
   const sendImageRequest = async (file: File, lang: string) => {
@@ -147,7 +149,7 @@ const AudioRequest = ({ onResponse }: { onResponse: any }) => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (error) AlertError(error.toString());
+    if (error) AlertError("Cannot send request");
   }, [isError]);
 
   const sendAudioRequest = async (file: File, lang: string) => {
@@ -220,7 +222,7 @@ const VideoRequest = ({ onResponse }: { onResponse: any }) => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (error) AlertError(error.toString());
+    if (error) AlertError("Cannot send request");
   }, [isError]);
 
   const sendVideoRequest = async (file: File, lang: string) => {
@@ -277,6 +279,7 @@ const VideoRequest = ({ onResponse }: { onResponse: any }) => {
 };
 
 const PlaygroundTab = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { type } = useParams();
 
@@ -314,7 +317,9 @@ const PlaygroundTab = () => {
               type === "text" ? styles.active : "",
             ].join(" ")}
           >
-            <Link to="/services/moderation/playground/text">TEXT</Link>
+            <Link to="/services/moderation/playground/text">
+              {t("services.moderationService.textTab")}
+            </Link>
           </li>
           <li
             className={[
@@ -322,7 +327,9 @@ const PlaygroundTab = () => {
               type === "image" ? styles.active : "",
             ].join(" ")}
           >
-            <Link to="/services/moderation/playground/image">IMAGE</Link>
+            <Link to="/services/moderation/playground/image">
+              {t("services.moderationService.imageTab")}
+            </Link>
           </li>
           <li
             className={[
@@ -330,7 +337,9 @@ const PlaygroundTab = () => {
               type === "audio" ? styles.active : "",
             ].join(" ")}
           >
-            <Link to="/services/moderation/playground/audio">AUDIO</Link>
+            <Link to="/services/moderation/playground/audio">
+              {t("services.moderationService.audioTab")}
+            </Link>
           </li>
           <li
             className={[
@@ -338,7 +347,9 @@ const PlaygroundTab = () => {
               type === "video" ? styles.active : "",
             ].join(" ")}
           >
-            <Link to="/services/moderation/playground/video">VIDEO</Link>
+            <Link to="/services/moderation/playground/video">
+              {t("services.moderationService.videoTab")}
+            </Link>
           </li>
         </menu>
       </div>
@@ -353,7 +364,7 @@ const PlaygroundTab = () => {
           <div className={styles.responseContainer}>
             <div className={styles.responseContent}>
               <div className={styles.responseDataContainer}>
-                response.json
+                //response.json
                 <div className={[styles.responseDataContent].join(" ")}>
                   {"body: {"}
                   {Object.getOwnPropertyNames(response).map((prop, ind) => (

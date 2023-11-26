@@ -1,34 +1,26 @@
+import { FormEvent, useState } from "react";
+import { useLoginMutation } from "@/api/authAPI";
 import { ColorVariant } from "@/interfaces";
+import { useTextInputProps } from "@/hooks";
 import Button from "@/components/ui/Button";
 import TextInput from "@/components/ui/TextInput";
-import { FormEvent, useState } from "react";
-import { useTextInputProps } from "@/hooks";
 import CheckBoxInput from "@/components/ui/CheckBoxInput";
-import { useLoginMutation } from "@/api/authAPI";
 
 import styles from "./AuthForm.module.css";
+import { useTranslation } from "react-i18next";
 
 export const SignInForm = () => {
+  const { t } = useTranslation();
   const [signin, { isLoading }] = useLoginMutation();
 
   const [hidePassword, setHidePassword] = useState<boolean>(true);
 
   const username = useTextInputProps({
-    placeholder: "USERNAME",
-    validation: {
-      rule: /^[a-zA-Z0-9]{8,}$/,
-      error:
-        "Wrong username. Username must contain at least 8 symbols [a-Z][0-9]",
-    },
+    placeholder: t("auth.username"),
   });
   const password = useTextInputProps({
-    placeholder: "PASSWORD",
+    placeholder: t("auth.password"),
     isHidden: hidePassword,
-    validation: {
-      rule: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_-])(?=\S+$).{8,}$/,
-      error:
-        "Wrong Password. Must contain at least 8 symbols ([a-Z], at least 1 digit and spec symbol)",
-    },
   });
 
   const hidePasswordHandler = () => {
@@ -46,13 +38,13 @@ export const SignInForm = () => {
       <TextInput {...password} validation={undefined} key="password" />
 
       <div className={styles.authShowPassword}>
-        <label>Show Password</label>
+        <label>{t("auth.showPassword")}</label>
         <CheckBoxInput onChange={hidePasswordHandler} checked={!hidePassword} />
       </div>
 
       <Button
         className="fill-container"
-        text={isLoading ? "LOADING" : "SIGN IN"}
+        text={isLoading ? t("auth.loading") : t("auth.signIn")}
         variant={ColorVariant.black}
         onClick={(e) => {
           signInHandler(e);

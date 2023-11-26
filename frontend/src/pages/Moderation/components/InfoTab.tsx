@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { InfoCard } from "./InfoCard";
 
 const InfoTab = () => {
+  const { t } = useTranslation();
   const cards = [
     {
       icon: (
@@ -17,8 +19,8 @@ const InfoTab = () => {
           />
         </svg>
       ),
-      title: "Different languages",
-      description: `The text moderation service provides multi-language capability, which allows for efficient filtering and validation of different types of text data in different languages. This capability is based on the use of advanced language models and machine learning algorithms.`,
+      title: t("services.moderationService.card1.title"),
+      description: t("services.moderationService.card1.description"),
     },
     {
       icon: (
@@ -35,9 +37,8 @@ const InfoTab = () => {
           />
         </svg>
       ),
-      title: "Improving algorithms",
-      description: `The text moderation service is constantly improving its algorithms to better and more accurately detect unwanted or malicious content. 
-              The main goal is to detect and filter all types of inappropriate content, such as insults, threats, discrimination, obscenity and other forms of spam, and to reduce false positives and false omissions.`,
+      title: t("services.moderationService.card2.title"),
+      description: t("services.moderationService.card2.description"),
     },
     {
       icon: (
@@ -54,8 +55,8 @@ const InfoTab = () => {
           />
         </svg>
       ),
-      title: "Cooperation",
-      description: `Co-operation with service users on text moderation is an important and effective tool for ensuring a safe and quality communication environment. This co-operation between users and the service allows to effectively combat unwanted content such as offensive language, threats, spam and other types of inappropriate content.`,
+      title: t("services.moderationService.card3.title"),
+      description: t("services.moderationService.card3.description"),
     },
   ];
   return (

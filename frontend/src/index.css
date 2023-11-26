@@ -180,6 +180,12 @@
         gap: 1rem;
         height: 4rem;
 
+        & > .navbar-language {
+          outline: none;
+          cursor: pointer;
+          font-size: 1.6rem;
+        }
+
         & > .navbar-action {
           cursor: pointer;
         }

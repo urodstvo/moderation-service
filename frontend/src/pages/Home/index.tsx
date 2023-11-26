@@ -5,9 +5,12 @@ import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import { useAppSelector, usePageTitle } from "@/hooks";
 
+import { useTranslation, Trans } from "react-i18next";
+
 export const Home = () => {
   usePageTitle("CLOUD | HOME PAGE");
 
+  const { t } = useTranslation();
   const { isAuth } = useAppSelector((state) => state.auth);
 
   return (
@@ -15,26 +18,34 @@ export const Home = () => {
       <header className={styles.heroContainer}>
         <div className={styles.heroContent}>
           <div className={styles.heroTitle}>
-            WELCOME TO THE <span>CLOUD</span> PLATFORM
+            <Trans i18nKey={"home.title"}>
+              WELCOME TO THE <span>CLOUD</span> PLATFORM
+            </Trans>
           </div>
 
-          <div className={styles.heroDescription}>
-            We use advanced artificial intelligence technologies to
-            intelligently analyse and effectively filter user-generated content
-          </div>
+          <div className={styles.heroDescription}>{t("home.description")}</div>
 
           <div className={styles.heroActions}>
             {!isAuth ? (
-              <Link to="?modal=signIn">
-                <Button text="GET STARTED" variant={ColorVariant.black} />
+              <Link to="?modal=auth">
+                <Button
+                  text={t("home.getStarted")}
+                  variant={ColorVariant.black}
+                />
               </Link>
             ) : (
               <Link to="/docs">
-                <Button text="READ DOCS" variant={ColorVariant.black} />
+                <Button
+                  text={t("home.readDocs")}
+                  variant={ColorVariant.black}
+                />
               </Link>
             )}
             <Link to="/services">
-              <Button text="CHECK SERVICES" variant={ColorVariant.white} />
+              <Button
+                text={t("home.checkServices")}
+                variant={ColorVariant.white}
+              />
             </Link>
           </div>
         </div>
@@ -43,5 +54,3 @@ export const Home = () => {
     </>
   );
 };
-
-//TODO: ADD RESPONSIVE TO HERO

@@ -9,14 +9,11 @@ import { ColorVariant, RoleEnum } from "@/interfaces";
 import { generateAPIToken } from "@/store/auth";
 import { useRef } from "react";
 import { AlertInfo } from "@/components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const IntegrationTab = () => {
-  const text = `Integrating a text moderation service via an API is a convenient and efficient way to automate and improve the process of controlling and filtering text content transmitted or displayed on a web platform, application or other online service.
-  The main benefits of integrating a text moderation service through an API include:
-  1. Saving time and effort;
-  2. Improved content quality;
-  3. Improved security;
-  4. Scalability.`;
+  const { t } = useTranslation();
+  const text = t("services.moderationService.integrationText");
 
   const dispatch = useAppDispatch();
   const parsedText = text.split("\n").map((el, ind) => <p key={ind}>{el}</p>);
@@ -38,7 +35,7 @@ const IntegrationTab = () => {
 
   const copyAPIKey = () => {
     navigator.clipboard.writeText(user!.api_token);
-    AlertInfo("API Key copied to clipboard.");
+    AlertInfo(t("services.moderationService.APIcopied"));
   };
 
   return (
@@ -71,7 +68,7 @@ const IntegrationTab = () => {
             ) : (
               <div className={styles.apiGenerateButton}>
                 <Button
-                  text="Generate API Key"
+                  text={t("services.moderationService.generateAPI")}
                   variant={ColorVariant.black}
                   className="width-100"
                   onClick={

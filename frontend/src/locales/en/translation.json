@@ -1,0 +1,86 @@
+{
+  "navbar": {
+    "services": "SERVICES",
+    "pricing": "PRICING",
+    "docs": "DOCS"
+  },
+  "auth": {
+    "signIn": "SIGN IN",
+    "signUp": "SIGN UP",
+    "loading": "LOADING...",
+    "showPassword": "Show Password",
+    "username": "USERNAME",
+    "email": "EMAIL",
+    "password": "PASSWORD",
+    "confirmPassword": "CONFIRM PASSWORD",
+    "usernameValidation": "Wrong username. Username must contain at least 8 symbols [a-Z][0-9]",
+    "passwordValidation": "Wrong Password. Must contain at least 8 symbols ([a-Z], at least 1 digit and spec symbol)",
+    "confirmPasswordValidation": "Passwords not matched.",
+    "emailValidation": "Wrong email.",
+    "invalidInput": "Invalid input data."
+  },
+  "home": {
+    "title": "WELCOME TO THE <1>CLOUD</1> PLATFORM",
+    "description": " We use advanced artificial intelligence technologies to\nintelligently analyse and effectively filter user-generated content",
+    "getStarted": "GET STARTED",
+    "readDocs": "READ DOCS",
+    "checkServices": "CHECK SERVICES"
+  },
+  "services": {
+    "heroTitle": "AI oriented services on a cloud platform",
+    "servicesTitle": "SERVICES",
+    "modetationCard": {
+      "title": "Moderation Service",
+      "description": "Moderation service for text moderation from text, image, audio and video"
+    },
+    "moderationService": {
+      "title": "MODERATION SERVICE",
+      "description": "A powerful text content moderation tool that provides options for safe and effective content control and management.\nThe service is based on advanced algorithms and machine learning technologies that allow us to automatically detect and classify different types of unwanted content, categorising it into 6 main classes: toxicity, excessive toxicity, threats, personal hatred, insults and non-protest.\nOne of the key features of our service is the ability to integrate using APIs. This means you can easily integrate our moderation system into your application.",
+      "info": "INFO",
+      "playground": "PLAYGROUND",
+      "integration": "INTEGRATION",
+      "card1": {
+        "title": "Different languages",
+        "description": "The text moderation service provides multi-language capability, which allows for efficient filtering and validation of different types of text data in different languages. This capability is based on the use of advanced language models and machine learning algorithms."
+      },
+      "card2": {
+        "title": "Improving algorithms",
+        "description": "The text moderation service is constantly improving its algorithms to better and more accurately detect unwanted or malicious content.\n\nThe main goal is to detect and filter all types of inappropriate content, such as insults, threats, discrimination, obscenity and other forms of spam, and to reduce false positives and false omissions."
+      },
+      "card3": {
+        "title": "Cooperation",
+        "description": "Co-operation with service users on text moderation is an important and effective tool for ensuring a safe and quality communication environment. This co-operation between users and the service allows to effectively combat unwanted content such as offensive language, threats, spam and other types of inappropriate content."
+      },
+      "textPlaceholder": "Enter text here",
+      "textTab": "TEXT",
+      "imageTab": "IMAGE",
+      "audioTab": "AUDIO",
+      "videoTab": "VIDEO",
+      "integrationText": "Integrating a text moderation service via an API is a convenient and efficient way to automate and improve the process of controlling and filtering text content transmitted or displayed on a web platform, application or other online service.\nThe main benefits of integrating a text moderation service through an API include:\n1. Saving time and effort;\n2. Improved content quality;\n3. Improved security;\n4. Scalability.",
+      "APIcopied": "API Key copied to clipboard.",
+      "generateAPI": "GENERATE API KEY"
+    }
+  },
+  "pricing": {
+    "title": "PRICING",
+    "studentCard": {
+      "title": "STUDENT",
+      "offer1": "1000 requests per day",
+      "offer2": "Text Moderation service",
+      "offer3": "Image Moderation service",
+      "term1": "Verified Email"
+    },
+    "companyCard": {
+      "title": "COMPANY",
+      "offer1": "Unlimited requests per day",
+      "offer2": "Text Moderation service",
+      "offer3": "Image Moderation service",
+      "offer4": "Audio Moderation service",
+      "offer5": "Video Moderation service",
+      "term1": "Verified Email",
+      "term2": "Admin Approval"
+    },
+    "choose": "CHOOSE PLAN",
+    "choosen": "CHOOSEN"
+  }
+}

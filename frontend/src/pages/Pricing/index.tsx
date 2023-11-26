@@ -5,8 +5,10 @@ import { PlanCard } from "@/pages/Pricing/components/PlanCard/PlanCard";
 import styles from "@/pages/Pricing/index.module.css";
 import { setRole } from "@/store/auth";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Pricing = () => {
+  const { t } = useTranslation();
   usePageTitle("PRICING PLAN | CLOUD");
 
   const [changeRole, { isLoading, isSuccess }] = useChangeRoleMutation();
@@ -24,35 +26,38 @@ export const Pricing = () => {
 
   return (
     <>
-      <h1 className="text-center">PRICING</h1>
+      <h1 className="text-center">{t("pricing.title")}</h1>
       <section>
         <div className={styles.plansContainer}>
           <div className={styles.plansContent}>
             <PlanCard
-              name="STUDENT"
+              name={t("pricing.studentCard.title")}
               price="FREE"
               offers={[
-                "1000 requests per day",
-                "Text Moderation service",
-                "Image Moderation service",
+                t("pricing.studentCard.offer1"),
+                t("pricing.studentCard.offer2"),
+                t("pricing.studentCard.offer3"),
               ]}
-              terms={["Verified Email"]}
+              terms={[t("pricing.studentCard.term1")]}
               disabled={
                 !user?.is_verified || user.role !== RoleEnum.User || isLoading
               }
               onChoose={() => choosePlan(RoleEnum.Student)}
             />
             <PlanCard
-              name="COMPANY"
+              name={t("pricing.companyCard.title")}
               price="FREE"
               offers={[
-                "Unlimited requests per day",
-                "Text Moderation service",
-                "Image Moderation service",
-                "Audio Moderation Service",
-                "Video Moderation service",
+                t("pricing.companyCard.offer1"),
+                t("pricing.companyCard.offer2"),
+                t("pricing.companyCard.offer3"),
+                t("pricing.companyCard.offer4"),
+                t("pricing.companyCard.offer5"),
               ]}
-              terms={["Verified Email", "Admin Approval"]}
+              terms={[
+                t("pricing.companyCard.term1"),
+                t("pricing.companyCard.term2"),
+              ]}
               disabled
             />
           </div>

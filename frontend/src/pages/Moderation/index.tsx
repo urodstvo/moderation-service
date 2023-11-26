@@ -6,8 +6,10 @@ import { ModTypeIcon } from "@/components/icon/ModTypeIcon";
 
 import stylesHeader from "@/pages/Moderation/styles/PageHeader.module.css";
 import stylesLayout from "@/pages/Moderation/styles/PageContentLayout.module.css";
+import { useTranslation } from "react-i18next";
 
 export const Moderation = () => {
+  const { t } = useTranslation();
   usePageTitle("MODERATION SERVICE PAGE");
 
   const { type } = useParams();
@@ -16,10 +18,8 @@ export const Moderation = () => {
 
   const header = {
     tab: tab.toUpperCase() as ModPageTab,
-    title: "MODERATION SERVICE",
-    description: `A powerful text content moderation tool that provides options for safe and effective content control and management. 
-            The service is based on advanced algorithms and machine learning technologies that allow us to automatically detect and classify different types of unwanted content, categorising it into 6 main classes: toxicity, excessive toxicity, threats, personal hatred, insults and non-protest.
-            One of the key features of our service is the ability to integrate using APIs. This means you can easily integrate our moderation system into your application. `,
+    title: t("services.moderationService.title"),
+    description: t("services.moderationService.description"),
     variant: ModerationType.text,
   };
 
@@ -45,7 +45,7 @@ export const Moderation = () => {
                     header.tab === "INFO" ? stylesHeader.selected : "",
                   ].join(" ")}
                 >
-                  INFO
+                  {t("services.moderationService.info")}
                 </Link>
                 <Link
                   to="/services/moderation/playground/text"
@@ -54,7 +54,7 @@ export const Moderation = () => {
                     header.tab === "PLAYGROUND" ? stylesHeader.selected : "",
                   ].join(" ")}
                 >
-                  PLAYGROUND
+                  {t("services.moderationService.playground")}
                 </Link>
                 <Link
                   to="/services/moderation/integration"
@@ -63,14 +63,16 @@ export const Moderation = () => {
                     header.tab === "INTEGRATION" ? stylesHeader.selected : "",
                   ].join(" ")}
                 >
-                  INTEGRATION
+                  {t("services.moderationService.integration")}
                 </Link>
               </div>
             </div>
           </div>
           <div className={stylesHeader.pageHeaderSection}>
             <div>
-              <ModTypeIcon variant={type as ModerationType} />
+              <ModTypeIcon
+                variant={(type as ModerationType) ?? ModerationType.text}
+              />
             </div>
           </div>
         </div>

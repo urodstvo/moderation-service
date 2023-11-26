@@ -1,50 +1,53 @@
-import { ColorVariant, iTextInputProps } from "@/interfaces";
+import { ColorVariant } from "@/interfaces";
 import Button from "@/components/ui/Button";
 import TextInput from "@/components/ui/TextInput";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useTextInputProps } from "@/hooks";
 import CheckBoxInput from "@/components/ui/CheckBoxInput";
 import { useSignupMutation } from "@/api/authAPI";
 import { AlertError } from "../ui/Alert";
 
 import styles from "./AuthForm.module.css";
+import { useTranslation } from "react-i18next";
 
 export const SignUpForm = () => {
+  const { t } = useTranslation();
   const [signUp] = useSignupMutation();
 
   const [hidePassword, setHidePassword] = useState<boolean>(true);
 
   const username = useTextInputProps({
     name: "username",
-    placeholder: "USERNAME",
+    placeholder: t("auth.username"),
     validation: {
       rule: /^[a-zA-Z0-9]{8,}$/,
-      error:
-        "Wrong username. Username must contain at least 8 symbols [a-Z][0-9]",
+      error: t("auth.usernameValidation"),
     },
   });
   const email = useTextInputProps({
     name: "email",
-    placeholder: "EMAIL",
-    validation: { rule: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, error: "Wrong email." },
+    placeholder: t("auth.email"),
+    validation: {
+      rule: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      error: t("auth.emailValidation"),
+    },
   });
   const password = useTextInputProps({
     name: "password",
-    placeholder: "PASSWORD",
+    placeholder: t("auth.password"),
     isHidden: hidePassword,
     validation: {
       rule: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_-])(?=\S+$).{8,}$/,
-      error:
-        "Wrong Password. Must contain at least 8 symbols ([a-Z], at least 1 digit and spec symbol)",
+      error: t("auth.passwordValidation"),
     },
   });
   let verify_password = useTextInputProps({
     name: "verify_password",
-    placeholder: "REPEAT PASSWORD",
+    placeholder: t("auth.confirmPassword"),
     isHidden: true,
     validation: {
       rule: RegExp(`^${password.value}$`),
-      error: "Password not matched.",
+      error: t("auth.confirmPasswordValidation"),
     },
   });
 
@@ -73,7 +76,7 @@ export const SignUpForm = () => {
         password: password.value,
       });
     else {
-      AlertError("Invalid input data.");
+      AlertError(t("auth.invalidInput"));
     }
   };
 
@@ -85,13 +88,13 @@ export const SignUpForm = () => {
       <TextInput {...verify_password} key="verify_password" />
 
       <div className={styles.authShowPassword}>
-        <label>Show Password</label>
+        <label>{t("auth.showPassword")}</label>
         <CheckBoxInput onChange={hidePasswordHandler} checked={!hidePassword} />
       </div>
 
       <Button
         className="fill-container"
-        text="SIGN UP"
+        text={t("auth.signUp")}
         variant={ColorVariant.black}
         onClick={(e) => {
           signUpHandler(e);

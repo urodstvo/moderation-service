@@ -2,6 +2,7 @@ import styles from "./PlanCard.module.css";
 import { ColorVariant, iPricingCardProps } from "@/interfaces";
 import Button from "@/components/ui/Button";
 import { useAppSelector } from "@/hooks";
+import { useTranslation } from "react-i18next";
 
 export const PlanCard = ({
   name,
@@ -11,6 +12,7 @@ export const PlanCard = ({
   disabled = false,
   onChoose,
 }: iPricingCardProps) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const choosen = name.toLowerCase() === user?.role;
 
@@ -39,7 +41,7 @@ export const PlanCard = ({
         <div className={styles.pricingCardButton}>
           <Button
             className="fill-container"
-            text={choosen ? "CHOOSEN" : "CHOOSE PLAN"}
+            text={choosen ? t("pricing.choosen") : t("pricing.choose")}
             variant={choosen ? ColorVariant.black : ColorVariant.white}
             disabled={disabled}
             onClick={onChoose}
