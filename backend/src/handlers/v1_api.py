@@ -44,6 +44,13 @@ async def checkRateLimit(user: UserResponse, table: type.__class__, db: AsyncSes
 
 v1_api_router = APIRouter()
 
+def sort_predicts(predicts: dict) -> float:
+    sum = 0.0
+    for key in predicts:
+        if key != 'toxic': sum += predicts[key]
+    print(sum)
+    return sum
+
 @v1_api_router.post('/text', response_model=PredictResponse)
 async def APITextModeration(
         data: TextPredictRequest,
@@ -55,10 +62,13 @@ async def APITextModeration(
     await checkRateLimit(user, TextModeration, db)
 
     en_text = GoogleTranslator(source='auto', target='en').translate(data.text)
-    predictions = text_model.predict(en_text)
+    texts = en_text.split('.')
+    predictions = [text_model.predict(text) for text in texts]
 
+    result = max(predictions, key=sort_predicts)
     await ModerationManager.addRequest(ModerationData(table=TextModeration, user_id=user.user_id), db, text=data.text)
-    return PredictResponse(**predictions)
+
+    return PredictResponse(**result)
 
 @v1_api_router.post("/image", response_model=PredictResponse)
 async def moderateImage(

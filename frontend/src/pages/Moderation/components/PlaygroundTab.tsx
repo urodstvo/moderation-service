@@ -18,7 +18,7 @@ const TextRequest = ({ onResponse }: { onResponse: any }) => {
   const [moderate, { isSuccess, isError, data, error }] =
     useTextModerationMutation();
   const [requestText, setRequestText] = useState<string>("");
-  const debouncedSetRequestText = debounce(setRequestText, 750);
+  const debouncedSetRequestText = debounce(setRequestText, 300);
 
   useEffect(() => {
     if (isSuccess) {

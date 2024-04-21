@@ -1,0 +1,13 @@
+{
+    "name": "moderation-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev:backend": "python ../backend/server.py",
+        "dev": "pnpm run dev:backend & pnpm run --prefix frontend dev"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
