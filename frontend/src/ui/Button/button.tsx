@@ -5,9 +5,10 @@ interface ButtonProps extends React.ComponentProps<'button'> {
     children: React.ReactNode;
     variant?: 'outline' | 'filled' | 'text';
     size?: 'compact' | 'default';
+    loading?: boolean;
 }
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ children, className, variant = 'filled', size = 'default', ...props }: ButtonProps, ref) => {
+    ({ loading, children, className, variant = 'filled', size = 'default', ...props }, ref) => {
         return (
             <button
                 className={clsx(
@@ -25,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {...props}
                 ref={ref}
             >
-                {children}
+                {loading ? 'Loading...' : children}
             </button>
         );
     },
