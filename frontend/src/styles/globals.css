@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --border-radius: 8px;
+    --border-radius-lg: 16px;
+    --border-radius-round: 50%;
+
+    --background-dark: #000;
+    --background-light: #eee;
+
+    --text-dark: #000;
+    --text-light: #fff;
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
