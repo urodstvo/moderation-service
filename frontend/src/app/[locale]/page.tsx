@@ -10,8 +10,8 @@ export default function Home() {
             <header className='w-full px-[--container-padding-lg]'>
                 <nav className='flex align-center justify-end gap-10'>
                     <Button asChild className='rounded-full px-5 py-1' variant='ghost'>
-                        <Link href='/services' className='font-overpass text-xl text-white font-medium'>
-                            Services
+                        <Link href='/services/moderation' className='font-overpass text-xl text-white font-medium'>
+                            Service
                         </Link>
                     </Button>
                     <Button asChild className='rounded-full px-5 py-1' variant='ghost'>

@@ -16,7 +16,7 @@ export default function RootLayout({
     params: { locale },
 }: Readonly<{ children: React.ReactNode; params: { locale: string } }>) {
     return (
-        <html lang={locale}>
+        <html lang={locale} className='scroll-smooth'>
             <body>
                 <Provider>{children}</Provider>
             </body>
