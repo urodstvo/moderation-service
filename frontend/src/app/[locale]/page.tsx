@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { Link } from '@/navigation';
 
 export default function Home() {
     const t = useTranslations('Home');

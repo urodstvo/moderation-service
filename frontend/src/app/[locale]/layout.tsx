@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 
 import '@/styles/reset.css';
 import '@/styles/globals.css';
+import { Provider } from './provider';
 
 export const metadata: Metadata = {
     title: 'Cloud',
@@ -16,7 +17,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode; params: { locale: string } }>) {
     return (
         <html lang={locale}>
-            <body>{children}</body>
+            <body>
+                <Provider>{children}</Provider>
+            </body>
         </html>
     );
 }
