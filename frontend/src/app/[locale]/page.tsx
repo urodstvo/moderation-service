@@ -1,8 +1,10 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
+    const t = useTranslations('Home');
     return (
         <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#222222] to-[#000000] py-5 gap-24'>
             <header className='w-full px-[--container-padding-lg]'>
@@ -26,7 +28,7 @@ export default function Home() {
             </header>
             <main className='size-full px-[--container-padding-lg] flex flex-col items-center grow gap-24'>
                 <div className='w-[840px] flex flex-col items-center gap-10'>
-                    <h1 className='scroll-m-20 text-[128px] font-black tracking-tight text-white'>WELCOME!</h1>
+                    <h1 className='scroll-m-20 text-[128px] font-black tracking-tight text-white'>{t('Title')}</h1>
                     <p className='text-2xl font-roboto text-white'>
                         Lorem ipsum dolor sit amet consectetur. Ut senectus ut turpis proin. Neque sit nunc dignissim
                         consequat sollicitudin luctus viverra quis integer. Neque ultrices purus quam adipiscing.
