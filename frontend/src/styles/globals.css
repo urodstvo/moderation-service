@@ -35,6 +35,7 @@
         --radius: 0.5rem;
 
         --container-padding-lg: 40px;
+        --container-padding-xl: 80px;
     }
 
     .dark {
