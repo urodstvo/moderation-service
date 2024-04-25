@@ -3,6 +3,8 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 
+import { HomeButton } from './components/HomeButton';
+
 export default function Home() {
     const t = useTranslations('Home');
     return (
@@ -35,11 +37,7 @@ export default function Home() {
                         Fermentum sem suspendisse arcu tincidunt. Id nisi facilisis eu aenean enim porta.
                     </p>
                 </div>
-                <Button asChild className='py-5 w-[300px] bg-transparent' size={null} variant='outline'>
-                    <Link href='/register' className='font-roboto text-xl font-bold text-white'>
-                        GET STARTED
-                    </Link>
-                </Button>
+                <HomeButton />
             </main>
         </div>
     );
