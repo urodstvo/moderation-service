@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from src.db.base import init_db
+from src.handlers.auth import auth_router
 
-app = FastAPI(title="AUTH SERVICE")
-
+app = FastAPI(title="AUTH SERVICE", root_path="/api")
 
 # app.add_middleware(
 #     CORSMiddleware,
@@ -15,11 +15,12 @@ app = FastAPI(title="AUTH SERVICE")
 #     allow_headers=["*"],
 # )
 
-# app.include_router(
-#     auth_router,
-#     prefix="/auth",
-#     tags=["Auth"],
-# )
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["Auth"],
+)
+
 
 @app.on_event("startup")
 async def on_startup():

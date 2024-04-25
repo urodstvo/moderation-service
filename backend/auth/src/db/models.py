@@ -1,11 +1,15 @@
-from sqlalchemy import Column, Boolean, String, func, ForeignKey
+import datetime
+from typing import Optional
+
+from pydantic import BaseModel
+from sqlalchemy import Column, Boolean, String, func
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
-from db.base import Base
+from .base import Base
 
 import uuid
 
 
-class User(Base):
+class UserTable(Base):
     __tablename__ = "users"
 
     user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
@@ -26,3 +30,13 @@ class User(Base):
             "is_verified": self.is_verified,
             "role": self.role
         }
+
+
+class UserModel(BaseModel):
+    user_id: Optional[uuid.UUID] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    registered_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    is_verified: Optional[bool] = None
+    role: Optional[str] = None
