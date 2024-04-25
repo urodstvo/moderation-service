@@ -56,13 +56,13 @@ export default function RegisterPage() {
                             </div>
                         </div>
                         <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
-                            Create an account
+                            {isPending ? 'Signing up...' : 'Create an account'}
                         </Button>
                     </div>
                     <div className='mt-4 text-center text-sm flex justify-between'>
                         Already have an account?
                         <Link href='/login' className='underline'>
-                            {isPending ? 'Signing in...' : 'Sign In'}
+                            Sign In
                         </Link>
                     </div>
                 </CardContent>

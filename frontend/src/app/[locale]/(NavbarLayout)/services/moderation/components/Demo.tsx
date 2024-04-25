@@ -81,7 +81,7 @@ export const Demo = () => {
             <div className='w-[600px] flex flex-col gap-5'>
                 <div className='flex justify-between'>
                     <TypeInput />
-                    <LanguageInput />
+                    {type !== 'text' && <LanguageInput />}
                 </div>
                 {type === 'text' && (
                     <Textarea

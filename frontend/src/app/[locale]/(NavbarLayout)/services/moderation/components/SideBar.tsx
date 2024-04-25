@@ -32,31 +32,31 @@ export const SideBar = () => {
     }, []);
     return (
         <aside>
-            <div className='sticky top-5 flex gap-2 p-5'>
-                <ul className='flex flex-col gap-2'>
+            <div className='sticky top-5 flex gap-8 p-5 rounded-lg border'>
+                <ul className='flex flex-col gap-1'>
                     <li>
-                        <Link href='#overview' className='font-overpass text-2xl'>
+                        <Link href='#overview' className='font-overpass text-xl'>
                             Overview
                         </Link>
                     </li>
 
-                    <li className='font-overpass text-2xl'>
-                        <Link href='#features' className='font-overpass text-2xl'>
+                    <li>
+                        <Link href='#features' className='font-overpass text-xl'>
                             Features
                         </Link>
                     </li>
-                    <li className='font-overpass text-2xl'>
-                        <Link href='#demo' className='font-overpass text-2xl'>
+                    <li>
+                        <Link href='#demo' className='font-overpass text-xl'>
                             Demo
                         </Link>
                     </li>
-                    <li className='font-overpass text-2xl'>
-                        <Link href='#docs' className='font-overpass text-2xl'>
+                    <li>
+                        <Link href='#docs' className='font-overpass text-xl'>
                             Documentation
                         </Link>
                     </li>
-                    <li className='font-overpass text-2xl'>
-                        <Link href='#integration' className='font-overpass text-2xl'>
+                    <li>
+                        <Link href='#integration' className='font-overpass text-xl'>
                             Integration
                         </Link>
                     </li>
@@ -67,6 +67,7 @@ export const SideBar = () => {
                             className='size-full bg-blue-500 transition duration-300 ease'
                             style={{ transform: `translateY(-${100 - progress}%)` }}
                         />
+                        <div className='absolute top-0 left-0 right-0 bottom-0 bg-neutral-300 z-[-1]' />
                     </Progress.Root>
                 </div>
             </div>
