@@ -7,7 +7,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const { isLoggedIn } = useUserStore();
 
-    isLoggedIn && router.replace('/');
+    isLoggedIn && router.back();
 
     return <>{children}</>;
 };

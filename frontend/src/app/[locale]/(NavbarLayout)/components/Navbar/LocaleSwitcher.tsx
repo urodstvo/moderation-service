@@ -6,7 +6,11 @@ import React from 'react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePathname, useRouter } from '@/navigation';
 
-export const LocaleSwitcher = () => {
+interface LocaleSwitcherProps {
+    id?: string;
+}
+
+export const LocaleSwitcher = (props: LocaleSwitcherProps) => {
     const router = useRouter();
     const [isPending, startTransition] = React.useTransition();
     const pathname = usePathname();
@@ -21,7 +25,7 @@ export const LocaleSwitcher = () => {
 
     return (
         <Select defaultValue={activeLocale} disabled={isPending} onValueChange={onSelectChange}>
-            <SelectTrigger className='w-[120px] font-roboto '>
+            <SelectTrigger className='w-full font-roboto' {...props}>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
