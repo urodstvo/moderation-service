@@ -3,7 +3,7 @@ FROM node:20.12.0-alpine AS base
 FROM base AS deps
 
 RUN corepack enable
-WORKDIR /app
+WORKDIR usr/src/app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm fetch --frozen-lockfile
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile --prod
@@ -11,7 +11,7 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install
 FROM base AS build
 
 RUN corepack enable
-WORKDIR /app
+WORKDIR usr/src/app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm fetch --frozen-lockfile
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
@@ -20,8 +20,8 @@ RUN pnpm build
 
 FROM base
 
-WORKDIR /app
-COPY --from=deps /app/node_modules /app/node_modules
-COPY --from=build /app/dist /app/dist
+WORKDIR usr/src/app
+COPY --from=deps usr/src/app/node_modules ./node_modules
+COPY --from=build usr/src/app/dist ./dist
 ENV NODE_ENV production
 CMD ["node", "./dist/server.js"]

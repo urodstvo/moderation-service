@@ -3,9 +3,7 @@ services:
         container_name: "moderation_service"
         build: ./moderation
         ports:
-            - 8002:8000
-        depends_on:
-            - db
+            - "8002:8000"
 
     auth_service:
         container_name: "auth_service"
@@ -14,7 +12,7 @@ services:
         volumes:
             - ./auth:/usr/src/app
         ports:
-            - 8001:8000
+            - "8001:8000"
         environment:
             DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/postgres
         depends_on:

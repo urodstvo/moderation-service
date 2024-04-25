@@ -1,19 +1,16 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "ESNext",
-        "outDir": "./dist",
+        "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "outDir": "dist",
         "baseUrl": ".",
-        "moduleResolution": "node",
-        "lib": ["es2016", "esnext", "dom"]
+        "paths": {
+            "@/*": ["src/*"]
+        }
     },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"],
-    "ts-node": {
-        "esm": true
-    }
+    "include": ["src/**/*"]
 }
