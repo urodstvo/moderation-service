@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import "@tensorflow/tfjs";
 import * as toxicity from "@tensorflow-models/toxicity";
+import { isClient } from "../middleware";
 
 const threshold = 0.5;
 const labels = ["identity_attack", "insult", "obscene", "severe_toxicity", "threat", "toxicity"];
@@ -18,7 +19,7 @@ type PredictionResponse = Array<{
 
 const router = Router();
 
-router.get("/text", async (req: Request, res: Response) => {
+router.get("/text", isClient, async (req: Request, res: Response) => {
     const text = req.query.query as string;
     const sentences = text
         .split(".")
