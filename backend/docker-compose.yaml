@@ -14,7 +14,13 @@ services:
         ports:
             - "8001:8000"
         environment:
-            DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/postgres
+            - DATABASE_URL=${DATABASE_URL}
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_LIFETIME=${WT_LIFETIME}
+            - FRONTEND_URL=${FRONTEND_URL}
+            - RESET_PASSWORD_LINK=${RESET_PASSWORD_LINK}
+            - SENDER_GMAIL=${SENDER_GMAIL}
+            - SENDER_GMAIL_PASSWORD=${SENDER_GMAIL_PASSWORD}
         depends_on:
             - db
 

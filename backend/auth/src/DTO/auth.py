@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from pydantic import BaseModel, EmailStr, field_validator, field_serializer
+from pydantic import BaseModel, EmailStr, field_serializer
 
 
 class TunedModel(BaseModel):
@@ -15,17 +15,16 @@ class Token(BaseModel):
     type: str
 
 
-class UserResponse(TunedModel):
+class UserResponse(BaseModel):
     user_id: uuid.UUID
     email: EmailStr
     is_verified: bool
     registered_at: datetime.datetime
     updated_at: datetime.datetime
-    role: str
 
     @field_serializer("user_id", when_used='json')
-    def serialize_uuid(user_id):
-        return str(user_id)
+    def serialize_uuid(self, value: uuid.UUID):
+        return str(value)
 
 
 class SignUpRequest(TunedModel):
@@ -45,3 +44,5 @@ SignInResponse = SignUpResponse
 class CreateUserData(BaseModel):
     email: str
     password: str
+
+
