@@ -5,7 +5,8 @@ from sqlalchemy import select, update, and_
 
 from src.DTO.auth import CreateUserData
 from src.db.base import AsyncSession
-from src.db.models import UserModel, UserTable
+from src.db.models import UserModel, UserTable, ProfileTable
+from src.db.tables.profiles import ProfilesTable
 
 
 class UsersTable:
@@ -17,6 +18,8 @@ class UsersTable:
             user = UserTable(password=data.password, email=data.email)
             session.add(user)
             await session.flush()
+            profile = ProfileTable(user_id=user.user_id)
+            session.add(profile)
             return user.user_id
 
     @staticmethod
@@ -35,5 +38,10 @@ class UsersTable:
     @staticmethod
     async def updateUser(user_data: UserModel, update_data: UserModel, db: AsyncSession) -> None:
         async with db.begin() as session:
-            await session.execute(update(UserTable).where(**user_data.dict()).values(**update_data))
+            filtered_user_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            conditions = [getattr(UserTable, key) == value for key, value in filtered_user_data.items()]
+
+            filtered_update_data = {key: value for key, value in update_data.dict().items() if value is not None}
+
+            await session.execute(update(UserTable).where(and_(*conditions)).values(**filtered_update_data))
             await session.commit()

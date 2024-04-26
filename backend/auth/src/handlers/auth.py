@@ -1,10 +1,16 @@
+
+
 from fastapi import APIRouter, Depends, HTTPException, Response, Request
 
-from src.db.base import get_session, AsyncSession
-from src.DTO.auth import SignUpResponse, SignUpRequest, CreateUserData, Token, SignInResponse, SignInRequest
+from src.db.base import AsyncSession
+from src.DTO.auth import SignUpResponse, SignUpRequest, CreateUserData, Token, SignInResponse, SignInRequest, \
+    UserResponse
+
 from src.db.models import UserModel
 from src.db.tables.users import UsersTable
-from src.util import hash_password, generate_jwt, check_password, verify_jwt
+from src.util import hash_password, generate_jwt, check_password, verify_jwt, get_userId_from_request
+
+from src.util import JWTBearer
 
 auth_router = APIRouter()
 
@@ -42,7 +48,7 @@ async def signUp(data: SignUpRequest, response: Response, db: AsyncSession):
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
 
     return SignUpResponse(
-        user=user,
+        user=UserResponse(**user.dict()),
         token=Token(token=access_token, type="Bearer")
     )
 
@@ -78,13 +84,13 @@ async def signIn(data: SignInRequest, response: Response, db: AsyncSession):
     response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
 
     return SignInResponse(
-        user=user,
+        user=UserResponse(**user.dict()),
         token=Token(token=access_token, type="Bearer")
     )
 
 
 #
-# ---------------------- VERIFY -----------------------
+# ---------------------- REFRESH -----------------------
 #
 
 
@@ -106,3 +112,21 @@ async def refresh(request: Request):
         token=access_token,
         type="Bearer"
     )
+
+
+#
+# ---------------------- VERIFY -----------------------
+#
+
+@auth_router.get('/verify', dependencies=[Depends(JWTBearer())], response_model=UserResponse)
+async def verify(request: Request, db: AsyncSession):
+    user_id = get_userId_from_request(request)
+
+    user = await UsersTable.getUser(UserModel(user_id=user_id), db)
+
+    if user is None:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    return user
+
+
