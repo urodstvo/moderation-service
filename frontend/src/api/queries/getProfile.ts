@@ -9,7 +9,7 @@ import { useAuthTokenStore, useProfileStore, useUserStore } from '@/store';
 export const useProfileQuery = () => {
     const { token } = useAuthTokenStore();
     const { user } = useUserStore();
-    const { profile, setProfile } = useProfileStore();
+    const { setProfile } = useProfileStore();
 
     const query = useQuery({
         queryKey: ['profile', user?.user_id],
@@ -18,8 +18,8 @@ export const useProfileQuery = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
         },
+        select: (data) => data.data,
         staleTime: 60 * 1000,
-        enabled: profile === null,
     });
 
     React.useEffect(() => {

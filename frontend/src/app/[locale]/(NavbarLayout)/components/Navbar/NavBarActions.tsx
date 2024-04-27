@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Link } from '@/navigation';
-import { useProfileStore, useUserStore } from '@/store';
+import { useUserStore } from '@/store';
 
 import { LocaleSwitcher } from './LocaleSwitcher';
 
@@ -24,7 +24,7 @@ const SettingsButton = () => {
     useProfileQuery();
 
     const { user } = useUserStore();
-    const { profile } = useProfileStore();
+    const { data } = useProfileQuery();
     const [isSettingsEditable, setIsSettingsEditable] = React.useState(false);
 
     return (
@@ -55,7 +55,7 @@ const SettingsButton = () => {
                                 <Link href='/pricing'>Change Role</Link>
                             </Button>
                         </div>
-                        <Input type='text' id='role' defaultValue={profile?.role} disabled />
+                        <Input type='text' id='role' defaultValue={data?.role} disabled />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>
