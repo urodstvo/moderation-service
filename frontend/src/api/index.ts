@@ -9,6 +9,10 @@ export * from './queries/register';
 export * from './queries/getProfile';
 export * from './queries/forgetPassword';
 export * from './queries/resetPassword';
+export * from './queries/changeRole';
+
+export * from './requests/refreshToken';
+export * from './requests/verifyUser';
 
 const api = axios.create({ withCredentials: true });
 

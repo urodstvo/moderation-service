@@ -1,7 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import axios, { AxiosResponse } from 'axios';
 import React from 'react';
-import { toast } from 'sonner';
 
 import api, { PROFILE_API_URL } from '@/api';
 import { useAuthTokenStore, useProfileStore, useUserStore } from '@/store';
@@ -20,11 +18,12 @@ export const useProfileQuery = () => {
         },
         select: (data) => data.data,
         staleTime: 60 * 1000,
+        retry: 1,
     });
 
     React.useEffect(() => {
         if (query.isSuccess) {
-            setProfile(query.data.data);
+            setProfile(query.data);
         }
     }, [query.isSuccess]);
 
