@@ -45,7 +45,8 @@ async def signUp(data: SignUpRequest, response: Response, db: AsyncSession):
 
     access_token = generate_jwt({"user_id": user.user_id}, 60 * 15)
     refresh_token = generate_jwt({"user_id": user.user_id}, 60 * 60 * 24 * 7)
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=60 * 60 * 24 * 7, expires=60 * 60 * 24 * 7)
 
     return SignUpResponse(
         user=UserResponse(**user.dict()),
@@ -81,7 +82,9 @@ async def signIn(data: SignInRequest, response: Response, db: AsyncSession):
 
     access_token = generate_jwt({"user_id": user.user_id}, 60 * 15)
     refresh_token = generate_jwt({"user_id": user.user_id}, 60 * 60 * 24 * 7)
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+
+
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=60 * 60 * 24 * 7, expires=60 * 60 * 24 * 7)
 
     return SignInResponse(
         user=UserResponse(**user.dict()),
