@@ -5,7 +5,6 @@ type UserState = {
     user: {
         user_id: string;
         email: string;
-        role: string;
         is_verified: boolean;
         registered_at: Date;
         updated_at: Date;

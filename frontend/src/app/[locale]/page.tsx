@@ -1,12 +1,12 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 
 import { HomeButton } from './components/HomeButton';
 
-export default function Home() {
-    const t = useTranslations('Home');
+export default async function Home() {
+    const t = await getTranslations('Home');
     return (
         <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#222222] to-[#000000] py-5 gap-24'>
             <header className='w-full px-[--container-padding-lg]'>

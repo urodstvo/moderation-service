@@ -1,8 +1,9 @@
 'use client';
 
-import { IconCheck, IconLogin, IconLogout, IconPencil, IconSettings } from '@tabler/icons-react';
+import { IconCheck, IconLogin, IconLogout, IconSettings } from '@tabler/icons-react';
 import React from 'react';
 
+import { useProfileQuery } from '@/api/queries/getProfile';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -15,12 +16,15 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Link } from '@/navigation';
-import { useUserStore } from '@/store';
+import { useProfileStore, useUserStore } from '@/store';
 
 import { LocaleSwitcher } from './LocaleSwitcher';
 
 const SettingsButton = () => {
+    useProfileQuery();
+
     const { user } = useUserStore();
+    const { profile } = useProfileStore();
     const [isSettingsEditable, setIsSettingsEditable] = React.useState(false);
 
     return (
@@ -41,6 +45,17 @@ const SettingsButton = () => {
                             UI Language
                         </label>
                         <LocaleSwitcher id='locale' />
+                    </div>
+                    <div className='flex flex-col gap-0 '>
+                        <div className='flex justify-between'>
+                            <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>
+                                Role
+                            </label>
+                            <Button asChild variant='link' size={null}>
+                                <Link href='/pricing'>Change Role</Link>
+                            </Button>
+                        </div>
+                        <Input type='text' id='role' defaultValue={profile?.role} disabled />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>

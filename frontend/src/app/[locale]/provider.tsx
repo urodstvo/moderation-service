@@ -35,16 +35,20 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
             }),
     );
 
-    const { setToken } = useAuthTokenStore();
+    const { token, setToken } = useAuthTokenStore();
     const { auth, logout } = useUserStore();
 
     React.useEffect(() => {
-        authorize()
-            .then((data) => {
-                setToken(data.token.token);
-                auth(data.user);
-            })
-            .catch(logout);
+        if (token)
+            authorize()
+                .then((data) => {
+                    setToken(data.token.token);
+                    auth(data.user);
+                })
+                .catch(() => {
+                    logout();
+                    setToken(null);
+                });
     }, []);
 
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
