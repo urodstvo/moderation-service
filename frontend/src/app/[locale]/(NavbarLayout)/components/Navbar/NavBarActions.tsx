@@ -5,7 +5,6 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 import React from 'react';
 
 import { useEmailVerificationMutation, useRequestVerificationMutation } from '@/api';
-import { useProfileQuery } from '@/api/queries/getProfile';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,7 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
 import { Link } from '@/navigation';
-import { useUserStore } from '@/store';
+import { useProfileStore, useUserStore } from '@/store';
 
 import { Timer } from '../Timer';
 import { LocaleSwitcher } from './LocaleSwitcher';
@@ -29,7 +28,7 @@ const SettingsButton = () => {
     const emailVerification = useEmailVerificationMutation();
 
     const { user } = useUserStore();
-    const { data } = useProfileQuery();
+    const { profile } = useProfileStore();
     const [isVerifying, setIsVerifying] = React.useState(false);
 
     const [otp, setOtp] = React.useState('');
@@ -72,7 +71,7 @@ const SettingsButton = () => {
                                 <Link href='/pricing'>Change Role</Link>
                             </Button>
                         </div>
-                        <Input type='text' id='role' defaultValue={data?.role ?? 'User'} disabled />
+                        <Input type='text' id='role' defaultValue={profile?.role ?? 'User'} disabled />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>

@@ -15,7 +15,6 @@ export const useLoginMutation = () => {
         },
         onSuccess(data: AxiosResponse<AuthResponse>) {
             setToken(data.data.token.token);
-
             auth(data.data.user);
         },
         onError(error) {

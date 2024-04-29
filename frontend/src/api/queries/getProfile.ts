@@ -22,10 +22,8 @@ export const useProfileQuery = () => {
     });
 
     React.useEffect(() => {
-        if (query.isSuccess) {
-            setProfile(query.data);
-        }
-    }, [query.isSuccess]);
+        if (query.isSuccess) setProfile(query.data);
+    }, [query.isSuccess, query.isRefetching]);
 
     return query;
 };

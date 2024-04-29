@@ -3,11 +3,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import { useRefreshTokenQuery, useVerifyUserQuery } from '@/api';
+import { useProfileQuery, useRefreshTokenQuery, useVerifyUserQuery } from '@/api';
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useRefreshTokenQuery();
     useVerifyUserQuery();
+    useProfileQuery();
 
     return children;
 };
