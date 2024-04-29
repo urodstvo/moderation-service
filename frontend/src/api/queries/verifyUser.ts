@@ -23,11 +23,11 @@ export const useVerifyUserQuery = () => {
 
     React.useEffect(() => {
         if (query.isSuccess) auth(query.data);
-    }, [query.isSuccess]);
+    }, [query.isSuccess, query.isFetching]);
 
     React.useEffect(() => {
         if (query.isError) logout();
-    }, [query.isError]);
+    }, [query.isError, query.isFetching]);
 
     return query;
 };

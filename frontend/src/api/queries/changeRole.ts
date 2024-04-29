@@ -11,7 +11,7 @@ export const useChangeRoleMutation = () => {
 
     return useMutation({
         mutationFn: (role: string) => {
-            return api.put<string>(PROFILE_API_URL + '/role/' + role, {}, { headers: { Authorization: token } });
+            return api.put<string>(PROFILE_API_URL + '/role/' + role, null, { headers: { Authorization: token } });
         },
         onSuccess() {
             client.invalidateQueries({ queryKey: ['profile'] });

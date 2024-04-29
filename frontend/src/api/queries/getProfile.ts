@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
 import api, { PROFILE_API_URL } from '@/api';
-import { useAuthTokenStore, useProfileStore, useUserStore } from '@/store';
+import { useAuthTokenStore, useProfileStore } from '@/store';
 
 export const useProfileQuery = () => {
     const { token } = useAuthTokenStore();
@@ -18,6 +18,7 @@ export const useProfileQuery = () => {
         select: (data) => data.data,
         staleTime: 60 * 1000,
         retry: 1,
+        enabled: !!token,
     });
 
     React.useEffect(() => {
