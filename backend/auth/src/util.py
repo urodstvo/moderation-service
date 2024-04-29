@@ -101,7 +101,7 @@ def get_userId_from_request(request: Request) -> str:
 
     try:
         payload = verify_jwt(token)
-    except Exception as e:
-        raise HTTPException(detail=e, status_code=401)
+    except:
+        raise HTTPException(detail="Invalid token", status_code=401)
 
     return payload.get('user_id')

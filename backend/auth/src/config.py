@@ -1,6 +1,8 @@
 import os
 
+import redis
 from fastapi_mail import ConnectionConfig
+from redis import Redis
 
 JWT_SECRET = os.getenv('JWT_SECRET')
 JWT_LIFETIME = os.getenv('JWT_LIFETIME')
@@ -26,3 +28,6 @@ MailConfig = ConnectionConfig(
     VALIDATE_CERTS=False,
     TEMPLATE_FOLDER=templates_folder,
 )
+
+redis: Redis = redis.Redis(host="redis", port=6379, decode_responses=True)
+

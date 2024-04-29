@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
 
+from src.config import redis
 from src.db.base import init_db
 from src.handlers.auth import auth_router
 from src.handlers.email import email_router
@@ -49,6 +50,11 @@ app.include_router(
 @app.on_event("startup")
 async def on_startup():
     await init_db()
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    redis.close()
 
 
 @app.get("/")

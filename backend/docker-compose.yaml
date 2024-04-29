@@ -19,8 +19,10 @@ services:
             - RESET_PASSWORD_LINK=${RESET_PASSWORD_LINK}
             - SENDER_GMAIL=${SENDER_GMAIL}
             - SENDER_GMAIL_PASSWORD=${SENDER_GMAIL_PASSWORD}
+            - REDIS_URL=${REDIS_URL}
         depends_on:
             - db
+            - redis
 
     db:
         container_name: "db"
