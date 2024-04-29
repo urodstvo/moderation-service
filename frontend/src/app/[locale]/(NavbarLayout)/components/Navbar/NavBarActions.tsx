@@ -1,8 +1,10 @@
 'use client';
 
 import { IconCheck, IconLogin, IconLogout, IconSettings } from '@tabler/icons-react';
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
 import React from 'react';
 
+import { useEmailVerificationMutation, useRequestVerificationMutation } from '@/api';
 import { useProfileQuery } from '@/api/queries/getProfile';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,17 +17,32 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
 import { Link } from '@/navigation';
 import { useUserStore } from '@/store';
 
+import { Timer } from '../Timer';
 import { LocaleSwitcher } from './LocaleSwitcher';
 
 const SettingsButton = () => {
-    useProfileQuery();
+    const requestVerification = useRequestVerificationMutation();
+    const emailVerification = useEmailVerificationMutation();
 
     const { user } = useUserStore();
     const { data } = useProfileQuery();
-    const [isSettingsEditable, setIsSettingsEditable] = React.useState(false);
+    const [isVerifying, setIsVerifying] = React.useState(false);
+
+    const [otp, setOtp] = React.useState('');
+
+    const handleVerify = () => emailVerification.mutate(otp);
+    const handleRequest = () => {
+        setIsVerifying(true);
+        requestVerification.mutate();
+    };
+
+    React.useEffect(() => {
+        if (emailVerification.isSuccess) setIsVerifying(false);
+    }, [emailVerification.isSuccess]);
 
     return (
         <Dialog>
@@ -55,7 +72,7 @@ const SettingsButton = () => {
                                 <Link href='/pricing'>Change Role</Link>
                             </Button>
                         </div>
-                        <Input type='text' id='role' defaultValue={data?.role} disabled />
+                        <Input type='text' id='role' defaultValue={data?.role ?? 'User'} disabled />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>
@@ -64,9 +81,39 @@ const SettingsButton = () => {
                         </label>
                         <Input type='text' placeholder='email' id='email' defaultValue={user?.email} disabled />
                     </div>
-                    {!user?.is_verified && <Button>Verify Email</Button>}
+                    {!user?.is_verified && !isVerifying && <Button onClick={handleRequest}>Verify Email</Button>}
+                    {isVerifying && (
+                        <div className='flex items-center flex-col'>
+                            <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} onChange={setOtp}>
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={0} />
+                                    <InputOTPSlot index={1} />
+                                    <InputOTPSlot index={2} />
+                                </InputOTPGroup>
+                                <InputOTPSeparator />
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={3} />
+                                    <InputOTPSlot index={4} />
+                                    <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                            </InputOTP>
+                            <div className='flex justify-end w-full font-roboto text-sm'>
+                                <Timer seconds={120}>
+                                    <Button variant='link' onClick={handleRequest}>
+                                        Try Again
+                                    </Button>
+                                </Timer>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <DialogFooter>{isSettingsEditable && <Button>Save Changes</Button>}</DialogFooter>
+                <DialogFooter>
+                    {isVerifying && (
+                        <Button className='w-full' disabled={otp.length !== 6} onClick={handleVerify}>
+                            {emailVerification.isPending ? 'Confirmation...' : 'Confirm'}
+                        </Button>
+                    )}
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
@@ -74,6 +121,7 @@ const SettingsButton = () => {
 
 export const NavBarActions = () => {
     const { isLoggedIn, logout } = useUserStore();
+
     return (
         <div className='flex items-center gap-2'>
             <div className='w-40'>
@@ -96,5 +144,3 @@ export const NavBarActions = () => {
         </div>
     );
 };
-
-//TODO: email verification

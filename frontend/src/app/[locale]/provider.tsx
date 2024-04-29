@@ -3,7 +3,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import auth from '@/lib/auth';
+import { useRefreshTokenQuery, useVerifyUserQuery } from '@/api';
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    useRefreshTokenQuery();
+    useVerifyUserQuery();
+
+    return children;
+};
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
     const [queryClient] = React.useState(
@@ -19,21 +26,9 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
             }),
     );
 
-    const [update, setUpdate] = React.useState(0);
-
-    React.useEffect(() => {
-        const interval = setInterval(
-            () => {
-                setUpdate((prev) => prev + 1);
-            },
-            1000 * 60 * 8,
-        );
-        return () => clearInterval(interval);
-    }, []);
-
-    React.useEffect(() => {
-        auth();
-    }, [update]);
-
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>{children}</AuthProvider>
+        </QueryClientProvider>
+    );
 };
