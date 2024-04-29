@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
-import api, { AUTH_API_URL } from '@/api';
+import { verifyUserRequest } from '@/api';
 import { useAuthTokenStore, useUserStore } from '@/store';
 
 export const useVerifyUserQuery = () => {
@@ -10,24 +10,19 @@ export const useVerifyUserQuery = () => {
 
     const query = useQuery({
         queryKey: ['verifyUser'],
-        queryFn: async () => {
-            return await api.get<AuthResponse['user']>(AUTH_API_URL + '/verify', {
-                headers: { Authorization: token },
-            });
-        },
+        queryFn: () => verifyUserRequest(token as string),
         select: (data) => data.data,
-        staleTime: 60 * 1000,
         retry: 1,
         enabled: !!token,
     });
 
     React.useEffect(() => {
         if (query.isSuccess) auth(query.data);
-    }, [query.isSuccess, query.isFetching]);
+    }, [query.isSuccess, query.isRefetching]);
 
     React.useEffect(() => {
         if (query.isError) logout();
-    }, [query.isError, query.isFetching]);
+    }, [query.isError, query.isRefetching]);
 
     return query;
 };

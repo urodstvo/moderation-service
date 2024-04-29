@@ -13,9 +13,11 @@ export const useLoginMutation = () => {
         mutationFn: (data: { email: string; password: string }) => {
             return api.post<AuthResponse>(AUTH_API_URL + '/signin', data);
         },
+
         onSuccess(data: AxiosResponse<AuthResponse>) {
-            setToken(data.data.token.token);
-            auth(data.data.user);
+            const { user, token } = data.data;
+            setToken(token.type + ' ' + token.token);
+            auth(user);
         },
         onError(error) {
             if (axios.isAxiosError(error)) error = Error(error.response?.data.detail ?? 'Something went wrong');
