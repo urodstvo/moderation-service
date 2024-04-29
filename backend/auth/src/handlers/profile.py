@@ -33,10 +33,10 @@ async def change_role(request: Request, role: str, db: AsyncSession):
 
     match role:
         case 'student':
-            await ProfileTable.updateProfile(ProfileModel(user_id=user_id), ProfileTable(role=role), db)
+            await ProfileTables.updateProfile(ProfileModel(user_id=user_id), ProfileTable(role=role), db)
             return JSONResponse(content='Role changed')
         case 'company':
-            await ProfileTable.updateProfile(ProfileModel(user_id=user_id), ProfileTable(is_company_requested=True), db)
+            await ProfileTables.updateProfile(ProfileModel(user_id=user_id), ProfileTable(is_company_requested=True), db)
             return JSONResponse(content='Role Changing Request Sent')
         case _:
             raise HTTPException(status_code=403, detail="You are not allowed to change this role")
