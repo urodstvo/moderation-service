@@ -6,7 +6,7 @@ from src.db.tables.profiles import ProfilesTable
 from src.db.tables.users import UsersTable
 from src.util import get_userId_from_request
 
-from fastapi.responses import JSONResponse
+from starlette.responses import JSONResponse
 
 roles = ['student', 'company']
 
@@ -31,15 +31,15 @@ async def change_role(request: Request, role: str, db: AsyncSession):
     if user.is_verified is not True:
         raise HTTPException(status_code=400, detail="User not verified")
 
-    match role:
-        case 'student':
-            await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(role=role), db)
-            return JSONResponse(content='Role changed')
-        case 'company':
-            await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(is_company_requested=True), db)
-            return JSONResponse(content='Role Changing Request Sent')
-        case _:
-            raise HTTPException(status_code=403, detail="You are not allowed to change this role")
+
+    if role == 'student':
+        await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(role=role), db)
+            
+    if role == 'company':
+        await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(is_company_requested=True), db)
+    
+
+    return JSONResponse(content='Role Changed')
 
 
 #

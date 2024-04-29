@@ -31,5 +31,5 @@ class ProfilesTable:
 
             filtered_update_data = {key: value for key, value in update_data.dict().items() if value is not None}
 
-            await session.execute(update(ProfilesTable).where(and_(*conditions)).values(**filtered_update_data))
+            await session.execute(update(ProfileTable).where(and_(*conditions)).values(**filtered_update_data))
             await session.commit()
