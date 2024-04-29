@@ -3,21 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import { refreshTokenRequest, verifyUserRequest } from '@/api';
-import { useAuthTokenStore, useUserStore } from '@/store';
-
-const authorize = async () => {
-    const refresh = await refreshTokenRequest();
-    if (refresh.status !== 200) throw Error('Failed to refresh token');
-
-    const verify = await verifyUserRequest(`${refresh.data.type} ${refresh.data.token}`);
-    if (verify.status !== 200) throw Error('Failed to verify user');
-
-    return {
-        token: refresh.data,
-        user: verify.data,
-    } as AuthResponse;
-};
+import auth from '@/lib/auth';
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
     const [queryClient] = React.useState(
@@ -33,28 +19,21 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
             }),
     );
 
-    const { token, setToken } = useAuthTokenStore();
-    const { auth, logout } = useUserStore();
+    const [update, setUpdate] = React.useState(0);
 
     React.useEffect(() => {
         const interval = setInterval(
             () => {
-                if (token)
-                    authorize()
-                        .then((data) => {
-                            setToken(data.token.token);
-                            auth(data.user);
-                        })
-                        .catch(() => {
-                            logout();
-                            setToken(null);
-                        });
+                setUpdate((prev) => prev + 1);
             },
             1000 * 60 * 8,
         );
-
         return () => clearInterval(interval);
     }, []);
+
+    React.useEffect(() => {
+        auth();
+    }, [update]);
 
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
