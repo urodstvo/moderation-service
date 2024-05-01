@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
 RUN apt-get update \
-  && apt-get -y install netcat gcc postgresql \
+  && apt-get -y install netcat gcc postgresql build-essential python3-dev python3-setuptools tesseract-ocr libgl1 gcc make  \
   && apt-get clean
 
 # install python dependencies
@@ -20,3 +20,5 @@ RUN pip install -r requirements.txt
 
 # add app
 COPY . .
+
+RUN uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8000

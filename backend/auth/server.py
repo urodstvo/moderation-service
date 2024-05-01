@@ -4,13 +4,14 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src.config import redis
 from src.db.base import init_db
+from src.handlers.api import api_router
 from src.handlers.auth import auth_router
 from src.handlers.email import email_router
 from src.handlers.password import password_router
 from src.handlers.profile import profile_router
 from src.util import JWTBearer
 
-app = FastAPI(title="AUTH SERVICE", root_path="/api")
+app = FastAPI(title="SERVICE", root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,6 +47,12 @@ app.include_router(
     tags=["Profile"],
 )
 
+app.include_router(
+    api_router,
+    prefix="/api",
+    tags=["API"],
+)
+
 
 @app.on_event("startup")
 async def on_startup():
@@ -63,4 +70,4 @@ async def ping():
 
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="127.0.0.1", port=8000)
+    uvicorn.run("server:app", host="0.0.0.0", port=8000)

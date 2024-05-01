@@ -70,3 +70,30 @@ class ProfileModel(BaseModel):
     updated_at: Optional[datetime.datetime] = None
     role: Optional[str] = None
     is_company_requested: Optional[bool] = None
+
+
+class RequestTable(Base):
+    __tablename__ = "requests"
+
+    request_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    user_id = Column(ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    moderation_type = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+
+    def as_dict(self):
+        return {
+            "request_id": self.request_id,
+            "user_id": self.user_id,
+            "moderation_type": self.moderation_type,
+            "content": self.content,
+            "created_at": self.created_at,
+        }
+
+
+class RequestModel(BaseModel):
+    request_id: Optional[uuid.UUID] = None
+    user_id: Optional[uuid.UUID] = None
+    moderation_type: Optional[str] = None
+    content: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None

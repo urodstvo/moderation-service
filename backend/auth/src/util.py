@@ -1,8 +1,10 @@
 import datetime
+import os
 from typing import Union
 
 import bcrypt
 import jwt
+import requests
 
 from .config import JWT_SECRET, JWT_LIFETIME
 
@@ -105,3 +107,32 @@ def get_userId_from_request(request: Request) -> str:
         raise HTTPException(detail="Invalid token", status_code=401)
 
     return payload.get('user_id')
+
+#
+# ---------------------- TRANSLATION -----------------------
+#
+
+
+def translate(text: str, lang: str = 'auto') -> str:
+
+    body = {
+        "targetLanguageCode": 'en',
+        "texts": [text],
+    }
+
+    if lang != 'auto':
+        body["sourceLanguageCode"] = lang
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Api-Key {os.getenv('YANDEX_API_KEY')}"
+    }
+
+    response = requests.post('https://translate.api.cloud.yandex.net/translate/v2/translate',
+                             json=body,
+                             headers=headers
+                             )
+
+    response = response.json()
+    return response['translations'][0]['text']
+

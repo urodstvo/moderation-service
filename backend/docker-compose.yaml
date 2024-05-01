@@ -1,16 +1,17 @@
 services:
-    moderation_service:
-        container_name: "moderation_service"
+    moderation:
+        container_name: "moderation"
         build: ./moderation
         ports:
-            - "8002:8000"
-
-    auth_service:
-        container_name: "auth_service"
-        build: ./auth
-        command: uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8000
-        ports:
             - "8001:8000"
+
+    api_service:
+        container_name: "api_service"
+        build: ./auth
+        volumes:
+            -   ./auth:/usr/src/app
+        ports:
+            - "8000:8000"
         environment:
             - DATABASE_URL=${DATABASE_URL}
             - JWT_SECRET=${JWT_SECRET}
@@ -20,9 +21,12 @@ services:
             - SENDER_GMAIL=${SENDER_GMAIL}
             - SENDER_GMAIL_PASSWORD=${SENDER_GMAIL_PASSWORD}
             - REDIS_URL=${REDIS_URL}
+            - YANDEX_API_KEY=${YANDEX_API_KEY}
+            - MODERATION_URL=${MODERATION_URL}
         depends_on:
             - db
             - redis
+            - moderation
 
     db:
         container_name: "db"
