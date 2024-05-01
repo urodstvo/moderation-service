@@ -51,6 +51,7 @@ class ProfileTable(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     role = Column(String, nullable=False, default='user')
     is_company_requested = Column(Boolean, default=False, nullable=False)
+    api_token = Column(String, nullable=True)
 
     def as_dict(self):
         return {
@@ -59,7 +60,8 @@ class ProfileTable(Base):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "role": self.role,
-            'is_company_requested': self.is_company_requested
+            'is_company_requested': self.is_company_requested,
+            'api_token': self.api_token
         }
 
 
@@ -70,6 +72,7 @@ class ProfileModel(BaseModel):
     updated_at: Optional[datetime.datetime] = None
     role: Optional[str] = None
     is_company_requested: Optional[bool] = None
+    api_token: Optional[str] = None
 
 
 class RequestTable(Base):

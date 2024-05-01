@@ -1,9 +1,10 @@
 import uuid
 from typing import Union
+from datetime import timedelta, datetime
 
 from sqlalchemy import select, update, and_
 
-from src.DTO.request import *
+from src.DTO.request import CreateRequestData
 from src.db.base import AsyncSession
 from src.db.models import RequestTable, RequestModel
 
@@ -43,3 +44,20 @@ class RequestsTable:
 
             await session.execute(update(RequestTable).where(and_(*conditions)).values(**filtered_update_data))
             await session.commit()
+
+    @staticmethod
+    async def countRequestOfToday(user_data: RequestModel, db: AsyncSession) -> int:
+        async with db.begin() as session:
+            filtered_user_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            conditions = [getattr(RequestTable, key) == value for key, value in filtered_user_data.items()]
+            query = select(RequestTable).where(and_(*conditions))
+
+            today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            tomorrow = today + timedelta(days=1)
+            query = query.where(RequestTable.created_at >= today)
+            query = query.where(RequestTable.created_at < tomorrow)
+
+            result = await session.execute(query)
+            rows = result.fetchall()
+
+            return len(rows) if rows is not None else 0

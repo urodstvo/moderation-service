@@ -14,6 +14,10 @@ from uuid import UUID
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from .db.base import AsyncSession
+from .db.models import ProfileModel
+from .db.tables.profiles import ProfilesTable
+
 
 #
 # ---------------------- JWT AUTHORIZATION -----------------------
@@ -41,6 +45,34 @@ class JWTBearer(HTTPBearer):
             return False
 
         return True
+
+
+#
+# ---------------------- API AUTHORIZATION -----------------------
+#
+
+
+async def check_auth(request: Request, db: AsyncSession) -> bool:
+    token = request.headers.get('Authorization')
+    if token is None:
+        raise HTTPException(status_code=403, detail="No token provided")
+
+    token = token.split(' ')
+    if token[0] != 'Api-Key':
+        raise HTTPException(status_code=403, detail="Invalid token type")
+
+    if token[1] == os.getenv('PASS_KEY'):
+        return False
+
+    user = await ProfilesTable.getProfile(ProfileModel(api_token=token[1]), db)
+    if user is None:
+        raise HTTPException(status_code=403, detail="Invalid token")
+
+    if user.role == 'user':
+        raise HTTPException(status_code=403, detail="Role is not allowed")
+
+    return True
+
 
 
 #
@@ -108,13 +140,13 @@ def get_userId_from_request(request: Request) -> str:
 
     return payload.get('user_id')
 
+
 #
 # ---------------------- TRANSLATION -----------------------
 #
 
 
 def translate(text: str, lang: str = 'auto') -> str:
-
     body = {
         "targetLanguageCode": 'en',
         "texts": [text],
@@ -135,4 +167,3 @@ def translate(text: str, lang: str = 'auto') -> str:
 
     response = response.json()
     return response['translations'][0]['text']
-

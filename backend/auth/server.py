@@ -9,7 +9,7 @@ from src.handlers.auth import auth_router
 from src.handlers.email import email_router
 from src.handlers.password import password_router
 from src.handlers.profile import profile_router
-from src.util import JWTBearer
+from src.util import JWTBearer, check_auth
 
 app = FastAPI(title="SERVICE", root_path="/api")
 
