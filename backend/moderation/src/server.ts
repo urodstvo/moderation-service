@@ -1,6 +1,6 @@
 import express, { Express, Response } from "express";
 
-import toxic_router from "./hadlers/toxicity";
+import toxic_router from "./toxicity";
 
 const app: Express = express();
 const port: number = 8000;

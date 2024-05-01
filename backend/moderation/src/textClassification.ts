@@ -1,13 +1,15 @@
-import { Router, Request, Response } from "express";
 import "@tensorflow/tfjs";
 import * as toxicity from "@tensorflow-models/toxicity";
-import { isClient } from "../middleware";
 
 const threshold = 0.5;
 const labels = ["identity_attack", "insult", "obscene", "severe_toxicity", "threat", "toxicity"];
 
 let model: toxicity.ToxicityClassifier;
-toxicity.load(threshold, labels).then((m) => (model = m));
+
+toxicity.load(threshold, labels).then((m) => {
+    console.log("Loaded model");
+    model = m;
+});
 
 type PredictionResponse = Array<{
     sentence: string;
@@ -17,16 +19,14 @@ type PredictionResponse = Array<{
     }>;
 }>;
 
-const router = Router();
-
-router.get("/text", isClient, async (req: Request, res: Response) => {
-    const text = req.query.query as string;
+export const classifyText = async (text: string) => {
     const sentences = text
         .split(".")
         .map((sentence) => sentence.trim())
         .filter((sentence) => !!sentence);
 
-    if (!text) return res.status(400).send("No text provided");
+    if (!text) throw Error("No text provided");
+    if (!model) throw Error("Model not loaded");
 
     let predictions: PredictionResponse = [];
     for (const sentence of sentences) {
@@ -38,7 +38,5 @@ router.get("/text", isClient, async (req: Request, res: Response) => {
         predictions.push({ sentence: sentence, toxicity: formatted_predicts });
     }
 
-    return res.status(200).send({ predictions });
-});
-
-export default router;
+    return predictions;
+};
