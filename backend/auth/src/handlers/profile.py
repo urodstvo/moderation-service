@@ -44,6 +44,28 @@ async def change_role(request: Request, role: str, db: AsyncSession):
 
 
 #
+# ---------------------- ACCEPT COMPANY -----------------------
+#
+
+@profile_router.post('/accept/{user}')
+async def change_role(request: Request, user: str, db: AsyncSession):
+    user_id = get_userId_from_request(request)
+    profile = await ProfilesTable.getUser(ProfileModel(user_id=user_id), db)
+
+    if profile is None:
+        raise HTTPException(status_code=403, detail="User not found")
+
+    if profile.role != 'admin':
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    await ProfilesTable.updateProfile(ProfileModel(user_id=user), ProfileModel(is_company_requested=False,
+                                                                               is_company_accepted=True,
+                                                                               role='company'), db)
+
+    return JSONResponse(content='Role Accepted')
+
+
+#
 # ---------------------- GET PROFILE -----------------------
 #
 
@@ -81,6 +103,6 @@ async def generate_api_key(request: Request, db: AsyncSession):
 
     token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16))
 
-    await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(api_key=token), db)
+    await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(api_token=token), db)
 
     return JSONResponse(content='Token Generated')

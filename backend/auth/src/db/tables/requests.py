@@ -1,9 +1,7 @@
 import uuid
-from typing import Union
+from typing import Union, List
 from datetime import timedelta, datetime
-
 from sqlalchemy import select, update, and_
-
 from src.DTO.request import CreateRequestData
 from src.db.base import AsyncSession
 from src.db.models import RequestTable, RequestModel
@@ -22,9 +20,9 @@ class RequestsTable:
             return request.request_id
 
     @staticmethod
-    async def getRequest(user_data: RequestModel, db: AsyncSession) -> Union[RequestModel, None]:
+    async def getRequest(request_data: RequestModel, db: AsyncSession) -> Union[RequestModel, None]:
         async with db.begin() as session:
-            filtered_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            filtered_data = {key: value for key, value in request_data.dict().items() if value is not None}
             conditions = [getattr(RequestTable, key) == value for key, value in filtered_data.items()]
 
             request = await session.execute(select(RequestTable).where(and_(*conditions)))
@@ -35,9 +33,25 @@ class RequestsTable:
             return RequestModel(**request[0].as_dict())
 
     @staticmethod
-    async def updateRequest(user_data: RequestModel, update_data: RequestModel, db: AsyncSession) -> None:
+    async def getRequests(request_data: RequestModel, db: AsyncSession) -> Union[List[RequestModel], None]:
         async with db.begin() as session:
-            filtered_user_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            filtered_data = {key: value for key, value in request_data.dict().items() if value is not None}
+            conditions = [getattr(RequestTable, key) == value for key, value in filtered_data.items()]
+
+            rows = await session.execute(select(RequestTable).where(and_(*conditions)))
+            if not rows:
+                return None
+
+            requests = []
+            for row in rows:
+                requests.append(RequestModel(**row[0].as_dict()))
+
+            return requests
+
+    @staticmethod
+    async def updateRequest(request_data: RequestModel, update_data: RequestModel, db: AsyncSession) -> None:
+        async with db.begin() as session:
+            filtered_user_data = {key: value for key, value in request_data.dict().items() if value is not None}
             conditions = [getattr(RequestTable, key) == value for key, value in filtered_user_data.items()]
 
             filtered_update_data = {key: value for key, value in update_data.dict().items() if value is not None}
@@ -46,9 +60,9 @@ class RequestsTable:
             await session.commit()
 
     @staticmethod
-    async def countRequestOfToday(user_data: RequestModel, db: AsyncSession) -> int:
+    async def countRequestOfToday(request_data: RequestModel, db: AsyncSession) -> int:
         async with db.begin() as session:
-            filtered_user_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            filtered_user_data = {key: value for key, value in request_data.dict().items() if value is not None}
             conditions = [getattr(RequestTable, key) == value for key, value in filtered_user_data.items()]
             query = select(RequestTable).where(and_(*conditions))
 

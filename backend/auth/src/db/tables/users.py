@@ -1,5 +1,5 @@
 import uuid
-from typing import Union
+from typing import Union, List
 
 from sqlalchemy import select, update, and_
 
@@ -34,6 +34,22 @@ class UsersTable:
                 return None
 
             return UserModel(**user[0].as_dict())
+
+    @staticmethod
+    async def getUsers(user_data: UserModel, db: AsyncSession) -> Union[List[UserModel], None]:
+        async with db.begin() as session:
+            filtered_data = {key: value for key, value in user_data.dict().items() if value is not None}
+            conditions = [getattr(UserTable, key) == value for key, value in filtered_data.items()]
+
+            rows = await session.execute(select(UserTable).where(and_(*conditions)))
+            if not rows:
+                return None
+
+            users = []
+            for row in rows:
+                users.append(UserModel(**row[0].as_dict()))
+
+            return users
 
     @staticmethod
     async def updateUser(user_data: UserModel, update_data: UserModel, db: AsyncSession) -> None:

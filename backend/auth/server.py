@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
 
+
 from src.config import redis
 from src.db.base import init_db
 from src.handlers.api import api_router
@@ -9,7 +10,8 @@ from src.handlers.auth import auth_router
 from src.handlers.email import email_router
 from src.handlers.password import password_router
 from src.handlers.profile import profile_router
-from src.util import JWTBearer, check_auth
+from src.handlers.admin import admin_router
+from src.util import JWTBearer
 
 app = FastAPI(title="SERVICE", root_path="/api")
 
@@ -50,6 +52,13 @@ app.include_router(
 app.include_router(
     api_router,
     tags=["API"],
+)
+
+app.include_router(
+    admin_router,
+    dependencies=[Depends(JWTBearer())],
+    tags=["ADMIN"],
+    prefix="/admin",
 )
 
 

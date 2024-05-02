@@ -4,6 +4,8 @@ from typing import Optional
 from pydantic import BaseModel
 from sqlalchemy import Column, Boolean, String, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from sqlalchemy.orm import relationship
+
 from .base import Base
 
 import uuid
@@ -19,6 +21,8 @@ class UserTable(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     role = Column(String, nullable=False, default='user')
+
+    profile = relationship("ProfileTable", uselist=False, back_populates="user")
 
     def as_dict(self):
         return {
@@ -51,7 +55,10 @@ class ProfileTable(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     role = Column(String, nullable=False, default='user')
     is_company_requested = Column(Boolean, default=False, nullable=False)
+    is_company_accepted = Column(Boolean, default=False, nullable=False)
     api_token = Column(String, nullable=True)
+
+    user = relationship("UserTable", uselist=False, back_populates="profile")
 
     def as_dict(self):
         return {
@@ -61,6 +68,7 @@ class ProfileTable(Base):
             "updated_at": self.updated_at,
             "role": self.role,
             'is_company_requested': self.is_company_requested,
+            'is_company_accepted': self.is_company_accepted,
             'api_token': self.api_token
         }
 
@@ -72,7 +80,10 @@ class ProfileModel(BaseModel):
     updated_at: Optional[datetime.datetime] = None
     role: Optional[str] = None
     is_company_requested: Optional[bool] = None
+    is_company_accepted: Optional[bool] = None
     api_token: Optional[str] = None
+
+
 
 
 class RequestTable(Base):
