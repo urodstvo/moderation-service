@@ -1,3 +1,6 @@
+import random
+import string
+
 from fastapi import APIRouter, HTTPException, Request
 
 from src.db.base import AsyncSession
@@ -31,13 +34,11 @@ async def change_role(request: Request, role: str, db: AsyncSession):
     if user.is_verified is not True:
         raise HTTPException(status_code=400, detail="User not verified")
 
-
     if role == 'student':
         await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(role=role), db)
-            
+
     if role == 'company':
         await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(is_company_requested=True), db)
-    
 
     return JSONResponse(content='Role Changed')
 
@@ -59,3 +60,27 @@ async def get_profile(request: Request, db: AsyncSession):
         raise HTTPException(status_code=400, detail="Profile not found")
 
     return profile
+
+
+#
+# -------------------- GENERATE API KEY -----------------------
+#
+
+
+@profile_router.post('/token')
+async def generate_api_key(request: Request, db: AsyncSession):
+    user_id = get_userId_from_request(request)
+
+    if user_id is None:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    profile = await ProfilesTable.getProfile(ProfileModel(user_id=user_id), db)
+
+    if profile.role == 'user':
+        raise HTTPException(status_code=403, detail="Not allowed to generate token")
+
+    token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16))
+
+    await ProfilesTable.updateProfile(ProfileModel(user_id=user_id), ProfileModel(api_key=token), db)
+
+    return JSONResponse(content='Token Generated')
