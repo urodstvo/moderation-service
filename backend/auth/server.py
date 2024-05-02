@@ -49,7 +49,6 @@ app.include_router(
 
 app.include_router(
     api_router,
-    prefix="/api",
     tags=["API"],
 )
 

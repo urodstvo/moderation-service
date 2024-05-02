@@ -1,21 +1,34 @@
 import os
 import uuid
+import re
 
-from fastapi import APIRouter, Request, HTTPException
+import io
+from pydub import AudioSegment
 
-from src.DTO.request import PredictionsResponse, PredictRequest, TextPredictResponse, LabelPredictResponse, \
-    CreateRequestData
+import cv2
+import numpy as np
+import pytesseract
+from PIL import Image
+from fastapi import APIRouter, Request, HTTPException, UploadFile, File, Form
+
+from src.DTO.request import *
 from src.db.base import AsyncSession
 from src.util import get_userId_from_request, translate
 
 from requests import get
+
+import speech_recognition as sr
+
+from moviepy.editor import VideoFileClip
 
 from src.db.tables.requests import RequestsTable
 from src.db.tables.profiles import ProfilesTable
 
 from src.db.models import RequestModel, UserModel, ProfileModel
 
-from src.util import check_auth
+from src.util import check_auth, encode_base64
+
+from src.config import speech_recognizer
 
 api_router = APIRouter()
 
@@ -41,7 +54,9 @@ async def checkRateLimit(user_id: uuid.UUID, db: AsyncSession):
 # ---------------------- Predict Text ----------------------
 #
 def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
-    translation = translate(text, lang)
+    translation = text
+    if not lang == 'eng':
+        translation = translate(text, lang)
 
     response = get(os.getenv("MODERATION_URL"), params={'query': translation})
     response = response.json()
@@ -57,7 +72,7 @@ def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
 #
 
 @api_router.post("/text", response_model=PredictionsResponse)
-async def text(data: PredictRequest, request: Request, db: AsyncSession):
+async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession):
     if await check_auth(request, db):
         user_id = get_userId_from_request(request)
         await checkRateLimit(user_id, db)
@@ -67,3 +82,116 @@ async def text(data: PredictRequest, request: Request, db: AsyncSession):
     response = classifyText(data.text, data.lang)
 
     return response
+
+
+#
+# ---------------------- Text ----------------------
+#
+
+
+@api_router.post("/image", response_model=PredictionsResponse)
+async def moderate_image(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
+    if await check_auth(request, db):
+        user_id = get_userId_from_request(request)
+        await checkRateLimit(user_id, db)
+        create_data = CreateRequestData(user_id=user_id, moderation_type="image", content=await encode_base64(file))
+        await RequestsTable.createRequest(create_data, db)
+
+    image = Image.open(file.file)
+
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+    image = cv2.resize(image, None, fx=5, fy=5, interpolation=cv2.INTER_CUBIC)
+
+    image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+    image = cv2.medianBlur(image, 5)
+
+    text: str = pytesseract.image_to_string(image, lang)
+
+    text = re.sub(r'\W+\s', ' ', text).strip()
+
+    if not text.strip():
+        HTTPException(status_code=500, detail='No text found')
+
+    response = classifyText(text, lang)
+
+    return response
+
+
+#
+# ---------------------- AUDIO ----------------------
+#
+
+languageMap = {
+    'eng': 'en-US',
+    'rus': 'ru-RU',
+}
+
+
+@api_router.post("/audio", response_model=PredictionsResponse)
+async def moderate_audio(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
+    if await check_auth(request, db):
+        user_id = get_userId_from_request(request)
+        await checkRateLimit(user_id, db)
+        create_data = CreateRequestData(user_id=user_id, moderation_type="audio", content=await encode_base64(file))
+        await RequestsTable.createRequest(create_data, db)
+
+    audio_content = await file.read()
+
+    audio_io = io.BytesIO(audio_content)
+
+    audio = AudioSegment.from_file(audio_io)
+    wav_audio_io = io.BytesIO()
+    audio.export(wav_audio_io, format="wav")
+    wav_audio_io.seek(0)
+
+    text = None
+
+    with sr.AudioFile(wav_audio_io) as source:
+        try:
+            audio_data = speech_recognizer.record(source)
+            text = speech_recognizer.recognize_google(audio_data, language=languageMap[lang])
+        except:
+            HTTPException(status_code=500, detail='No text found')
+
+    if text is None:
+        HTTPException(status_code=500, detail='No text found')
+
+    return classifyText(text, lang)
+
+
+#
+# ---------------------- VIDEO ----------------------
+#
+
+@api_router.post("/video", response_model=PredictionsResponse)
+async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
+    if await check_auth(request, db):
+        user_id = get_userId_from_request(request)
+        await checkRateLimit(user_id, db)
+        create_data = CreateRequestData(user_id=user_id, moderation_type="video", content=await encode_base64(file))
+        await RequestsTable.createRequest(create_data, db)
+
+    video_content = await file.read()
+
+    video_io = io.BytesIO(video_content)
+
+    with VideoFileClip(video_io) as video:
+        audio = video.audio
+        wav_audio_io = io.BytesIO()
+        audio.write_audiofile(wav_audio_io, codec='pcm_s16le')
+        wav_audio_io.seek(0)
+
+    text = None
+
+    with sr.AudioFile(wav_audio_io) as source:
+        try:
+            audio_data = speech_recognizer.record(source)
+            text = speech_recognizer.recognize_google(audio_data, language=languageMap[lang])
+        except:
+            HTTPException(status_code=500, detail='No text found')
+
+    if text is None:
+        HTTPException(status_code=500, detail='No text found')
+
+    return classifyText(text, lang)

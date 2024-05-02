@@ -1,3 +1,4 @@
+import base64
 import datetime
 import os
 from typing import Union
@@ -11,7 +12,7 @@ from .config import JWT_SECRET, JWT_LIFETIME
 from json import JSONEncoder
 from uuid import UUID
 
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, UploadFile
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from .db.base import AsyncSession
@@ -53,6 +54,9 @@ class JWTBearer(HTTPBearer):
 
 
 async def check_auth(request: Request, db: AsyncSession) -> bool:
+    if request.client.host == '172.18.0.1':
+        return False
+
     token = request.headers.get('Authorization')
     if token is None:
         raise HTTPException(status_code=403, detail="No token provided")
@@ -60,9 +64,6 @@ async def check_auth(request: Request, db: AsyncSession) -> bool:
     token = token.split(' ')
     if token[0] != 'Api-Key':
         raise HTTPException(status_code=403, detail="Invalid token type")
-
-    if token[1] == os.getenv('PASS_KEY'):
-        return False
 
     user = await ProfilesTable.getProfile(ProfileModel(api_token=token[1]), db)
     if user is None:
@@ -72,7 +73,6 @@ async def check_auth(request: Request, db: AsyncSession) -> bool:
         raise HTTPException(status_code=403, detail="Role is not allowed")
 
     return True
-
 
 
 #
@@ -145,6 +145,10 @@ def get_userId_from_request(request: Request) -> str:
 # ---------------------- TRANSLATION -----------------------
 #
 
+translateMap = {
+    'rus': 'ru'
+}
+
 
 def translate(text: str, lang: str = 'auto') -> str:
     body = {
@@ -153,7 +157,7 @@ def translate(text: str, lang: str = 'auto') -> str:
     }
 
     if lang != 'auto':
-        body["sourceLanguageCode"] = lang
+        body["sourceLanguageCode"] = translateMap[lang]
 
     headers = {
         "Content-Type": "application/json",
@@ -167,3 +171,11 @@ def translate(text: str, lang: str = 'auto') -> str:
 
     response = response.json()
     return response['translations'][0]['text']
+
+
+#
+# ---------------------- ENCODE BASE64 -----------------------
+#
+
+async def encode_base64(file: UploadFile) -> str:
+    return base64.b64encode(await file.read()).decode('utf-8')

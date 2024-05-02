@@ -4,6 +4,8 @@ import redis
 from fastapi_mail import ConnectionConfig
 from redis import Redis
 
+import speech_recognition as sr
+
 JWT_SECRET = os.getenv('JWT_SECRET')
 JWT_LIFETIME = os.getenv('JWT_LIFETIME')
 
@@ -28,6 +30,8 @@ MailConfig = ConnectionConfig(
     VALIDATE_CERTS=False,
     TEMPLATE_FOLDER=templates_folder,
 )
+
+speech_recognizer = sr.Recognizer()
 
 redis: Redis = redis.Redis(host="redis", port=6379, decode_responses=True)
 

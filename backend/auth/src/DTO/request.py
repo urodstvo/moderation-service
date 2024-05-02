@@ -2,6 +2,7 @@ import uuid
 from typing import List, Optional
 
 from pydantic import BaseModel
+from fastapi import File
 
 
 class CreateRequestData(BaseModel):
@@ -27,3 +28,5 @@ class PredictionsResponse(BaseModel):
 class PredictRequest(BaseModel):
     text: str
     lang: Optional[str] = 'auto'
+
+
