@@ -2,18 +2,19 @@
 
 import React from 'react';
 
-import { redirect } from '@/navigation';
-import { useProfileStore, useUserStore } from '@/store';
+import { useRouter } from '@/navigation';
+import { useProfileStore } from '@/store';
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
-    const { isLoggedIn } = useUserStore((state) => state);
     const { profile } = useProfileStore((state) => state);
+    const router = useRouter();
 
-    const hasAccess = isLoggedIn && profile?.role === 'admin';
+    const hasAccess = profile?.role === 'admin';
 
-    if (!hasAccess) {
-        redirect('/');
-    }
+    React.useEffect(() => {
+        if (hasAccess) router.push('/dashboard');
+        else router.replace('/');
+    }, [hasAccess]);
 
     return <>{hasAccess && children}</>;
 };

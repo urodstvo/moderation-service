@@ -12,9 +12,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
     const hasAccess = !isLoggedIn;
 
     React.useLayoutEffect(() => {
-        if (!hasAccess) {
-            router.push('/');
-        }
+        if (!hasAccess) router.replace('/');
     }, [hasAccess]);
 
     return <>{hasAccess && children}</>;

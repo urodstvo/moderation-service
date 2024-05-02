@@ -8,9 +8,9 @@ export default function DashboardLayout({
     return (
         <Provider>
             <main className='flex flex-col px-[--container-padding-lg]'>
+                {children}
                 {stats}
                 {users}
-                {children}
             </main>
         </Provider>
     );

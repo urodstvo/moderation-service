@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 
+import { DashboardLink } from './components/DashboardLink';
 import { HomeButton } from './components/HomeButton';
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
         <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#222222] to-[#000000] py-5 gap-24'>
             <header className='w-full px-[--container-padding-lg]'>
                 <nav className='flex align-center justify-end gap-10'>
+                    <DashboardLink />
                     <Button asChild className='rounded-full px-5 py-1' variant='ghost'>
                         <Link href='/services/moderation' className='font-overpass text-xl text-white font-medium'>
                             Service
