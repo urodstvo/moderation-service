@@ -26,3 +26,13 @@ type ProfileResponse = {
 type AuthError = {
     detail: string;
 };
+
+type PredictionResponse = {
+    predictions: Array<{
+        text: string;
+        toxicity: Array<{
+            label: string;
+            score: number;
+        }>;
+    }>;
+};

@@ -7,7 +7,7 @@ import { Link } from '@/navigation';
 import { useUserStore } from '@/store';
 
 export const HomeButton = () => {
-    const { isLoggedIn } = useUserStore();
+    const { isLoggedIn } = useUserStore((state) => state);
     return (
         !isLoggedIn && (
             <Button asChild className='py-5 w-[300px] bg-transparent' size={null} variant='outline'>

@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
 import { verifyUserRequest } from '@/api';
-import { useAuthTokenStore, useUserStore } from '@/store';
+import { useTokenStore, useUserStore } from '@/store';
 
 export const useVerifyUserQuery = () => {
-    const { token } = useAuthTokenStore();
-    const { auth, logout } = useUserStore();
+    const { token } = useTokenStore((state) => state);
+    const { auth, logout } = useUserStore((state) => state);
 
     const query = useQuery({
         queryKey: ['verifyUser'],

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useProfileStore, useUserStore } from '@/store';
 
 export const StudentCardButton = () => {
-    const { profile } = useProfileStore();
-    const { user } = useUserStore();
+    const { profile } = useProfileStore((state) => state);
+    const { user } = useUserStore((state) => state);
     const changeRole = useChangeRoleMutation();
 
     const handleClick = () => changeRole.mutate('student');

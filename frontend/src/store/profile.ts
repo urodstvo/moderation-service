@@ -1,4 +1,7 @@
-import { create } from 'zustand';
+import React from 'react';
+import { create, useStore } from 'zustand';
+
+import { ProfileStoreContext } from '@/app/[locale]/provider';
 
 type ProfileState = {
     profile: {
@@ -21,7 +24,20 @@ const initialState: ProfileState = {
     profile: null,
 };
 
-export const useProfileStore = create<ProfileState & ProfileActions>((set) => ({
-    ...initialState,
-    setProfile: (data: ProfileState['profile']) => set({ profile: data }),
-}));
+export type ProfileStore = ProfileState & ProfileActions;
+
+export const createProfileStore = () =>
+    create<ProfileStore>((set) => ({
+        ...initialState,
+        setProfile: (data: ProfileState['profile']) => set({ profile: data }),
+    }));
+
+export const useProfileStore = <T>(selector: (store: ProfileStore) => T): T => {
+    const userStoreContext = React.useContext(ProfileStoreContext);
+
+    if (!userStoreContext) {
+        throw new Error(`useUserStore must be use within UserStoreProvider`);
+    }
+
+    return useStore(userStoreContext, selector);
+};

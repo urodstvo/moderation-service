@@ -10,9 +10,9 @@ import { Link } from '@/navigation';
 import { useProfileStore, useUserStore } from '@/store';
 
 export const Integration = () => {
-    const { profile } = useProfileStore();
+    const { profile } = useProfileStore((state) => state);
     const [isHidden, setIsHidden] = React.useState(true);
-    const { isLoggedIn } = useUserStore();
+    const { isLoggedIn } = useUserStore((state) => state);
 
     const generateToken = useGenerateTokentMutation();
 

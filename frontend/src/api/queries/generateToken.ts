@@ -3,10 +3,10 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 import api, { PROFILE_API_URL } from '@/api';
-import { useAuthTokenStore } from '@/store';
+import { useTokenStore } from '@/store';
 
 export const useGenerateTokentMutation = () => {
-    const { token } = useAuthTokenStore();
+    const { token } = useTokenStore((state) => state);
     const client = useQueryClient();
 
     return useMutation({

@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
 import api, { PROFILE_API_URL } from '@/api';
-import { useAuthTokenStore, useProfileStore } from '@/store';
+import { useProfileStore, useTokenStore } from '@/store';
 
 export const useProfileQuery = () => {
-    const { token } = useAuthTokenStore();
-    const { setProfile } = useProfileStore();
+    const { token } = useTokenStore((state) => state);
+    const { setProfile } = useProfileStore((state) => state);
 
     const query = useQuery({
         queryKey: ['profile'],

@@ -16,6 +16,11 @@ export const Navbar = () => {
                     </Link>
                 </Button>
                 <Button asChild variant='link' size={null}>
+                    <Link href='/services/moderation' className='font-overpass !text-2xl !font-light'>
+                        Service
+                    </Link>
+                </Button>
+                <Button asChild variant='link' size={null}>
                     <Link href='/pricing' className='font-overpass !text-2xl !font-light'>
                         Pricing
                     </Link>

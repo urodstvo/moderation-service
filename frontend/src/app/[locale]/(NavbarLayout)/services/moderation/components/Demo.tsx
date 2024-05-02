@@ -1,9 +1,10 @@
 'use client';
 
 import { IconChevronDown } from '@tabler/icons-react';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { create } from 'zustand';
 
+import { useFileModerationMutation, useTextModerationMutation } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
@@ -11,11 +12,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea';
 
 const useLanguageStore = create<{
-    language: 'ru' | 'en';
-    setLanguage: (language: 'ru' | 'en') => void;
+    language: 'rus' | 'eng';
+    setLanguage: (language: 'rus' | 'eng') => void;
 }>((set) => ({
-    language: 'en',
-    setLanguage: (language: 'ru' | 'en') => set({ language }),
+    language: 'eng',
+    setLanguage: (language: 'rus' | 'eng') => set({ language }),
 }));
 
 const useInputTypeStore = create<{
@@ -39,8 +40,8 @@ const LanguageInput = React.memo(() => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value='ru'>Russian</SelectItem>
-                        <SelectItem value='en'>English</SelectItem>
+                        <SelectItem value='rus'>Russian</SelectItem>
+                        <SelectItem value='eng'>English</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -75,6 +76,26 @@ const TypeInput = React.memo(() => {
 export const Demo = () => {
     const { language } = useLanguageStore();
     const { type } = useInputTypeStore();
+    const [text, setText] = React.useState<string>('');
+    const [image, setImage] = React.useState<File>();
+    const [audio, setAudio] = React.useState<File>();
+    const [video, setVideo] = React.useState<File>();
+
+    const textModeration = useTextModerationMutation();
+    const fileModeration = useFileModerationMutation();
+
+    const handleAnalyze = () => {
+        if (type === 'text') {
+            textModeration.mutate({ text, lang: 'auto' });
+        } else {
+            const file = type === 'image' ? image : type === 'audio' ? audio : video;
+            const data = new FormData();
+            data.append('file', file as File);
+            data.append('lang', language);
+            fileModeration.mutate({ type, data });
+        }
+    };
+
     return (
         <section className='flex flex-col gap-5' id='demo'>
             <h3 className='font-overpass text-2xl font-bold text-[#555]'>Test Out The Moderation API</h3>
@@ -85,14 +106,26 @@ export const Demo = () => {
                 </div>
                 {type === 'text' && (
                     <Textarea
+                        value={text}
+                        onChange={(e) => setText(e.currentTarget.value)}
                         placeholder='Write here something'
                         className='w-full resize-none font-roboto text-[16px] leading-5'
                         rows={10}
                     />
                 )}
-                {type === 'image' && <Input type='file' accept='image/*' />}
-                {type === 'audio' && <Input type='file' accept='audio/wav' />}
-                {type === 'video' && <Input type='file' accept='video/mp4,video/x-m4v,video/*' />}
+                {type === 'image' && (
+                    <Input type='file' accept='image/*' onChange={(e) => setImage(e.target.files?.[0])} />
+                )}
+                {type === 'audio' && (
+                    <Input type='file' accept='audio/*' onChange={(e) => setAudio(e.target.files?.[0])} />
+                )}
+                {type === 'video' && (
+                    <Input
+                        type='file'
+                        accept='video/mp4,video/x-m4v,video/*'
+                        onChange={(e) => setVideo(e.target.files?.[0])}
+                    />
+                )}
 
                 <Collapsible>
                     <div className='flex items-center justify-between'>
@@ -101,10 +134,25 @@ export const Demo = () => {
                                 Show Response <IconChevronDown stroke={1.5} size={24} />
                             </Button>
                         </CollapsibleTrigger>
-                        <Button className='w-40 font-roboto font-medium text-xl'>Analyze</Button>
+                        <Button className='w-40 font-roboto font-medium text-xl' onClick={handleAnalyze}>
+                            Analyze
+                        </Button>
                     </div>
                     <CollapsibleContent>
-                        <pre>asdasd</pre>
+                        <pre className='whitespace-pre-wrap'>
+                            {type === 'text' && (
+                                <>
+                                    {textModeration.isSuccess && JSON.stringify(textModeration.data.data, undefined, 2)}
+                                    {textModeration.isPending && <div>Loading...</div>}
+                                </>
+                            )}
+                            {type !== 'text' && (
+                                <>
+                                    {fileModeration.isSuccess && JSON.stringify(fileModeration.data.data, undefined, 2)}
+                                    {fileModeration.isPending && <div>Loading...</div>}
+                                </>
+                            )}
+                        </pre>
                     </CollapsibleContent>
                 </Collapsible>
             </div>

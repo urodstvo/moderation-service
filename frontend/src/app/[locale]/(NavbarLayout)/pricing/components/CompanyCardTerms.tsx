@@ -6,7 +6,7 @@ import React from 'react';
 import { useUserStore } from '@/store';
 
 export const CompanyCardTerms = () => {
-    const { isLoggedIn, user } = useUserStore();
+    const { isLoggedIn, user } = useUserStore((state) => state);
     const isVerified = user?.is_verified;
     return (
         <ul className='font-roboto text-lg'>

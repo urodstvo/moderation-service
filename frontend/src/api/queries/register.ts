@@ -3,11 +3,11 @@ import axios, { AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 
 import api, { AUTH_API_URL } from '@/api';
-import { useAuthTokenStore, useUserStore } from '@/store';
+import { useTokenStore, useUserStore } from '@/store';
 
 export const useRegisterMutation = () => {
-    const { setToken } = useAuthTokenStore();
-    const { auth } = useUserStore();
+    const { setToken } = useTokenStore((state) => state);
+    const { auth } = useUserStore((state) => state);
 
     return useMutation({
         mutationFn: (data: { email: string; password: string }) => {

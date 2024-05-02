@@ -3,10 +3,10 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 import api, { EMAIL_API_URL } from '@/api';
-import { useAuthTokenStore } from '@/store';
+import { useTokenStore } from '@/store';
 
 export const useRequestVerificationMutation = () => {
-    const { token } = useAuthTokenStore();
+    const { token } = useTokenStore((state) => state);
 
     return useMutation({
         mutationFn: () => {

@@ -1,4 +1,7 @@
-import { create } from 'zustand';
+import React from 'react';
+import { create, useStore } from 'zustand';
+
+import { UserStoreContext } from '@/app/[locale]/provider';
 
 type UserState = {
     isLoggedIn: boolean;
@@ -16,13 +19,26 @@ type UserActions = {
     logout: () => void;
 };
 
+export type UserStore = UserState & UserActions;
+
 const initialState: UserState = {
     isLoggedIn: false,
     user: null,
 };
 
-export const useUserStore = create<UserState & UserActions>((set) => ({
-    ...initialState,
-    auth: (data: UserState['user']) => set({ isLoggedIn: true, user: data }),
-    logout: () => set({ isLoggedIn: false, user: null }),
-}));
+export const createUserStore = () =>
+    create<UserStore>((set) => ({
+        ...initialState,
+        auth: (data: UserState['user']) => set({ isLoggedIn: true, user: data }),
+        logout: () => set({ isLoggedIn: false, user: null }),
+    }));
+
+export const useUserStore = <T>(selector: (store: UserStore) => T): T => {
+    const userStoreContext = React.useContext(UserStoreContext);
+
+    if (!userStoreContext) {
+        throw new Error(`useUserStore must be use within UserStoreProvider`);
+    }
+
+    return useStore(userStoreContext, selector);
+};

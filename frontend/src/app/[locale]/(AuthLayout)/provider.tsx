@@ -1,17 +1,21 @@
 'use client';
 
-import { useEffect } from 'react';
+import React from 'react';
 
 import { useRouter } from '@/navigation';
 import { useUserStore } from '@/store';
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
+    const { isLoggedIn } = useUserStore((state) => state);
     const router = useRouter();
-    const { isLoggedIn } = useUserStore();
 
-    useEffect(() => {
-        isLoggedIn && router.replace('/');
-    }, [isLoggedIn]);
+    const hasAccess = !isLoggedIn;
 
-    return <>{children}</>;
+    React.useLayoutEffect(() => {
+        if (!hasAccess) {
+            router.push('/');
+        }
+    }, [hasAccess]);
+
+    return <>{hasAccess && children}</>;
 };

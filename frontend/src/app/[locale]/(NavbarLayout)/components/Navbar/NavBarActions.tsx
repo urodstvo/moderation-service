@@ -27,8 +27,8 @@ const SettingsButton = () => {
     const requestVerification = useRequestVerificationMutation();
     const emailVerification = useEmailVerificationMutation();
 
-    const { user } = useUserStore();
-    const { profile } = useProfileStore();
+    const { user } = useUserStore((state) => state);
+    const { profile } = useProfileStore((state) => state);
     const [isVerifying, setIsVerifying] = React.useState(false);
 
     const [otp, setOtp] = React.useState('');
@@ -119,7 +119,7 @@ const SettingsButton = () => {
 };
 
 export const NavBarActions = () => {
-    const { isLoggedIn, logout } = useUserStore();
+    const { isLoggedIn, logout } = useUserStore((state) => state);
 
     return (
         <div className='flex items-center gap-2'>

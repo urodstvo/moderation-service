@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
 import { refreshTokenRequest } from '@/api';
-import { useAuthTokenStore } from '@/store';
+import { useTokenStore } from '@/store';
 
 export const useRefreshTokenQuery = () => {
-    const { token, setToken } = useAuthTokenStore();
+    const { token, setToken } = useTokenStore((state) => state);
 
     const query = useQuery({
         queryKey: ['refreshToken'],
