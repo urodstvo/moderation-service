@@ -15,10 +15,12 @@ type AuthResponse = {
 type ProfileResponse = {
     profile_id: string;
     user_id: string;
-    registered_at: Date;
+    created_at: Date;
     updated_at: Date;
     role: 'user' | 'student' | 'company' | 'admin';
     is_company_requested: boolean;
+    is_company_accepted: boolean;
+    api_token: string | null;
 };
 
 type AuthError = {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8001/api';
+const API_URL = 'http://localhost:8000/api';
 
 export const AUTH_API_URL = API_URL + '/auth';
 export const PROFILE_API_URL = API_URL + '/profile';
@@ -17,6 +17,7 @@ export * from './queries/verifyUser';
 export * from './queries/refreshToken';
 export * from './queries/requestVerification';
 export * from './queries/emailVerification';
+export * from './queries/generateToken';
 
 export * from './requests/refreshToken';
 export * from './requests/verifyUser';
