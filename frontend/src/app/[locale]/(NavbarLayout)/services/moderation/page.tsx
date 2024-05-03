@@ -59,7 +59,7 @@ const Documentation = () => {
                         odio pharetra lorem suspendisse dolor nulla nulla neque sodales.
                     </p>
                     <Button asChild className='px-5 py-1 font-roboto text-2xl' size={null} variant='ghost'>
-                        <Link href='/docs'>Learn More</Link>
+                        <Link href='/docs/moderation/overview'>Learn More</Link>
                     </Button>
                 </div>
                 <div className='border flex flex-col justify-between p-5 items-end gap-2'>
@@ -69,7 +69,7 @@ const Documentation = () => {
                         odio pharetra lorem suspendisse dolor nulla nulla neque sodales.
                     </p>
                     <Button asChild className='px-5 py-1 font-roboto text-2xl' size={null} variant='ghost'>
-                        <Link href='/docs'>Learn More</Link>
+                        <Link href='/docs/moderation/examples'>Learn More</Link>
                     </Button>
                 </div>
             </div>
