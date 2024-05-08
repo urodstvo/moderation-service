@@ -33,10 +33,10 @@ export default function Home() {
             <main className='size-full px-[--container-padding-lg] flex flex-col items-center grow gap-24'>
                 <div className='w-[840px] flex flex-col items-center gap-10'>
                     <h1 className='scroll-m-20 text-[128px] font-black tracking-tight text-white'>{t('Title')}</h1>
-                    <p className='text-2xl font-roboto text-white'>
-                        Lorem ipsum dolor sit amet consectetur. Ut senectus ut turpis proin. Neque sit nunc dignissim
-                        consequat sollicitudin luctus viverra quis integer. Neque ultrices purus quam adipiscing.
-                        Fermentum sem suspendisse arcu tincidunt. Id nisi facilisis eu aenean enim porta.
+                    <p className='text-2xl font-roboto text-white text-center'>
+                        We offer moderation tool for all types of content - text, images, video and audio. Secure your
+                        online platform with ease using our efficient and flexible system. Join us today and create a
+                        space free of unwanted content!
                     </p>
                 </div>
                 <HomeButton />

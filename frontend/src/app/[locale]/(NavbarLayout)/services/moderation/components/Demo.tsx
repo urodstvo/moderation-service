@@ -1,7 +1,7 @@
 'use client';
 
 import { IconChevronDown } from '@tabler/icons-react';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { create } from 'zustand';
 
 import { useFileModerationMutation, useTextModerationMutation } from '@/api';
@@ -159,5 +159,3 @@ export const Demo = () => {
         </section>
     );
 };
-
-//TODO: add request logic for button

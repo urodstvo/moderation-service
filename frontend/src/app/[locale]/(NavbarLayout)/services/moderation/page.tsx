@@ -9,10 +9,6 @@ const Overview = () => {
     return (
         <section className='flex flex-col gap-5' id='overview'>
             <h1 className='font-overpass text-4xl font-bold'>MODERATION SERVICE</h1>
-            <p className='font-roboto text-xl'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua.
-            </p>
         </section>
     );
 };
@@ -27,19 +23,17 @@ const Features = () => {
                         Different Languages
                     </div>
                     <p className='flex-1 font-roboto text-xl'>
-                        Lorem ipsum dolor sit amet consectetur. Eget dignissim pellentesque quis egestas ac. Consequat
-                        odio pharetra lorem suspendisse dolor nulla nulla neque sodales. Venenatis senectus eleifend
-                        malesuada non. Sit feugiat turpis fringilla amet ac aliquam in senectus enim.
+                        Regardless of the language of discussion or publication, our system is able to effectively
+                        analyse content and ensure a high level of moderation
                     </p>
                 </div>
                 <div className='flex justify-between'>
                     <div className='w-[300px] font-overpass text-2xl px-2 border-l-2 border-[#aaa] font-medium'>
-                        Improving algorithms
+                        Variety of formats
                     </div>
                     <p className='flex-1 font-roboto text-xl'>
-                        Lorem ipsum dolor sit amet consectetur. Eget dignissim pellentesque quis egestas ac. Consequat
-                        odio pharetra lorem suspendisse dolor nulla nulla neque sodales. Venenatis senectus eleifend
-                        malesuada non. Sit feugiat turpis fringilla amet ac aliquam in senectus enim.
+                        Whether it's text messages, images, videos or audio recordings, our platform provides
+                        comprehensive moderation, ensuring a safe and enjoyable online experience for all users.
                     </p>
                 </div>
             </div>
