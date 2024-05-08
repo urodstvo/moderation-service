@@ -28,7 +28,7 @@ from src.db.models import RequestModel, UserModel, ProfileModel
 
 from src.util import check_auth, encode_base64
 
-from src.config import speech_recognizer
+from src.config import speech_recognizer, dirname
 
 api_router = APIRouter()
 
@@ -58,13 +58,22 @@ def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
     if not lang == 'eng':
         translation = translate(text, lang)
 
+    splitted = text.split('.')
+
     response = get(os.getenv("MODERATION_URL"), params={'query': translation})
     response = response.json()
 
-    predictions = response['predictions'][0]
-    toxicity = [LabelPredictResponse(label=label['label'], score=label['score']) for label in predictions['toxicity']]
+    predictions = response['predictions']
 
-    return PredictionsResponse(predictions=[TextPredictResponse(text=text, toxicity=toxicity)])
+    response = []
+
+    ind = 0
+    for predict in predictions:      
+      toxicity = [LabelPredictResponse(label=label['label'], score=label['score']) for label in predict['toxicity']]
+      response.append(TextPredictResponse(text=splitted[ind], toxicity=toxicity))
+      ind += 1
+
+    return PredictionsResponse(predictions=response)
 
 
 #
@@ -85,7 +94,7 @@ async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession
 
 
 #
-# ---------------------- Text ----------------------
+# ---------------------- IMAGE ----------------------
 #
 
 
@@ -108,7 +117,7 @@ async def moderate_image(request: Request, db: AsyncSession, file: UploadFile = 
 
     text: str = pytesseract.image_to_string(image, lang)
 
-    text = re.sub(r'\W+\s', ' ', text).strip()
+    text = re.sub(r'[\t\r\n\f\v]', ' ', text).strip()
 
     if not text.strip():
         HTTPException(status_code=500, detail='No text found')
@@ -172,19 +181,19 @@ async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = 
         create_data = CreateRequestData(user_id=user_id, moderation_type="video", content=await encode_base64(file))
         await RequestsTable.createRequest(create_data, db)
 
-    video_content = await file.read()
+    import shutil
+    file_location = dirname + f"/tmp/{file.filename}"
+    with open(file_location, "wb+") as file_object:
+        shutil.copyfileobj(file.file, file_object)    
 
-    video_io = io.BytesIO(video_content)
+    filename, ext = os.path.splitext(file.filename)
 
-    with VideoFileClip(video_io) as video:
-        audio = video.audio
-        wav_audio_io = io.BytesIO()
-        audio.write_audiofile(wav_audio_io, codec='pcm_s16le')
-        wav_audio_io.seek(0)
+    clip = VideoFileClip(file_location)
+    clip.audio.write_audiofile(f"{dirname}/tmp/{filename}.wav")
 
     text = None
 
-    with sr.AudioFile(wav_audio_io) as source:
+    with sr.AudioFile(f"{dirname}/tmp/{filename}.wav") as source:
         try:
             audio_data = speech_recognizer.record(source)
             text = speech_recognizer.recognize_google(audio_data, language=languageMap[lang])
@@ -193,5 +202,7 @@ async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = 
 
     if text is None:
         HTTPException(status_code=500, detail='No text found')
+
+    print(text)
 
     return classifyText(text, lang)
