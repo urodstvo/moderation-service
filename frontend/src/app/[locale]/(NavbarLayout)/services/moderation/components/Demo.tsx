@@ -27,6 +27,7 @@ const useInputTypeStore = create<{
     setType: (type: 'text' | 'audio' | 'image' | 'video') => set({ type }),
 }));
 
+// eslint-disable-next-line react/display-name
 const LanguageInput = React.memo(() => {
     const { language, setLanguage } = useLanguageStore();
     return (
@@ -49,6 +50,7 @@ const LanguageInput = React.memo(() => {
     );
 });
 
+// eslint-disable-next-line react/display-name
 const TypeInput = React.memo(() => {
     const { type, setType } = useInputTypeStore();
     return (

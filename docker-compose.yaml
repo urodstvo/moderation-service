@@ -1,31 +1,42 @@
 services:
-    moderation:
+    moderation_service:
         container_name: "moderation"
-        build: ./moderation
+        build: ./backend/moderation
         ports:
             - "8001:8000"
 
     api_service:
-        container_name: "api_service"
-        build: ./auth
+        container_name: "api"
+        build: ./backend/auth
         command: uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8000
         ports:
             - "8000:8000"
+        volumes:
+            - ./backend/auth:/usr/src/app
         environment:
             - DATABASE_URL=${DATABASE_URL}
             - JWT_SECRET=${JWT_SECRET}
             - JWT_LIFETIME=${JWT_LIFETIME}
-            - FRONTEND_URL=${FRONTEND_URL}
+            - FRONTEND_URL=http://frontend:3000
             - RESET_PASSWORD_LINK=${RESET_PASSWORD_LINK}
             - SENDER_GMAIL=${SENDER_GMAIL}
             - SENDER_GMAIL_PASSWORD=${SENDER_GMAIL_PASSWORD}
             - REDIS_URL=${REDIS_URL}
             - YANDEX_API_KEY=${YANDEX_API_KEY}
-            - MODERATION_URL=${MODERATION_URL}
+            - MODERATION_URL=http://moderation_service:8000/api/text
         depends_on:
             - db
             - redis
-            - moderation
+            - moderation_service
+
+    frontend:
+        container_name: "frontend"
+        build: ./frontend
+        restart: always
+        ports:
+            - "3000:3000"
+        environment:
+            - NEXT_PUBLIC_API_URL=http://api_service:8000/api
 
     db:
         container_name: "db"

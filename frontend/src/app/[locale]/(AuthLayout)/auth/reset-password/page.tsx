@@ -30,22 +30,23 @@ export default function ResetPasswordPage({
     searchParams: { [key: string]: string | string[] | undefined };
 }) {
     const token = searchParams.token as string;
-    if (!token) return notFound();
-
+    
     const router = useRouter();
 
     const resetPassword = usePasswordResetMutation();
-
+    
     const form = useForm({ resolver: zodResolver(schema) });
-
+    
     const handleSumbit = form.handleSubmit(async (data) => {
         resetPassword.mutate({ token: token, password: data.password });
     });
-
+    
     React.useEffect(() => {
         router.replace('/login');
     }, [resetPassword.isSuccess]);
-
+    
+    if (!token) return notFound();
+    
     return (
         <form onSubmit={handleSumbit}>
             <Card className='mx-auto max-w-sm w-[350px]'>

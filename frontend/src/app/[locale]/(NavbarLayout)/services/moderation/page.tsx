@@ -32,7 +32,7 @@ const Features = () => {
                         Variety of formats
                     </div>
                     <p className='flex-1 font-roboto text-xl'>
-                        Whether it's text messages, images, videos or audio recordings, our platform provides
+                        Whether it&apos;s text messages, images, videos or audio recordings, our platform provides
                         comprehensive moderation, ensuring a safe and enjoyable online experience for all users.
                     </p>
                 </div>

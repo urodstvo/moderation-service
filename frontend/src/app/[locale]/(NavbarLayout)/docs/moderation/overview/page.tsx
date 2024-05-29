@@ -29,9 +29,10 @@ export default function ModerationOverviewPage() {
                 <p className='font-roboto text-lg mb-5'>
                     Our service provides a simple and intuitive API for sending requests and retrieving classified data.
                     The request API form includes data transfer via HTTP POST method. For text-based requests, you need
-                    to specify the "/text" endpoint and pass the textual information in the body of the request. For
-                    requests involving images, audio or video files, you must also specify the appropriate endpoint
-                    ("/image", "/audio" or "/video") and send the appropriate multimedia content.
+                    to specify the &quot;/text&quot; endpoint and pass the textual information in the body of the
+                    request. For requests involving images, audio or video files, you must also specify the appropriate
+                    endpoint (&quot;/image&quot;, &quot;/audio&quot; or &quot;/video&quot;) and send the appropriate
+                    multimedia content.
                 </p>
                 <p className='font-roboto text-lg mb-5'>
                     API requests can be sent using standard HTTP headers, including an authentication header to ensure
@@ -87,10 +88,11 @@ export default function ModerationOverviewPage() {
                 <h2 className='font-overpass text-2xl font-bold'>API Answer</h2>
                 <p className='font-roboto text-lg mb-5'>
                     Our service provides fast and accurate text analysis, returning results in JSON format. The
-                    classification includes the following categories: "Toxicity", "Severe Toxicity", "Threat", "Insult",
-                    "Obscene" and "Identity Attack". Each class represents a different aspect of content, identified by
-                    the content of the text, allowing users to effectively identify and manage unwanted or dangerous
-                    content in their applications and systems.
+                    classification includes the following categories: &quot;Toxicity&quot;, &quot;Severe Toxicity&quot;,
+                    &quot;Threat&quot;, &quot;Insult&quot;, &quot;Obscene&quot; and &quot;Identity Attack&quot;. Each
+                    class represents a different aspect of content, identified by the content of the text, allowing
+                    users to effectively identify and manage unwanted or dangerous content in their applications and
+                    systems.
                 </p>
                 <div className='my-5'>
                     <Table>

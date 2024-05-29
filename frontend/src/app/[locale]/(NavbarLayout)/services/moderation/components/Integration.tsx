@@ -33,7 +33,7 @@ export const Integration = () => {
                     {profile?.role === 'user' && (
                         <div className='h-40 rounded-lg border-2 bg-gradient-to-b from-[#222222] to-[#000000] flex items-center justify-center'>
                             <Link href='/pricing' className='font-overpass text-2xl text-white hover:underline'>
-                                Serviced available only for users with status "Student" or better.
+                                Serviced available only for users with status &quot;Student&quot; or better.
                             </Link>
                         </div>
                     )}

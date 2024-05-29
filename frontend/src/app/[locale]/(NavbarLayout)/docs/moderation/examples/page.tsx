@@ -12,7 +12,7 @@ export default function ModerationExamplesPage() {
                         <code className='flex flex-col gap-1 text-sm text-neutral-400 [&_span]:h-4'>
                             <span>
                                 <span className='text-sky-400'>const</span> API_URL =
-                                <span className='text-yellow-500'>'http://localhost:8000/api'</span>;
+                                <span className='text-yellow-500'>&apos;http://localhost:8000/api&apos;</span>;
                             </span>
                             <span />
                             <span>
@@ -24,11 +24,12 @@ export default function ModerationExamplesPage() {
                                 <span className='text-yellow-500'>fetch</span>
                                 {'(`${API_URL}/text`, {'}
                             </span>
-                            <span className='pl-16'>method: 'POST',</span>
+                            <span className='pl-16'>method: &apos;POST&apos;,</span>
                             <span className='pl-16'>headers: {'{'}</span>
-                            <span className='pl-24'>'Content-Type': 'application/json',</span>
+                            <span className='pl-24'>&apos;Content-Type&apos;: &apos;application/json&apos;,</span>
                             <span className='pl-24'>
-                                Authorization: 'Api-Key <span className='text-yellow-500'>{'<API_TOKEN>'}</span>',
+                                Authorization: &apos;Api-Key <span className='text-yellow-500'>{'<API_TOKEN>'}</span>
+                                &apos;,
                             </span>
                             <span className='pl-16'>{'}'},</span>
                             <span className='pl-16'>body: JSON.stringify({'{ text }'}),</span>
@@ -46,8 +47,8 @@ export default function ModerationExamplesPage() {
                             <span className='pl-8'>
                                 <span className='text-sky-400'>const</span> data = new FormData();
                             </span>
-                            <span className='pl-8'>data.append('file', file);</span>
-                            <span className='pl-8'>data.append('lang', lang);</span>
+                            <span className='pl-8'>data.append(&apos;file&apos;, file);</span>
+                            <span className='pl-8'>data.append(&apos;lang&apos;, lang);</span>
                             <span />
                             <span>
                                 <span className='text-sky-400 pl-8'>const</span> response ={' '}
@@ -55,11 +56,12 @@ export default function ModerationExamplesPage() {
                                 <span className='text-yellow-500'>fetch</span>
                                 {'(`${API_URL}/${type}`, {'}
                             </span>
-                            <span className='pl-16'>method: 'POST',</span>
+                            <span className='pl-16'>method: &apos;POST&apos;,</span>
                             <span className='pl-16'>headers: {'{'}</span>
-                            <span className='pl-24'>'Content-Type': 'multipart/form-data',</span>
+                            <span className='pl-24'>&apos;Content-Type&apos;: &apos;multipart/form-data&apos;,</span>
                             <span className='pl-24'>
-                                Authorization: 'Api-Key <span className='text-yellow-500'>{'<API_TOKEN>'}</span>',
+                                Authorization: &apos;Api-Key <span className='text-yellow-500'>{'<API_TOKEN>'}</span>
+                                &apos;,
                             </span>
                             <span className='pl-16'>{'}'},</span>
                             <span className='pl-16'>body: data</span>

@@ -63,9 +63,9 @@ export default function IntroductionPage() {
             <section className='my-10'>
                 <h2 className='font-overpass text-2xl font-bold'>How to Use These Docs</h2>
                 <p className='font-roboto text-lg'>
-                    On the left side of the screen, you'll find the docs navbar. The pages of the docs are organized
-                    sequentially, so you can follow them step-by-step when building your application. However, you can
-                    read them in any order or skip to the pages that apply to your use case.
+                    On the left side of the screen, you&apos;ll find the docs navbar. The pages of the docs are
+                    organized sequentially, so you can follow them step-by-step when building your application. However,
+                    you can read them in any order or skip to the pages that apply to your use case.
                 </p>
             </section>
         </main>
