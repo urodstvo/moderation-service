@@ -1,5 +1,88 @@
 {
-    "Home": {
-        "Title": "Welcome!"
+    "home": {
+        "title": "Welcome!",
+        "description": "We offer moderation tool for all types of content - text, images, video and audio. Secure your online platform with ease using our efficient and flexible system. Join us today and create a space free of unwanted content!",
+        "button": "Get Started",
+        "service": "Service",
+        "pricing": "Pricing",
+        "docs": "Documentation"
+    },
+    "not-found": {
+        "title": "Page Not Found",
+        "button": "Go Back Home"
+    },
+    "register": {
+        "title": "Register",
+        "description": "Enter your information to create an account",
+        "email": "Email",
+        "password": "Password",
+        "alternative": "Already have an account?",
+        "signIn": "Sign In",
+        "create": "Create Account",
+        "creating": "Account Creating..."
+    },
+    "navbar": {
+        "service": "Service",
+        "pricing": "Pricing",
+        "docs": "Documentation"
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your account settings.",
+        "language": "UI Language",
+        "role": "Role",
+        "changeRole": "Change Role",
+        "email": "Email",
+        "verifyEmail": "Verify Email",
+        "tryAgain": "Try Again",
+        "confirm": "Confirm",
+        "confirmation": "Confirmation..."
+    },
+    "services": {
+        "features": "Features",
+        "diffLang": {
+            "title": "Different Languages",
+            "description": " Regardless of the language of discussion or publication, our system is able to effectively analyse content and ensure a high level of moderation"
+        },
+        "varietyFormats": {
+            "title": "Variety of Formats",
+            "description": "Whether it's text messages, images, videos or audio recordings, our platform providescomprehensive moderation, ensuring a safe and enjoyable online experience for all users."
+        },
+        "docs": "Documentation",
+        "endpoints": {
+            "title": "Endpoints",
+            "description": ""
+        },
+        "learnMore": "Learn More",
+        "examples": {
+            "title": "Integration Examples",
+            "description": ""
+        },
+        "tryDemo": "Try Demo",
+        "demo": {
+            "title": "Test Out The Moderation API",
+            "show": "Show Response",
+            "analyze": "Analyze",
+            "language": "Language",
+            "type": "Input Type",
+            "text": "Text",
+            "image": "Image",
+            "video": "Video",
+            "audio": "Audio"
+        },
+        "integration": {
+            "title": "API Integration",
+            "signIn": "Please sign in to have access to the API.",
+            "available": "Serviced available only for users with status Student or better.",
+            "generate": "Generate API Key",
+            "generating": "Generating..."
+        },
+        "sidebar": {
+            "overview": "Overview",
+            "features": "Features",
+            "demo": "Demo",
+            "docs": "Documentation",
+            "integration": "Integration"
+        }
     }
 }

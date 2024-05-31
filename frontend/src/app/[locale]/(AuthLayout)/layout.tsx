@@ -1,4 +1,5 @@
 import { IconHome } from '@tabler/icons-react';
+import { NextIntlClientProvider, useMessages } from 'next-intl';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Provider } from './provider';
 
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+    const messages = useMessages();
     return (
         <Provider>
             <div className='flex min-h-screen flex-col'>
@@ -16,7 +18,10 @@ export default function AuthLayout({ children }: Readonly<{ children: React.Reac
                         </Link>
                     </Button>
                 </header>
-                <main className='flex-1 flex items-center justify-center'>{children}</main>
+
+                <main className='flex-1 flex items-center justify-center'>
+                    <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+                </main>
             </div>
         </Provider>
     );

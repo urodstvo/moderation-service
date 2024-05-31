@@ -1,11 +1,13 @@
 'use client';
 
 import * as Progress from '@radix-ui/react-progress';
+import { useTranslations } from 'next-intl';
 import React, { useEffect } from 'react';
 
 import { Link } from '@/navigation';
 
 export const SideBar = () => {
+    const t = useTranslations('services.sidebar');
     const [progress, setProgress] = React.useState(0);
     useEffect(() => {
         const onScroll = () => {
@@ -36,28 +38,28 @@ export const SideBar = () => {
                 <ul className='flex flex-col gap-1'>
                     <li>
                         <Link href='#overview' className='font-overpass text-xl'>
-                            Overview
+                            {t('overview')}
                         </Link>
                     </li>
 
                     <li>
                         <Link href='#features' className='font-overpass text-xl'>
-                            Features
+                            {t('features')}
                         </Link>
                     </li>
                     <li>
                         <Link href='#demo' className='font-overpass text-xl'>
-                            Demo
+                            {t('demo')}
                         </Link>
                     </li>
                     <li>
                         <Link href='#docs' className='font-overpass text-xl'>
-                            Documentation
+                            {t('docs')}
                         </Link>
                     </li>
                     <li>
                         <Link href='#integration' className='font-overpass text-xl'>
-                            Integration
+                            {t('integration')}
                         </Link>
                     </li>
                 </ul>

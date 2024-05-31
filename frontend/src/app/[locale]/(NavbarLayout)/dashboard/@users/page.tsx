@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useAcceptRoleMutation, useUsersQuery } from '@/api';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function UsersPage() {
     const users = useUsersQuery();
@@ -38,9 +38,9 @@ export default function UsersPage() {
                                 </TableCell>
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell className='text-center'>{user.moderation.text}</TableCell>
-                                <TableCell className='text-center'>{user.moderation.text}</TableCell>
-                                <TableCell className='text-center'>{user.moderation.text}</TableCell>
-                                <TableCell className='text-center'>{user.moderation.text}</TableCell>
+                                <TableCell className='text-center'>{user.moderation.image}</TableCell>
+                                <TableCell className='text-center'>{user.moderation.audio}</TableCell>
+                                <TableCell className='text-center'>{user.moderation.video}</TableCell>
                                 <TableCell>
                                     {user.is_company_requested && (
                                         <Button onClick={() => acceptRole.mutate(user.user_id)}>ACCEPT COMPANY</Button>

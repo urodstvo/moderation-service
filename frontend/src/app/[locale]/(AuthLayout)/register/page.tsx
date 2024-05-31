@@ -2,6 +2,7 @@
 
 import { ErrorMessage } from '@hookform/error-message';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -16,6 +17,7 @@ const schema = z.object({
     password: z.string().min(4, 'Password must be at least 4 characters').trim(),
 });
 export default function RegisterPage() {
+    const t = useTranslations('register');
     const { mutate, isPending } = useRegisterMutation();
     const form = useForm({
         resolver: zodResolver(schema),
@@ -26,13 +28,13 @@ export default function RegisterPage() {
         <form onSubmit={form.handleSubmit((data) => mutate({ email: data.email, password: data.password }))}>
             <Card className='mx-auto max-w-sm w-[350px]'>
                 <CardHeader>
-                    <CardTitle className='text-2xl'>Sign Up</CardTitle>
-                    <CardDescription>Enter your information to create an account</CardDescription>
+                    <CardTitle className='text-2xl'>{t('title')}</CardTitle>
+                    <CardDescription>{t('description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className='grid gap-4'>
                         <div className='grid gap-2'>
-                            <label htmlFor='email'>Email</label>
+                            <label htmlFor='email'>{t('email')}</label>
                             <div className='flex flex-col'>
                                 <Input {...form.register('email')} id='email' placeholder='m@example.com' />
                                 <ErrorMessage
@@ -43,7 +45,7 @@ export default function RegisterPage() {
                             </div>
                         </div>
                         <div className='grid gap-2'>
-                            <label htmlFor='password'>Password</label>
+                            <label htmlFor='password'>{t('password')}</label>
                             <div className='flex flex-col'>
                                 <Input {...form.register('password')} id='password' type='password' />
                                 <ErrorMessage
@@ -54,13 +56,13 @@ export default function RegisterPage() {
                             </div>
                         </div>
                         <Button type='submit' className='w-full' disabled={!form.formState.isValid}>
-                            {isPending ? 'Signing up...' : 'Create an account'}
+                            {isPending ? t('creating') : t('create')}
                         </Button>
                     </div>
                     <div className='mt-4 text-center text-sm flex justify-between'>
-                        Already have an account?
+                        {t('alternative')}
                         <Link href='/login' className='underline'>
-                            Sign In
+                            {t('signIn')}
                         </Link>
                     </div>
                 </CardContent>

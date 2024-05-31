@@ -1,6 +1,7 @@
 'use client';
 
 import { IconChevronDown } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import { create } from 'zustand';
 
@@ -29,11 +30,12 @@ const useInputTypeStore = create<{
 
 // eslint-disable-next-line react/display-name
 const LanguageInput = React.memo(() => {
+    const t = useTranslations('services.demo');
     const { language, setLanguage } = useLanguageStore();
     return (
         <div>
             <label htmlFor='inputlanguage' className='font-roboto text-[16px] leading-5'>
-                Language
+                {t('language')}
             </label>
             <Select defaultValue={language} onValueChange={setLanguage}>
                 <SelectTrigger className='w-60' id='inputlanguage'>
@@ -41,7 +43,7 @@ const LanguageInput = React.memo(() => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value='rus'>Russian</SelectItem>
+                        <SelectItem value='rus'>Русский</SelectItem>
                         <SelectItem value='eng'>English</SelectItem>
                     </SelectGroup>
                 </SelectContent>
@@ -52,11 +54,12 @@ const LanguageInput = React.memo(() => {
 
 // eslint-disable-next-line react/display-name
 const TypeInput = React.memo(() => {
+    const t = useTranslations('services.demo');
     const { type, setType } = useInputTypeStore();
     return (
         <div>
             <label htmlFor='inputtype' className='font-roboto text-[16px] leading-5'>
-                Input Type
+                {t('type')}
             </label>
             <Select defaultValue={type} onValueChange={setType}>
                 <SelectTrigger className='w-60' id='inputtype'>
@@ -64,10 +67,10 @@ const TypeInput = React.memo(() => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectItem value='text'>Text</SelectItem>
-                        <SelectItem value='image'>Image</SelectItem>
-                        <SelectItem value='audio'>Audio</SelectItem>
-                        <SelectItem value='video'>Video</SelectItem>
+                        <SelectItem value='text'>{t('text')}</SelectItem>
+                        <SelectItem value='image'>{t('image')}</SelectItem>
+                        <SelectItem value='audio'>{t('audio')}</SelectItem>
+                        <SelectItem value='video'>{t('video')}</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -76,6 +79,7 @@ const TypeInput = React.memo(() => {
 });
 
 export const Demo = () => {
+    const t = useTranslations('services.demo');
     const { language } = useLanguageStore();
     const { type } = useInputTypeStore();
     const [text, setText] = React.useState<string>('');
@@ -100,7 +104,7 @@ export const Demo = () => {
 
     return (
         <section className='flex flex-col gap-5' id='demo'>
-            <h3 className='font-overpass text-2xl font-bold text-[#555]'>Test Out The Moderation API</h3>
+            <h3 className='font-overpass text-2xl font-bold text-[#555]'>{t('title')}</h3>
             <div className='w-[600px] flex flex-col gap-5'>
                 <div className='flex justify-between'>
                     <TypeInput />
@@ -133,11 +137,11 @@ export const Demo = () => {
                     <div className='flex items-center justify-between'>
                         <CollapsibleTrigger asChild>
                             <Button variant='outline' className='font-roboto'>
-                                Show Response <IconChevronDown stroke={1.5} size={24} />
+                                {t('show')} <IconChevronDown stroke={1.5} size={24} />
                             </Button>
                         </CollapsibleTrigger>
                         <Button className='w-40 font-roboto font-medium text-xl' onClick={handleAnalyze}>
-                            Analyze
+                            {t('analyze')}
                         </Button>
                     </div>
                     <CollapsibleContent>

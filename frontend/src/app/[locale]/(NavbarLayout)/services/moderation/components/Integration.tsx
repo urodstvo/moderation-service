@@ -1,6 +1,7 @@
 'use client';
 
 import { IconCopy, IconEye, IconEyeOff } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { useGenerateTokentMutation } from '@/api';
@@ -10,6 +11,7 @@ import { Link } from '@/navigation';
 import { useProfileStore, useUserStore } from '@/store';
 
 export const Integration = () => {
+    const t = useTranslations('services.integration');
     const { profile } = useProfileStore((state) => state);
     const [isHidden, setIsHidden] = React.useState(true);
     const { isLoggedIn } = useUserStore((state) => state);
@@ -20,11 +22,11 @@ export const Integration = () => {
 
     return (
         <section className='flex flex-col gap-5' id='integration'>
-            <h3 className='font-overpass text-2xl font-bold text-[#555]'>API Integration</h3>
+            <h3 className='font-overpass text-2xl font-bold text-[#555]'>{t('title')}</h3>
             {!isLoggedIn && (
                 <div className='h-40 rounded-lg border-2 bg-gradient-to-b from-[#222222] to-[#000000] flex items-center justify-center'>
                     <Link href='/login' className='font-overpass text-2xl text-white hover:underline'>
-                        Please sign in to have access to the API.
+                        {t('signIn')}
                     </Link>
                 </div>
             )}
@@ -33,7 +35,7 @@ export const Integration = () => {
                     {profile?.role === 'user' && (
                         <div className='h-40 rounded-lg border-2 bg-gradient-to-b from-[#222222] to-[#000000] flex items-center justify-center'>
                             <Link href='/pricing' className='font-overpass text-2xl text-white hover:underline'>
-                                Serviced available only for users with status &quot;Student&quot; or better.
+                                {t('available')}
                             </Link>
                         </div>
                     )}
@@ -72,7 +74,7 @@ export const Integration = () => {
                             )}
                             {!profile?.api_token?.length && (
                                 <Button className='w-[300px]' onClick={handleGenerate}>
-                                    {generateToken.isPending ? 'Generating...' : 'Generate API Key'}
+                                    {generateToken.isPending ? t('generating') : t('generate')}
                                 </Button>
                             )}
                         </>

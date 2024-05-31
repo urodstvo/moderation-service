@@ -2,6 +2,7 @@
 
 import { IconCheck, IconLogin, IconLogout, IconSettings } from '@tabler/icons-react';
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { useEmailVerificationMutation, useRequestVerificationMutation } from '@/api';
@@ -24,6 +25,7 @@ import { Timer } from '../Timer';
 import { LocaleSwitcher } from './LocaleSwitcher';
 
 const SettingsButton = () => {
+    const t = useTranslations('settings');
     const requestVerification = useRequestVerificationMutation();
     const emailVerification = useEmailVerificationMutation();
 
@@ -52,35 +54,35 @@ const SettingsButton = () => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Settings</DialogTitle>
-                    <DialogDescription>Manage your account settings.</DialogDescription>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
                 <div className='flex flex-col gap-5'>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='locale' className='font-roboto text-sm px-1 flex gap-1'>
-                            UI Language
+                            {t('language')}
                         </label>
                         <LocaleSwitcher id='locale' />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <div className='flex justify-between'>
                             <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>
-                                Role
+                                {t('role')}
                             </label>
                             <Button asChild variant='link' size={null}>
-                                <Link href='/pricing'>Change Role</Link>
+                                <Link href='/pricing'>{t('changeRole')}</Link>
                             </Button>
                         </div>
                         <Input type='text' id='role' defaultValue={profile?.role ?? 'User'} disabled />
                     </div>
                     <div className='flex flex-col gap-0 '>
                         <label htmlFor='email' className='font-roboto text-sm px-1 flex gap-1'>
-                            Email
+                            {t('email')}
                             {user?.is_verified && <IconCheck stroke={1.5} size={16} />}
                         </label>
                         <Input type='text' placeholder='email' id='email' defaultValue={user?.email} disabled />
                     </div>
-                    {!user?.is_verified && !isVerifying && <Button onClick={handleRequest}>Verify Email</Button>}
+                    {!user?.is_verified && !isVerifying && <Button onClick={handleRequest}>{t('verifyEmail')}</Button>}
                     {isVerifying && (
                         <div className='flex items-center flex-col'>
                             <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} onChange={setOtp}>
@@ -99,7 +101,7 @@ const SettingsButton = () => {
                             <div className='flex justify-end w-full font-roboto text-sm'>
                                 <Timer seconds={120}>
                                     <Button variant='link' onClick={handleRequest}>
-                                        Try Again
+                                        {t('tryAgain')}
                                     </Button>
                                 </Timer>
                             </div>
@@ -109,7 +111,7 @@ const SettingsButton = () => {
                 <DialogFooter>
                     {isVerifying && (
                         <Button className='w-full' disabled={otp.length !== 6} onClick={handleVerify}>
-                            {emailVerification.isPending ? 'Confirmation...' : 'Confirm'}
+                            {emailVerification.isPending ? t('confirmation') : t('confirm')}
                         </Button>
                     )}
                 </DialogFooter>

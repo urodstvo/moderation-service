@@ -1,3 +1,5 @@
+import { NextIntlClientProvider, useMessages, useTranslations } from 'next-intl';
+
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 
@@ -14,27 +16,22 @@ const Overview = () => {
 };
 
 const Features = () => {
+    const t = useTranslations('services');
     return (
         <section className='flex flex-col gap-5' id='features'>
-            <h3 className='font-overpass text-2xl font-bold text-[#555]'>Features</h3>
+            <h3 className='font-overpass text-2xl font-bold text-[#555]'>{t('features')}</h3>
             <div className='w-full flex flex-col gap-10 '>
                 <div className='flex justify-between'>
                     <div className='w-[300px] font-overpass text-2xl px-2 border-l-2 border-[#aaa] font-medium'>
-                        Different Languages
+                        {t('diffLang.title')}
                     </div>
-                    <p className='flex-1 font-roboto text-xl'>
-                        Regardless of the language of discussion or publication, our system is able to effectively
-                        analyse content and ensure a high level of moderation
-                    </p>
+                    <p className='flex-1 font-roboto text-xl'>{t('diffLang.description')}</p>
                 </div>
                 <div className='flex justify-between'>
                     <div className='w-[300px] font-overpass text-2xl px-2 border-l-2 border-[#aaa] font-medium'>
-                        Variety of formats
+                        {t('varietyFormats.title')}
                     </div>
-                    <p className='flex-1 font-roboto text-xl'>
-                        Whether it&apos;s text messages, images, videos or audio recordings, our platform provides
-                        comprehensive moderation, ensuring a safe and enjoyable online experience for all users.
-                    </p>
+                    <p className='flex-1 font-roboto text-xl'>{t('varietyFormats.description')}</p>
                 </div>
             </div>
         </section>
@@ -42,28 +39,23 @@ const Features = () => {
 };
 
 const Documentation = () => {
+    const t = useTranslations('services');
     return (
         <section className='flex flex-col gap-5' id='docs'>
-            <h3 className='font-overpass text-2xl font-bold text-[#555]'>Documentation</h3>
+            <h3 className='font-overpass text-2xl font-bold text-[#555]'>{t('docs')}</h3>
             <div className='w-full flex flex-col '>
                 <div className='border flex flex-col justify-between p-5 items-end gap-2'>
-                    <div className='w-full font-overpass text-2xl font-medium'>Endpoints</div>
-                    <p className='font-roboto text-xl text-[#333]'>
-                        Lorem ipsum dolor sit amet consectetur. Eget dignissim pellentesque quis egestas ac. Consequat
-                        odio pharetra lorem suspendisse dolor nulla nulla neque sodales.
-                    </p>
+                    <div className='w-full font-overpass text-2xl font-medium'>{t('endpoints.title')}</div>
+                    <p className='font-roboto text-xl text-[#333]'>{t('endpoints.description')}</p>
                     <Button asChild className='px-5 py-1 font-roboto text-2xl' size={null} variant='ghost'>
-                        <Link href='/docs/moderation/overview'>Learn More</Link>
+                        <Link href='/docs/moderation/overview'>{t('learnMore')}</Link>
                     </Button>
                 </div>
                 <div className='border flex flex-col justify-between p-5 items-end gap-2'>
-                    <div className='w-full font-overpass text-2xl font-medium'>Integration Examples</div>
-                    <p className='font-roboto text-xl text-[#333]'>
-                        Lorem ipsum dolor sit amet consectetur. Eget dignissim pellentesque quis egestas ac. Consequat
-                        odio pharetra lorem suspendisse dolor nulla nulla neque sodales.
-                    </p>
+                    <div className='w-full font-overpass text-2xl font-medium'>{t('examples.title')}</div>
+                    <p className='font-roboto text-xl text-[#333]'>{t('examples.description')}</p>
                     <Button asChild className='px-5 py-1 font-roboto text-2xl' size={null} variant='ghost'>
-                        <Link href='/docs/moderation/examples'>Learn More</Link>
+                        <Link href='/docs/moderation/examples'>{t('learnMore')}</Link>
                     </Button>
                 </div>
             </div>
@@ -72,19 +64,27 @@ const Documentation = () => {
 };
 
 export default function ModerationPage() {
+    const t = useTranslations('services');
+    const messages = useMessages();
     return (
         <main className='px-[--container-padding-xl] flex justify-between gap-24 py-5'>
             <div className='flex-grow flex flex-col gap-[30px]'>
                 <Overview />
                 <Button asChild className='w-[300px] py-5 px-10 font-roboto text-xl' size={null}>
-                    <Link href='#demo'>TRY DEMO</Link>
+                    <Link href='#demo'>{t('tryDemo')}</Link>
                 </Button>
                 <Features />
-                <Demo />
+                <NextIntlClientProvider messages={messages}>
+                    <Demo />
+                </NextIntlClientProvider>
                 <Documentation />
-                <Integration />
+                <NextIntlClientProvider messages={messages}>
+                    <Integration />
+                </NextIntlClientProvider>
             </div>
-            <SideBar />
+            <NextIntlClientProvider messages={messages}>
+                <SideBar />
+            </NextIntlClientProvider>
         </main>
     );
 }
