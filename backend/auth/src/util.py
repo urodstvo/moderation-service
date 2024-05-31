@@ -53,13 +53,12 @@ class JWTBearer(HTTPBearer):
 #
 
 
-async def check_auth(request: Request, db: AsyncSession) -> bool:
-    if request.client.host == '172.18.0.1':
-        return False
-
+async def check_auth(request: Request, db: AsyncSession):
     token = request.headers.get('Authorization')
     if token is None:
-        raise HTTPException(status_code=403, detail="No token provided")
+      if request.client.host == '172.18.0.1':
+        return False, None
+      raise HTTPException(status_code=403, detail="No token provided")
 
     token = token.split(' ')
     if token[0] != 'Api-Key':
@@ -72,7 +71,7 @@ async def check_auth(request: Request, db: AsyncSession) -> bool:
     if user.role == 'user':
         raise HTTPException(status_code=403, detail="Role is not allowed")
 
-    return True
+    return True, user.user_id
 
 
 #

@@ -82,8 +82,8 @@ def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
 
 @api_router.post("/text", response_model=PredictionsResponse)
 async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession):
-    if await check_auth(request, db):
-        user_id = get_userId_from_request(request)
+    isChecked, user_id = await check_auth(request, db)
+    if isChecked:
         await checkRateLimit(user_id, db)
         await RequestsTable.createRequest(CreateRequestData(user_id=user_id, moderation_type="text", content=data.text),
                                           db)
@@ -100,8 +100,8 @@ async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession
 
 @api_router.post("/image", response_model=PredictionsResponse)
 async def moderate_image(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
-    if await check_auth(request, db):
-        user_id = get_userId_from_request(request)
+    isChecked, user_id = await check_auth(request, db)
+    if isChecked:
         await checkRateLimit(user_id, db)
         create_data = CreateRequestData(user_id=user_id, moderation_type="image", content=await encode_base64(file))
         await RequestsTable.createRequest(create_data, db)
@@ -139,8 +139,8 @@ languageMap = {
 
 @api_router.post("/audio", response_model=PredictionsResponse)
 async def moderate_audio(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
-    if await check_auth(request, db):
-        user_id = get_userId_from_request(request)
+    isChecked, user_id = await check_auth(request, db)
+    if isChecked:
         await checkRateLimit(user_id, db)
         create_data = CreateRequestData(user_id=user_id, moderation_type="audio", content=await encode_base64(file))
         await RequestsTable.createRequest(create_data, db)
@@ -175,8 +175,8 @@ async def moderate_audio(request: Request, db: AsyncSession, file: UploadFile = 
 
 @api_router.post("/video", response_model=PredictionsResponse)
 async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
-    if await check_auth(request, db):
-        user_id = get_userId_from_request(request)
+    isChecked, user_id = await check_auth(request, db)
+    if isChecked:
         await checkRateLimit(user_id, db)
         create_data = CreateRequestData(user_id=user_id, moderation_type="video", content=await encode_base64(file))
         await RequestsTable.createRequest(create_data, db)
@@ -202,7 +202,5 @@ async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = 
 
     if text is None:
         HTTPException(status_code=500, detail='No text found')
-
-    print(text)
 
     return classifyText(text, lang)
