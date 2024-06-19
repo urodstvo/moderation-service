@@ -7,6 +7,7 @@ import { TokenStoreContext, UserStoreContext } from '@/app/[locale]/provider';
 export type TokenStore = {
     token: string | null;
     setToken: (token: string | null) => void;
+    сlearToken: () => void;
 };
 
 export const createAuthTokenStore = () =>
@@ -16,6 +17,7 @@ export const createAuthTokenStore = () =>
                 (set) => ({
                     token: null,
                     setToken: (token: string | null) => set({ token }),
+                    сlearToken: () => set({ token: null }),
                 }),
                 { name: 'auth-token' },
             ),

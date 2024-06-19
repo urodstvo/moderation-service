@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
 import { Link } from '@/navigation';
-import { useProfileStore, useUserStore } from '@/store';
+import { useProfileStore, useTokenStore, useUserStore } from '@/store';
 
 import { Timer } from '../Timer';
 import { LocaleSwitcher } from './LocaleSwitcher';
@@ -122,6 +122,7 @@ const SettingsButton = () => {
 
 export const NavBarActions = () => {
     const { isLoggedIn, logout } = useUserStore((state) => state);
+    const clearToken = useTokenStore((state) => state.сlearToken);
 
     return (
         <div className='flex items-center gap-2'>
@@ -131,7 +132,14 @@ export const NavBarActions = () => {
             {isLoggedIn ? (
                 <>
                     <SettingsButton />
-                    <Button variant='ghost' size='icon' onClick={logout}>
+                    <Button
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => {
+                            logout();
+                            clearToken();
+                        }}
+                    >
                         <IconLogout stroke={1.5} size={24} />
                     </Button>
                 </>
