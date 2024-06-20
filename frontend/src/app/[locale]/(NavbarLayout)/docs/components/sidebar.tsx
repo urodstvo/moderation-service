@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { Link, usePathname } from '@/navigation';
@@ -9,6 +10,7 @@ const selected = 'font-roboto text-xl border-l-2 border-blue-500 px-3 font-mediu
 const standard = 'font-roboto text-xl border-l-2 border-[#aaa] px-3';
 
 export const SideBar = () => {
+    const t = useTranslations('docs.sidebar');
     const pathname = usePathname();
     return (
         <aside className='relative'>
@@ -21,7 +23,7 @@ export const SideBar = () => {
                             [standard]: pathname !== '/docs',
                         })}
                     >
-                        Introduction
+                        {t('intro')}
                     </Link>
                 </li>
                 <p className='rounded border-2 border-neutral-700 bg-neutral-700 text-white px-3 font-medium text-lg'>
@@ -36,7 +38,7 @@ export const SideBar = () => {
                                 [standard]: pathname !== '/docs/moderation/overview',
                             })}
                         >
-                            Overview
+                            {t('overview')}
                         </Link>
                     </li>
                     <li className={clsx('hover:bg-blue-100 transition duration-200')}>
@@ -47,7 +49,7 @@ export const SideBar = () => {
                                 [standard]: pathname !== '/docs/moderation/examples',
                             })}
                         >
-                            Examples
+                            {t('examples')}
                         </Link>
                     </li>
                 </ul>

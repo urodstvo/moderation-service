@@ -14,6 +14,8 @@ import {
     createUserStore,
 } from '@/store';
 
+import { UnsuportedProvider } from './unsuported';
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useRefreshTokenQuery();
     useVerifyUserQuery();
@@ -37,15 +39,17 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
     );
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <TokenStoreProvider>
-                <UserStoreProvider>
-                    <ProfileStoreProvider>
-                        <AuthProvider>{children}</AuthProvider>
-                    </ProfileStoreProvider>
-                </UserStoreProvider>
-            </TokenStoreProvider>
-        </QueryClientProvider>
+        <UnsuportedProvider>
+            <QueryClientProvider client={queryClient}>
+                <TokenStoreProvider>
+                    <UserStoreProvider>
+                        <ProfileStoreProvider>
+                            <AuthProvider>{children}</AuthProvider>
+                        </ProfileStoreProvider>
+                    </UserStoreProvider>
+                </TokenStoreProvider>
+            </QueryClientProvider>
+        </UnsuportedProvider>
     );
 };
 

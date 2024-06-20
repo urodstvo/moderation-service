@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { useChangeRoleMutation } from '@/api/queries/changeRole';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useProfileStore, useUserStore } from '@/store';
 
 export const CompanyCardButton = () => {
+    const t = useTranslations('company-card');
     const { profile } = useProfileStore((state) => state);
     const { user } = useUserStore((state) => state);
     const changeRole = useChangeRoleMutation();
@@ -17,7 +19,7 @@ export const CompanyCardButton = () => {
 
     return (
         <Button className='w-full' disabled={!user?.is_verified} onClick={handleClick}>
-            {changeRole.isPending ? 'REQUESTING...' : 'REQUEST APPROVAL'}
+            {changeRole.isPending ? t('requesting') : t('request')}
         </Button>
     );
 };

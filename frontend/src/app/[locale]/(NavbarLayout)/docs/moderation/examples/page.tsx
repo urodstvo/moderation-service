@@ -1,10 +1,11 @@
+import { useTranslations } from 'next-intl';
+
 export default function ModerationExamplesPage() {
+    const t = useTranslations('docs.examples');
     return (
         <main className='w-[66%]'>
-            <h1 className='font-overpass text-4xl font-bold '>Moderation Service Examples</h1>
-            <p className='font-roboto text-lg mb-5'>
-                Here we will present examples of service integration in different languages
-            </p>
+            <h1 className='font-overpass text-4xl font-bold '>{t('title')}</h1>
+            <p className='font-roboto text-lg mb-5'>{t('1')}</p>
             <section className='my-10'>
                 <h2 className='font-overpass text-2xl font-bold'>JavaScript</h2>
                 <div className='rounded bg-neutral-900 p-5'>
@@ -12,7 +13,10 @@ export default function ModerationExamplesPage() {
                         <code className='flex flex-col gap-1 text-sm text-neutral-400 [&_span]:h-4'>
                             <span>
                                 <span className='text-sky-400'>const</span> API_URL =
-                                <span className='text-yellow-500'>&apos;http://localhost:8000/api&apos;</span>;
+                                <span className='text-yellow-500'>
+                                    &apos;https://back.moderation-service.ru/api&apos;
+                                </span>
+                                ;
                             </span>
                             <span />
                             <span>
