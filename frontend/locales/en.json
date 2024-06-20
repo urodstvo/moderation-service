@@ -84,5 +84,98 @@
             "docs": "Documentation",
             "integration": "Integration"
         }
+    },
+    "login": {
+        "title": "Login",
+        "description": "Enter your email below to login to your account",
+        "email": "Email",
+        "password": "Password",
+        "forgot": "Forgot Your Password",
+        "alternative": "Don't have an account?",
+        "signIn": "Sign In",
+        "signingIn": "Signing In...",
+        "signUp": "Sign Up"
+    },
+    "student-card": {
+        "terms": "Terms",
+        "requests": "1000 requests per day",
+        "access": "Access to Moderation Service",
+        "verified": "Verified Email",
+        "choose": "Choose Plan",
+        "changing": "Changing..."
+    },
+    "company-card": {
+        "terms": "Terms",
+        "requests": "1000 requests per day",
+        "access": "Access to Moderation Service",
+        "approval": "Administration Approval",
+        "verified": "Verified Email",
+        "request": "Request Approval",
+        "requesting": "Sending Request..."
+    },
+    "docs": {
+        "sidebar": {
+            "intro": "Introduction",
+            "overview": "Overview",
+            "examples": "Examples"
+        },
+        "introduction": {
+            "title": "Introduction",
+            "1": "Welcome to the Moderation Patform documentation!",
+            "2": "What is the Moderation Platform?",
+            "3": "Our moderation platform is an integrated solution for controlling and managing content on online platforms. It provides automated and human-centred moderation, content filtering and reputation management, ensuring a safe and pleasant environment for users.",
+            "4": "Under the bonnet of our platform also lies advanced artificial intelligence and machine learning technology, which automates content discovery and analysis. This reduces the burden on moderators and ensures a quick response to potentially harmful situations.",
+            "5": "Main Features",
+            "6": "Some of the main Moderation platform features include:",
+            "7": "Automated moderation",
+            "8": "The platform provides a fully automated solution for content control, freeing the client from the need to set up and manage a moderation system.",
+            "9": "Multi-format content",
+            "10": "Supports a variety of content formats, including text, graphics and multimedia, providing full control over all types of information on the platform.",
+            "11": "High efficiency",
+            "12": "The platform is highly efficient and accurate in detecting and blocking unwanted content, ensuring a safe and quality user experience.",
+            "13": "Cloud solution",
+            "14": "The platform runs on cloud infrastructure, which ensures scalability, reliability and availability of the service at any time and from anywhere in the world.",
+            "15": "How to Use These Docs",
+            "16": "On the left side of the screen, you'll find the docs navbar. The pages of the docs are organized sequentially, so you can follow them step-by-step when building your application. However, you can read them in any order or skip to the pages that apply to your use case."
+        },
+        "overview": {
+            "title": "Moderation Service Overview",
+            "1": "Our REST API service is a powerful tool for intelligent analysis of user content. The query format supported by our service allows users to easily integrate it into their applications and systems. Simply submit a request to the endpoint described below by providing an API key, and in response you will receive accurate classification into predefined analysis classes.",
+            "2": "Our service provides a high degree of classification accuracy and reliability by using advanced machine learning algorithms. We are constantly updating and improving our model to provide our clients with the highest level of results. Thanks to this, you can be sure of the quality and reliability of the analyses obtained through our service.",
+            "3": "Our REST API service is ideal for a wide range of tasks, including analysing text posts on social networks, filtering content on forums, automating text processing and much more. Whether you need analysis for business, research or security, our service is ready to offer a reliable and fast solution.",
+            "4": "API Request",
+            "5": "Our service provides a simple and intuitive API for sending requests and retrieving classified data. The request API form includes data transfer via HTTP POST method. For text-based requests, you need to specify the /text endpoint and pass the textual information in the body of the request. For requests involving images, audio or video files, you must also specify the appropriate endpoint (/image, /audio or /video) and send the appropriate multimedia content.",
+            "6": "API requests can be sent using standard HTTP headers, including an authentication header to ensure the security of transmitted data. The response from the service is returned in JSON format and contains categorised data according to the request type and specified categories. This simple and efficient approach to sending and processing requests makes our service a convenient and flexible tool for analysing text, images, audio and video content.",
+            "7": "Endpoint",
+            "8": "Description",
+            "9": "/text",
+            "10": "This endpoint is designed to analyse textual information. It allows you to send text queries and retrieve classified data about text content according to specified categories.",
+            "11": "/image",
+            "12": "This endpoint provides the ability to analyse images. Users can send images for processing and get information about the text content of the image.",
+            "13": "/audio",
+            "14": "This endpoint is designed to analyse audio files. It allows users to send audio recordings for analysis and get results about the content of the audio file, including speech recognition.",
+            "15": "/video",
+            "16": "This endpoint provides the ability to analyse video files. Users can send video recordings for processing and get information about the audio content of the video.",
+            "17": "API Response",
+            "18": "Our service provides fast and accurate text analysis, returning results in JSON format. The classification includes the following categories: Toxicity, Severe Toxicity, Threat, Insult, Obscene; and Identity Attack. Each class represents a different aspect of content, identified by the content of the text, allowing users to effectively identify and manage unwanted or dangerous content in their applications and systems.",
+            "19": "Class",
+            "20": "Description",
+            "21": "Toxicity",
+            "22": "Identifies the presence of elements in the text that may cause negative emotional reactions or offence to the reader.",
+            "23": "Severe Toxicity",
+            "24": "Identifies texts that contain highly offensive or insulting content that may pose a real threat or cause a serious negative impact on the audience.",
+            "25": "Threat",
+            "26": "Identifies threatening language or perceived threats in a text that may cause harm or anxiety to the reader.",
+            "27": "Insult",
+            "28": "Recognises texts that contain abusive or derogatory language about a person or group.",
+            "29": "Obscene",
+            "30": "Identifies texts containing obscene or vulgar language that may be inappropriate for the audience or environment in which it is used.",
+            "31": "Identity Attack",
+            "32": "Identifies texts that seek to attack or disparage a person or group of persons based on their race, gender, religion or other identifying characteristics."
+        },
+        "examples": {
+            "title": "Moderation Service Examples",
+            "1": "Here we will present examples of service integration in different languages"
+        }
     }
 }
