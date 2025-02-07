@@ -24,7 +24,7 @@ export const UnsuportedProvider = ({ children }: { children: React.ReactNode }) 
     if (isMobile) {
         return (
             <main className='flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#222222] to-[#000000]'>
-                <h1 className='font-overpass text-[100px] font-black text-white'>
+                <h1 className='font-overpass font-black text-white text-center text-2xl'>
                     Our app is not supported on mobile devices.
                 </h1>
                 <p className='font-roboto text-white'>Go to the desktop version to continue.</p>

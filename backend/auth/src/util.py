@@ -19,6 +19,10 @@ from .db.base import AsyncSession
 from .db.models import ProfileModel
 from .db.tables.profiles import ProfilesTable
 
+import asyncio
+from googletrans import Translator
+
+
 
 #
 # ---------------------- JWT AUTHORIZATION -----------------------
@@ -54,9 +58,10 @@ class JWTBearer(HTTPBearer):
 
 
 async def check_auth(request: Request, db: AsyncSession):
+    # print('\n', request.client.host, '\n')
     token = request.headers.get('Authorization')
     if token is None:
-      if request.client.host == '172.18.0.1':
+      if request.client.host == '172.18.0.2':
         return False, None
       raise HTTPException(status_code=403, detail="No token provided")
 
@@ -170,6 +175,12 @@ def translate(text: str, lang: str = 'auto') -> str:
 
     response = response.json()
     return response['translations'][0]['text']
+
+async def GoogleTranslate(text: str) -> str:
+    async with Translator() as translator:
+        result = await translator.translate(text, dest='en')
+
+        return result.text
 
 
 #

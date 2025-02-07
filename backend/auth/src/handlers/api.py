@@ -13,7 +13,7 @@ from fastapi import APIRouter, Request, HTTPException, UploadFile, File, Form
 
 from src.DTO.request import *
 from src.db.base import AsyncSession
-from src.util import get_userId_from_request, translate
+from src.util import GoogleTranslate
 
 from requests import get
 
@@ -24,11 +24,13 @@ from moviepy.editor import VideoFileClip
 from src.db.tables.requests import RequestsTable
 from src.db.tables.profiles import ProfilesTable
 
-from src.db.models import RequestModel, UserModel, ProfileModel
+from src.db.models import RequestModel, ProfileModel
 
 from src.util import check_auth, encode_base64
 
 from src.config import speech_recognizer, dirname
+
+
 
 api_router = APIRouter()
 
@@ -38,6 +40,7 @@ api_router = APIRouter()
 #
 
 async def checkRateLimit(user_id: uuid.UUID, db: AsyncSession):
+    return
     user = await ProfilesTable.getProfile(ProfileModel(user_id=user_id), db)
 
     if user.role != 'student':
@@ -53,10 +56,10 @@ async def checkRateLimit(user_id: uuid.UUID, db: AsyncSession):
 #
 # ---------------------- Predict Text ----------------------
 #
-def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
+async def classifyText(text: str, lang: str = 'auto') -> PredictionsResponse:
     translation = text
     if not lang == 'eng':
-        translation = translate(text, lang)
+        translation = await GoogleTranslate(text)
 
     splitted = text.split('.')
 
@@ -88,7 +91,7 @@ async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession
         await RequestsTable.createRequest(CreateRequestData(user_id=user_id, moderation_type="text", content=data.text),
                                           db)
 
-    response = classifyText(data.text, data.lang)
+    response = await classifyText(data.text, data.lang)
 
     return response
 
@@ -100,12 +103,12 @@ async def moderate_text(data: PredictRequest, request: Request, db: AsyncSession
 
 @api_router.post("/image", response_model=PredictionsResponse)
 async def moderate_image(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
-    isChecked, user_id = await check_auth(request, db)
-    if isChecked:
-        await checkRateLimit(user_id, db)
-        create_data = CreateRequestData(user_id=user_id, moderation_type="image", content=await encode_base64(file))
-        await RequestsTable.createRequest(create_data, db)
-
+    # isChecked, user_id = await check_auth(request, db)
+    # if isChecked:
+    #     await checkRateLimit(user_id, db)
+    #     create_data = CreateRequestData(user_id=user_id, moderation_type="image", content=await encode_base64(file))
+    #     await RequestsTable.createRequest(create_data, db)
+    print(file.content_type, lang)
     image = Image.open(file.file)
 
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
@@ -114,15 +117,16 @@ async def moderate_image(request: Request, db: AsyncSession, file: UploadFile = 
     image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
     image = cv2.medianBlur(image, 5)
+    try:
+        text: str = pytesseract.image_to_string(image, lang)
 
-    text: str = pytesseract.image_to_string(image, lang)
-
-    text = re.sub(r'[\t\r\n\f\v]', ' ', text).strip()
-
+        text = re.sub(r'[\t\r\n\f\v]', ' ', text).strip()
+    except:
+        raise HTTPException(status_code=500, detail='Tesseract Error')
     if not text.strip():
-        HTTPException(status_code=500, detail='No text found')
-
-    response = classifyText(text, lang)
+        raise HTTPException(status_code=500, detail='No text found')
+    response = await classifyText(text, lang)
+    print('done')
 
     return response
 
@@ -166,7 +170,7 @@ async def moderate_audio(request: Request, db: AsyncSession, file: UploadFile = 
     if text is None:
         HTTPException(status_code=500, detail='No text found')
 
-    return classifyText(text, lang)
+    return await classifyText(text, lang)
 
 
 #
@@ -175,11 +179,11 @@ async def moderate_audio(request: Request, db: AsyncSession, file: UploadFile = 
 
 @api_router.post("/video", response_model=PredictionsResponse)
 async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = File(...), lang: str = Form(...)):
-    isChecked, user_id = await check_auth(request, db)
-    if isChecked:
-        await checkRateLimit(user_id, db)
-        create_data = CreateRequestData(user_id=user_id, moderation_type="video", content=await encode_base64(file))
-        await RequestsTable.createRequest(create_data, db)
+    # isChecked, user_id = await check_auth(request, db)
+    # if isChecked:
+    #     await checkRateLimit(user_id, db)
+    #     create_data = CreateRequestData(user_id=user_id, moderation_type="video", content=await encode_base64(file))
+    #     await RequestsTable.createRequest(create_data, db)
 
     import shutil
     file_location = dirname + f"/tmp/{file.filename}"
@@ -198,9 +202,12 @@ async def moderate_video(request: Request, db: AsyncSession, file: UploadFile = 
             audio_data = speech_recognizer.record(source)
             text = speech_recognizer.recognize_google(audio_data, language=languageMap[lang])
         except:
-            HTTPException(status_code=500, detail='No text found')
+            print('No text found')
+            raise HTTPException(status_code=500, detail='No text found')
 
     if text is None:
-        HTTPException(status_code=500, detail='No text found')
+        print('No text found')
+        raise HTTPException(status_code=500, detail='No text found')
 
-    return classifyText(text, lang)
+    print(text, lang)
+    return await classifyText(text, lang)
