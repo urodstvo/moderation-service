@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-export const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'https://back.moderation-service.ru/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:8000/api';
 
 export const AUTH_API_URL = '/auth';
 export const PROFILE_API_URL = '/profile';
