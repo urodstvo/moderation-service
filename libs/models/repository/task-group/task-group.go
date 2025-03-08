@@ -1,14 +1,21 @@
 package token
 
-import "github.com/jackc/pgx/v5/pgxpool"
+import (
+	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
 
 type repository struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	getter *trmpgx.CtxGetter
 }
 
 type TaskGroupRepository interface {
 }
 
 func NewTaskGroupRepository(db *pgxpool.Pool) TaskGroupRepository {
-	return &repository{db: db}
+	return &repository{
+		db:     db,
+		getter: trmpgx.DefaultCtxGetter,
+	}
 }
