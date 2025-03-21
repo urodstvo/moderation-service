@@ -1,8 +1,12 @@
-package token
+package task_result
 
 import (
+	"context"
+
+	"github.com/Masterminds/squirrel"
 	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
 type repository struct {
@@ -11,6 +15,8 @@ type repository struct {
 }
 
 type TaskResultRepository interface {
+	Create(ctx context.Context, taskId int, result string) error
+	GetByTaskId(ctx context.Context, taskId int) (*gomodels.TaskResult, error)
 }
 
 func NewTaskResultRepository(db *pgxpool.Pool) TaskResultRepository {
@@ -19,3 +25,5 @@ func NewTaskResultRepository(db *pgxpool.Pool) TaskResultRepository {
 		getter: trmpgx.DefaultCtxGetter,
 	}
 }
+
+var sq = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)

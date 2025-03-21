@@ -1,14 +1,14 @@
-package token
+package task_result
 
 import (
 	"context"
 	"fmt"
 )
 
-func (r *repository) Create(ctx context.Context, token string, userId int) error {
+func (r *repository) Create(ctx context.Context, taskId int, result string) error {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Insert("tokens").Columns("token", "user_id").Values(token, userId).ToSql()
+	query, args, err := sq.Insert("task_results").Columns("task_id", "content").Values(taskId, result).ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}

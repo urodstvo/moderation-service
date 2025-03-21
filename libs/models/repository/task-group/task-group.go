@@ -1,8 +1,12 @@
-package token
+package task_group
 
 import (
+	"context"
+
+	"github.com/Masterminds/squirrel"
 	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
 type repository struct {
@@ -11,6 +15,9 @@ type repository struct {
 }
 
 type TaskGroupRepository interface {
+	Create(ctx context.Context, userId int) (int, error)
+	GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGroup, error)
+	UpdateStatus(ctx context.Context, id int, status string) error
 }
 
 func NewTaskGroupRepository(db *pgxpool.Pool) TaskGroupRepository {
@@ -19,3 +26,5 @@ func NewTaskGroupRepository(db *pgxpool.Pool) TaskGroupRepository {
 		getter: trmpgx.DefaultCtxGetter,
 	}
 }
+
+var sq = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)

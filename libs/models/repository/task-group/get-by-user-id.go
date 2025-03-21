@@ -1,4 +1,4 @@
-package user
+package task_group
 
 import (
 	"context"
@@ -10,23 +10,23 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) GetByEmail(ctx context.Context, email string) (*gomodels.User, error) {
+func (r *repository) GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGroup, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Select("*").From("users").Where(squirrel.Eq{"email": email}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
+	query, args, err := sq.Select("*").From("task_groups").Where(squirrel.Eq{"user_id": userId}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	var user gomodels.User
+	var t gomodels.TaskGroup
 	err = conn.QueryRow(ctx, query, args...).
-		Scan(&user.Id, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.IsVerified, &user.Role)
+		Scan(&t.Id, &t.UserId, &t.Status, &t.CreatedAt, &t.UpdatedAt, &t.DeletedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("user not found")
+			return nil, fmt.Errorf("task_group not found")
 		}
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	return &user, nil
+	return &t, nil
 }
