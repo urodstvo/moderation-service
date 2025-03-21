@@ -1,3 +1,4 @@
+name: moderation-v2
 services:
   proxy:
     image: nginx:latest
@@ -44,6 +45,8 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
+    ports:
+      - 5432:5432
     networks:
       - moderation-net
 
@@ -58,16 +61,18 @@ services:
 
   minio:
     image: minio/minio
-    command: server --address 0.0.0.0:9000 --console-address ":9001" /data
+    command: server --address ":9000" --console-address ":9001" /data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      # MINIO_SERVER_URL: http://s3.localhost # Для API
+      # MINIO_BROWSER_REDIRECT_URL: http://console.s3.localhost # Для консоли
+      # MINIO_DOMAIN: s3.localhost
     volumes:
       - minio_data:/data
-      - minio-config:/root/.minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    # ports:
+    #   - "9000:9000"
+    #   - "9001:9001"
     networks:
       - moderation-net
 
@@ -80,10 +85,13 @@ services:
       - moderation-net
 
   authorization:
-    image: authorization
-    build: ./auth
+    container_name: authorization
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
     environment:
       REDIS_HOST: "redis:6379"
+      POSTGRES_URL: ${POSTGRES_URL}
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,8 +101,10 @@ services:
       - moderation-net
 
   task-aggregator:
-    image: task-aggregator
-    build: ./task-aggregator
+    container_name: task-agregator
+    build:
+      context: .
+      dockerfile: ./apps/task-agregator/Dockerfile
     environment:
       MINIO_URL: ${MINIO_URL}
       POSTGRES_URL: ${POSTGRES_URL}
@@ -106,29 +116,29 @@ services:
     networks:
       - moderation-net
 
-  result-aggregator:
-    image: result-aggregator
-    build: ./result-aggregator
-    environment:
-      MINIO_URL: ${MINIO_URL}
-      POSTGRES_URL: ${POSTGRES_URL}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      minio:
-        condition: service_started
-    networks:
-      - moderation-net
+  # result-aggregator:
+  #   container_name: result-aggregator
+  #   build: ./result-aggregator
+  #   environment:
+  #     MINIO_URL: ${MINIO_URL}
+  #     POSTGRES_URL: ${POSTGRES_URL}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_started
+  #   networks:
+  #     - moderation-net
 
-  moderation:
-    image: moderation
-    build: ./moderation-service
-    environment:
-      REDIS_URL: ${REDIS_URL}
-    depends_on:
-      - redis
-    networks:
-      - moderation-net
+  # moderation:
+  #   container_name: moderation
+  #   build: ./moderation-service
+  #   environment:
+  #     REDIS_URL: ${REDIS_URL}
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - moderation-net
 
 volumes:
   redis_data:

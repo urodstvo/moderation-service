@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/urodstvo/moderation-service/libs/logger"
 	token_service "github.com/urodstvo/moderation-service/libs/models/service/token"
 	user_service "github.com/urodstvo/moderation-service/libs/models/service/user"
 	"go.uber.org/fx"
 )
 
 type Auth struct {
+	Logger       logger.Logger
 	UserService  user_service.UserService
 	TokenService token_service.TokenService
 }
@@ -18,6 +20,7 @@ type Auth struct {
 type Opts struct {
 	fx.In
 
+	Logger       logger.Logger
 	UserService  user_service.UserService
 	TokenService token_service.TokenService
 	Huma         huma.API
@@ -25,6 +28,7 @@ type Opts struct {
 
 func NewAuthRoutes(opts Opts) Auth {
 	a := Auth{
+		Logger:       opts.Logger,
 		UserService:  opts.UserService,
 		TokenService: opts.TokenService,
 	}
@@ -75,11 +79,9 @@ func NewAuthRoutes(opts Opts) Auth {
 			Summary:     "Auth Check",
 		},
 		func(
-			ctx context.Context, i *struct {
-				Header checkRequest
-			},
+			ctx context.Context, i *checkRequest,
 		) (*checkResponse, error) {
-			return a.Check(ctx, i.Header)
+			return a.Check(ctx, *i)
 		},
 	)
 

@@ -2,9 +2,11 @@ go 1.23.2
 
 use (
 	./apps/auth
+	./apps/task-agregator
 	./libs/config
 	./libs/fx
 	./libs/logger
+	./libs/migrations
 	./libs/models
 	./libs/nats
 )

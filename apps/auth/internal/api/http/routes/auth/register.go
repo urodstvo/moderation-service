@@ -14,7 +14,9 @@ type registerRequest struct {
 }
 
 type registerResponse struct {
-	Token string `json:"token"`
+	Body struct {
+		Token string `json:"token"`
+	}
 }
 
 func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerResponse, error) {
@@ -25,11 +27,13 @@ func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerRe
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to hash password")
 	}
 
 	userId, err := h.UserService.Create(ctx, input.Email, string(bytes))
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to create user")
 	}
 
@@ -37,9 +41,11 @@ func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerRe
 
 	err = h.TokenService.Create(ctx, token, userId)
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to create token")
 	}
 
-	return &registerResponse{Token: token}, nil
-
+	res := &registerResponse{}
+	res.Body.Token = token
+	return res, nil
 }

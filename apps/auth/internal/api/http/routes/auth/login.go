@@ -13,7 +13,9 @@ type loginRequest struct {
 }
 
 type loginResponse struct {
-	Token string `json:"token"`
+	Body struct {
+		Token string `json:"token"`
+	}
 }
 
 func (h *Auth) Login(ctx context.Context, input loginRequest) (*loginResponse, error) {
@@ -32,6 +34,7 @@ func (h *Auth) Login(ctx context.Context, input loginRequest) (*loginResponse, e
 		return nil, huma.Error400BadRequest("Failed to get token")
 	}
 
-	return &loginResponse{Token: token.Token}, nil
-
+	res := &loginResponse{}
+	res.Body.Token = token.Token
+	return res, nil
 }

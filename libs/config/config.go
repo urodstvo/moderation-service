@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,7 +11,7 @@ import (
 )
 
 type Config struct {
-	DatabaseUrl string `required:"true"                                        envconfig:"DATABASE_URL"`
+	DatabaseUrl string `required:"true"                                        envconfig:"POSTGRES_URL"`
 	AppEnv      string `required:"true"  default:"development"                 envconfig:"APP_ENV"`
 
 	S3PublicUrl   string `required:"false" envconfig:"MINIO_PUBLIC_URL"`
@@ -30,6 +31,7 @@ func NewWithEnvPath(envPath string) (*Config, error) {
 		return nil, err
 	}
 
+	fmt.Println(newCfg.DatabaseUrl)
 	return &newCfg, nil
 }
 
@@ -46,6 +48,7 @@ func New() (*Config, error) {
 	}
 
 	envPath := filepath.Join(wd, ".env")
+	// fmt.Println(envPath)
 
 	return NewWithEnvPath(envPath)
 }
