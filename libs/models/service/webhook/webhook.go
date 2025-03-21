@@ -1,4 +1,4 @@
-package user
+package webhook
 
 import (
 	"context"
@@ -20,8 +20,8 @@ func NewWebhookService(repo repo.WebhookRepository) WebhookService {
 	return &service{repo: repo}
 }
 
-func (s *service) Create(ctx context.Context, url string, userId int) error {
-	return s.repo.Create(ctx, url, userId)
+func (s *service) Create(ctx context.Context, webhookUrl string, userId int) error {
+	return s.repo.Create(ctx, webhookUrl, userId)
 }
 
 func (s *service) GetByUserId(ctx context.Context, userId int) (*gomodels.Webhook, error) {
