@@ -17,6 +17,7 @@ type repository struct {
 type TaskGroupRepository interface {
 	Create(ctx context.Context, userId int) (int, error)
 	GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGroup, error)
+	GetById(ctx context.Context, id int) (*gomodels.TaskGroup, error)
 	UpdateStatus(ctx context.Context, id int, status string) error
 }
 

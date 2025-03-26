@@ -1,24 +1,14 @@
 package nats
 
-type GetTaskResponse struct {
-	TaskId string `json:"taskId"`
+type Task struct {
+	TaskId int `json:"taskId"`
 }
 
-type SetTaskRequest struct {
-	TaskId string `json:"taskId"`
-}
-
-type TaskDoneRequest struct {
-	TaskId string `json:"taskId"`
-}
-
-type TaskDoneResponse struct {
-	TaskId string `json:"taskId"`
+type TaskDone struct {
+	TaskId int `json:"taskId"`
 }
 
 type eventBus struct {
-	GetTask Queue[struct{}, GetTaskResponse]
-	SetTask Queue[SetTaskRequest, struct{}]
-
-	TaskDone Queue[TaskDoneRequest, TaskDoneResponse]
+	Task     Queue[Task, struct{}]
+	TaskDone Queue[TaskDone, struct{}]
 }

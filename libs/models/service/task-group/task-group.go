@@ -22,6 +22,7 @@ type service struct {
 type TaskGroupService interface {
 	Create(ctx context.Context, userId int) (int, error)
 	GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGroup, error)
+	GetById(ctx context.Context, id int) (*gomodels.TaskGroup, error)
 	UpdateStatus(ctx context.Context, id int, status TaskStatus) error
 }
 
@@ -39,4 +40,8 @@ func (s *service) GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGr
 
 func (s *service) UpdateStatus(ctx context.Context, id int, status TaskStatus) error {
 	return s.repo.UpdateStatus(ctx, id, string(status))
+}
+
+func (s *service) GetById(ctx context.Context, id int) (*gomodels.TaskGroup, error) {
+	return s.repo.GetById(ctx, id)
 }

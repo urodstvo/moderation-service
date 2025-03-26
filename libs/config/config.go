@@ -14,12 +14,12 @@ type Config struct {
 	DatabaseUrl string `required:"true"                                        envconfig:"POSTGRES_URL"`
 	AppEnv      string `required:"true"  default:"development"                 envconfig:"APP_ENV"`
 
-	S3PublicUrl   string `required:"false" envconfig:"MINIO_PUBLIC_URL"`
-	S3Host        string `required:"false" envconfig:"MINIO_HOST"`
-	S3Bucket      string `required:"false" envconfig:"MINIO_BUCKET"`
-	S3Region      string `required:"false" envconfig:"MINIO_REGION"`
-	S3AccessToken string `required:"false" envconfig:"MINIO_ACCESS_TOKEN"`
-	S3SecretToken string `required:"false" envconfig:"MINIO_SECRET_TOKEN"`
+	S3PublicUrl   string `required:"false" envconfig:"CDN_PUBLIC_URL"`
+	S3Host        string `required:"false" envconfig:"CDN_HOST"`
+	S3Bucket      string `required:"false" envconfig:"CDN_BUCKET"`
+	S3Region      string `required:"false" envconfig:"CDN_REGION"`
+	S3AccessToken string `required:"false" envconfig:"CDN_ACCESS_TOKEN"`
+	S3SecretToken string `required:"false" envconfig:"CDN_SECRET_TOKEN"`
 	NatsUrl       string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
 }
 

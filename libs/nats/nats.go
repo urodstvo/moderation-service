@@ -14,21 +14,14 @@ type Bus struct {
 func NewNatsBus(nc *nats.Conn) *Bus {
 	return &Bus{
 		&eventBus{
-			GetTask: NewNatsQueue[struct{}, GetTaskResponse](
+			Task: NewNatsQueue[Task, struct{}](
 				nc,
-				GET_TASK,
+				TASK,
 				30*time.Minute,
 				nats.GOB_ENCODER,
 			),
 
-			SetTask: NewNatsQueue[SetTaskRequest, struct{}](
-				nc,
-				SET_TASK,
-				1*time.Minute,
-				nats.GOB_ENCODER,
-			),
-
-			TaskDone: NewNatsQueue[TaskDoneRequest, TaskDoneResponse](
+			TaskDone: NewNatsQueue[TaskDone, struct{}](
 				nc,
 				TASK_DONE,
 				30*time.Minute,

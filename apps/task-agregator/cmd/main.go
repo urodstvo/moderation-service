@@ -2,10 +2,18 @@ package main
 
 import (
 	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http"
-	testroute "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/test"
+	moderation_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/moderation"
+	webhook_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/webhook"
+	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/files"
 	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/server"
 	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/server/middlewares"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
+	task_repo "github.com/urodstvo/moderation-service/libs/models/repository/task"
+	task_group_repo "github.com/urodstvo/moderation-service/libs/models/repository/task-group"
+	webhook_repo "github.com/urodstvo/moderation-service/libs/models/repository/webhook"
+	task_service "github.com/urodstvo/moderation-service/libs/models/service/task"
+	task_group_service "github.com/urodstvo/moderation-service/libs/models/service/task-group"
+	webhook_service "github.com/urodstvo/moderation-service/libs/models/service/webhook"
 
 	"go.uber.org/fx"
 )
@@ -18,17 +26,27 @@ func main() {
 			},
 		),
 		// repositories
-		fx.Provide(),
+		fx.Provide(
+			task_group_repo.NewTaskGroupRepository,
+			task_repo.NewTaskRepository,
+			webhook_repo.NewWebhookRepository,
+		),
 		// services
-		fx.Provide(),
+		fx.Provide(
+			task_group_service.NewTaskGroupService,
+			task_service.NewTaskService,
+			webhook_service.NewWebhookService,
+		),
 		// app itself
 		fx.Provide(
+			files.NewMinio,
 			middlewares.New,
 			server.New,
 			http.NewHuma,
 		),
 		fx.Invoke(
-			testroute.NewTestRoutes,
+			webhook_routes.NewWebhookRoutes,
+			moderation_routes.NewModerationRoutes,
 		),
 	).Run()
 }

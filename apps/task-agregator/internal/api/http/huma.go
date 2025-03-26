@@ -24,17 +24,14 @@ func NewHuma(router *server.Server) huma.API {
 		"json":             jsonFormat,
 	}
 
-	// GET /greetings/{id}
-	// PUT /greetings/{id}
-
 	api := humagin.New(router.Engine, config)
-	// api.UseMiddleware(
-	// 	func(ctx huma.Context, next func(huma.Context)) {
-	// 		ctx = huma.WithValue(ctx, dataloader.LoadersKey, loader.Load())
-
-	// 		next(ctx)
-	// 	},
-	// )
+	api.UseMiddleware(
+		func(ctx huma.Context, next func(huma.Context)) {
+			userId := ctx.Header("X-User-Id")
+			ctx = huma.WithValue(ctx, "UserId", userId)
+			next(ctx)
+		},
+	)
 
 	return api
 }
