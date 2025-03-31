@@ -24,6 +24,8 @@ type TaskGroupService interface {
 	GetByUserId(ctx context.Context, userId int) (*gomodels.TaskGroup, error)
 	GetById(ctx context.Context, id int) (*gomodels.TaskGroup, error)
 	UpdateStatus(ctx context.Context, id int, status TaskStatus) error
+
+	AreAllTasksCompleted(ctx context.Context, groupId int) (bool, error)
 }
 
 func NewTaskGroupService(repo repo.TaskGroupRepository) TaskGroupService {
@@ -44,4 +46,8 @@ func (s *service) UpdateStatus(ctx context.Context, id int, status TaskStatus) e
 
 func (s *service) GetById(ctx context.Context, id int) (*gomodels.TaskGroup, error) {
 	return s.repo.GetById(ctx, id)
+}
+
+func (s *service) AreAllTasksCompleted(ctx context.Context, groupId int) (bool, error) {
+	return s.repo.AreAllTasksCompleted(ctx, groupId)
 }

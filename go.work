@@ -7,6 +7,8 @@ use (
 	./libs/fx
 	./libs/logger
 	./libs/migrations
+	./libs/minio
 	./libs/models
 	./libs/nats
+	./libs/utils
 )

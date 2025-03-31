@@ -1,4 +1,4 @@
-package files
+package minio
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewMinio(l logger.Logger, config config.Config, lc fx.Lifecycle) (*minio.Client, error) {
+func New(l logger.Logger, config config.Config, lc fx.Lifecycle) (*minio.Client, error) {
 	var creds *credentials.Credentials
 	creds = credentials.NewStaticV4(config.S3AccessToken, config.S3SecretToken, "")
 
