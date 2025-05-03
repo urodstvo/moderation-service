@@ -8,7 +8,7 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - task-aggregator
+      - task-agregator
       - authorization
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
@@ -25,7 +25,7 @@ services:
       - "8888:8080"
     environment:
       - ADMINER_DEFAULT_SERVER=postgres:5432
-      - ADMINER_PLUGINS=enum-types enum-option json-column
+      # - ADMINER_PLUGINS=enum-option json-column
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
       - moderation-net
 
@@ -70,9 +70,9 @@ services:
       # MINIO_DOMAIN: s3.localhost
     volumes:
       - minio_data:/data
-    # ports:
-    #   - "9000:9000"
-    #   - "9001:9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     networks:
       - moderation-net
 
@@ -81,6 +81,8 @@ services:
     image: nats:latest
     container_name: nats
     command: -js -m 8222
+    ports:
+      - "4222:4222"
     networks:
       - moderation-net
 
@@ -89,9 +91,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
-    environment:
-      REDIS_HOST: "redis:6379"
-      POSTGRES_URL: ${POSTGRES_URL}
+    env_file: ".env"
     depends_on:
       postgres:
         condition: service_healthy
@@ -100,14 +100,12 @@ services:
     networks:
       - moderation-net
 
-  task-aggregator:
+  task-agregator:
     container_name: task-agregator
     build:
       context: .
       dockerfile: ./apps/task-agregator/Dockerfile
-    environment:
-      MINIO_URL: ${MINIO_URL}
-      POSTGRES_URL: ${POSTGRES_URL}
+    env_file: ".env"
     depends_on:
       postgres:
         condition: service_healthy
@@ -116,29 +114,33 @@ services:
     networks:
       - moderation-net
 
-  # result-aggregator:
-  #   container_name: result-aggregator
-  #   build: ./result-aggregator
-  #   environment:
-  #     MINIO_URL: ${MINIO_URL}
-  #     POSTGRES_URL: ${POSTGRES_URL}
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #   networks:
-  #     - moderation-net
+  result-agregator:
+    container_name: result-agregator
+    build:
+      context: .
+      dockerfile: ./apps/result-agregator/Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - moderation-net
 
-  # moderation:
-  #   container_name: moderation
-  #   build: ./moderation-service
-  #   environment:
-  #     REDIS_URL: ${REDIS_URL}
-  #   depends_on:
-  #     - redis
-  #   networks:
-  #     - moderation-net
+  moderation:
+    container_name: moderation
+    build: ./apps/moderation
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      nats:
+        condition: service_started
+    networks:
+      - moderation-net
 
 volumes:
   redis_data:

@@ -51,6 +51,7 @@ func New(opts Opts) (*BusListener, error) {
 		webhook:     opts.Webhook,
 		task:        opts.Task,
 		taskGroup:   opts.TaskGroup,
+		taskResult:  opts.TaskResult,
 		minioClient: opts.MinioClient,
 	}
 

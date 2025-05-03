@@ -27,7 +27,7 @@ type handler struct {
 type Opts struct {
 	fx.In
 
-	config           config.Config
+	Config           config.Config
 	Huma             huma.API
 	Logger           logger.Logger
 	MinioClient      *minio.Client
@@ -43,7 +43,7 @@ func NewModerationRoutes(opts Opts) handler {
 		TaskGroupService: opts.TaskGroupService,
 		MinioClient:      opts.MinioClient,
 		Bus:              opts.Bus,
-		BucketName:       opts.config.S3Bucket,
+		BucketName:       opts.Config.S3Bucket,
 	}
 
 	huma.Register(
@@ -55,7 +55,7 @@ func NewModerationRoutes(opts Opts) handler {
 			Tags:        []string{"Moderation"},
 			Summary:     "Moderation",
 		},
-		func(ctx context.Context, i *createTasksRequest) (*struct{}, error) {
+		func(ctx context.Context, i *createTasksRequest) (*createTasksResponse, error) {
 			return a.CreateTasks(ctx, *i)
 		},
 	)

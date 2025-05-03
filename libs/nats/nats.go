@@ -18,14 +18,14 @@ func NewNatsBus(nc *nats.Conn) *Bus {
 				nc,
 				TASK,
 				30*time.Minute,
-				nats.GOB_ENCODER,
+				nats.JSON_ENCODER,
 			),
 
 			TaskDone: NewNatsQueue[TaskDone, struct{}](
 				nc,
 				TASK_DONE,
 				30*time.Minute,
-				nats.GOB_ENCODER,
+				nats.JSON_ENCODER,
 			),
 		},
 	}

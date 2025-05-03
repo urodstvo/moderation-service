@@ -11,8 +11,8 @@ import (
 )
 
 type Config struct {
-	DatabaseUrl string `required:"true"                                        envconfig:"POSTGRES_URL"`
-	AppEnv      string `required:"true"  default:"development"                 envconfig:"APP_ENV"`
+	DatabaseUrl string `required:"true"                            envconfig:"POSTGRES_URL"`
+	AppEnv      string `required:"true"  default:"development"     envconfig:"APP_ENV"`
 
 	S3PublicUrl   string `required:"false" envconfig:"CDN_PUBLIC_URL"`
 	S3Host        string `required:"false" envconfig:"CDN_HOST"`
@@ -20,18 +20,22 @@ type Config struct {
 	S3Region      string `required:"false" envconfig:"CDN_REGION"`
 	S3AccessToken string `required:"false" envconfig:"CDN_ACCESS_TOKEN"`
 	S3SecretToken string `required:"false" envconfig:"CDN_SECRET_TOKEN"`
+	
 	NatsUrl       string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {
+	fmt.Println("Loading .env from:", envPath)
 	var newCfg Config
-	_ = godotenv.Load(envPath)
+	_ = godotenv.Overload(envPath)
+	
+	fmt.Println("Postgres URL:", os.Getenv("POSTGRES_URL"))
 
 	if err := envconfig.Process("", &newCfg); err != nil {
 		return nil, err
 	}
 
-	fmt.Println(newCfg.DatabaseUrl)
+	// fmt.Println(newCfg.DatabaseUrl)
 	return &newCfg, nil
 }
 

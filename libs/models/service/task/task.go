@@ -22,7 +22,7 @@ type service struct {
 }
 
 type TaskService interface {
-	Create(ctx context.Context, groupId int, contentType ContentType, filePath string) (int, error)
+	Create(ctx context.Context, groupId int, contentType ContentType, filePath string, originalName string) (int, error)
 	GetById(ctx context.Context, id int) (*gomodels.Task, error)
 	GetByGroupId(ctx context.Context, groupId int) ([]*gomodels.Task, error)
 	UpdateStatus(ctx context.Context, id int, status task_group.TaskStatus) error
@@ -32,8 +32,8 @@ func NewTaskService(repo repo.TaskRepository) TaskService {
 	return &service{repo: repo}
 }
 
-func (s *service) Create(ctx context.Context, groupId int, contentType ContentType, filePath string) (int, error) {
-	return s.repo.Create(ctx, groupId, string(contentType), filePath)
+func (s *service) Create(ctx context.Context, groupId int, contentType ContentType, filePath string, originalName string) (int, error) {
+	return s.repo.Create(ctx, groupId, string(contentType), filePath, originalName)
 }
 
 func (s *service) GetById(ctx context.Context, id int) (*gomodels.Task, error) {

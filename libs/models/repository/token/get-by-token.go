@@ -14,7 +14,7 @@ func (r *repository) GetByToken(ctx context.Context, token string) (*gomodels.To
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
 	query, args, err := sq.
-		Select("*").From("tokens").Where(squirrel.Eq{"token": token}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
+		Select("*").From("tokens").Where(squirrel.Eq{"token": token}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}

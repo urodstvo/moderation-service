@@ -11,6 +11,7 @@ type Task struct {
 	Status      string `json:"status"`
 	ContentType string `json:"content_type"`
 	FilePath    string `json:"file_path"`
+	OriginalName string `json:"original_name"`
 
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`

@@ -202,3 +202,7 @@ next-env.d.ts
 example
 
 Todo
+assets/test
+*.pt
+onnx
+*.onnx

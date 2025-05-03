@@ -19,7 +19,7 @@ func (r *repository) GetById(ctx context.Context, id int) (*gomodels.Task, error
 	}
 
 	var t gomodels.Task
-	err = conn.QueryRow(ctx, query, args...).Scan(&t.Id, &t.GroupId, &t.Status, &t.ContentType, &t.FilePath, &t.CreatedAt, &t.UpdatedAt, &t.DeletedAt)
+	err = conn.QueryRow(ctx, query, args...).Scan(&t.Id, &t.GroupId, &t.Status, &t.ContentType, &t.FilePath, &t.OriginalName, &t.CreatedAt, &t.UpdatedAt, &t.DeletedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("task not found")

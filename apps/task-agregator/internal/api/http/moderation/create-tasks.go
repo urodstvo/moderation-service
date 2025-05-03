@@ -16,11 +16,21 @@ import (
 )
 
 type createTasksRequest struct {
-	RawBody *multipart.Form
+	RawBody huma.MultipartFormFiles[struct {
+		Files []huma.FormFile `form:"file"`
+	}]
 }
 
-func (h *handler) CreateTasks(ctx context.Context, input createTasksRequest) (*struct{}, error) {
-	if input.RawBody == nil || len(input.RawBody.File) == 0 {
+type createTasksResponse struct {
+	Body struct {
+		GroupId int
+	}
+}
+
+// TODO: think about parallelism for boosting speed
+func (h *handler) CreateTasks(ctx context.Context, input createTasksRequest) (*createTasksResponse, error) {
+	formData := input.RawBody.Data()
+	if len(formData.Files) == 0 {
 		h.Logger.Error("Empty file")
 		return nil, huma.Error400BadRequest("Empty file")
 	}
@@ -28,50 +38,43 @@ func (h *handler) CreateTasks(ctx context.Context, input createTasksRequest) (*s
 	uploadedFiles := []string{}
 
 	userId := ctx.Value("UserId").(int)
+
 	taskGroupID, err := h.TaskGroupService.Create(ctx, userId)
 	if err != nil {
 		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to create task group")
 	}
 
-	for _, files := range input.RawBody.File {
-		for _, fileHeader := range files {
-			file, err := fileHeader.Open()
-			if err != nil {
-				h.Logger.Error(err.Error())
-				h.rollbackFiles(uploadedFiles)
-				return nil, huma.Error500InternalServerError("")
-			}
-			defer file.Close()
+	// for _, files := range formData.File {
+	for _, file := range formData.Files {
+		fileType := detectFileType(file.Filename)
+		uniqueFileName := generateUniqueFileName(file.Filename)
 
-			fileType := detectFileType(fileHeader.Filename)
-			uniqueFileName := generateUniqueFileName(fileHeader.Filename)
+		fileURL, err := h.uploadToMinio(ctx, file.File, uniqueFileName)
+		if err != nil {
+			h.Logger.Error(err.Error())
+			h.rollbackFiles(uploadedFiles)
+			return nil, huma.Error500InternalServerError("")
+		}
+		uploadedFiles = append(uploadedFiles, uniqueFileName)
 
-			fileURL, err := h.uploadToMinio(ctx, file, uniqueFileName)
-			if err != nil {
-				h.Logger.Error(err.Error())
-				h.rollbackFiles(uploadedFiles)
-				return nil, huma.Error500InternalServerError("")
-			}
-			uploadedFiles = append(uploadedFiles, uniqueFileName)
+		taskID, err := h.TaskService.Create(ctx, taskGroupID, fileType, fileURL, file.Filename)
+		if err != nil {
+			h.Logger.Error(err.Error())
+			h.rollbackFiles(uploadedFiles)
+			return nil, huma.Error500InternalServerError("")
+		}
 
-			taskID, err := h.TaskService.Create(ctx, taskGroupID, fileType, fileURL)
-			if err != nil {
-				h.Logger.Error(err.Error())
-				h.rollbackFiles(uploadedFiles)
-				return nil, huma.Error500InternalServerError("")
-			}
-
-			err = h.Bus.Task.Publish(nats.Task{TaskId: taskID})
-			if err != nil {
-				h.Logger.Error(err.Error())
-				h.rollbackFiles(uploadedFiles)
-				return nil, fmt.Errorf("failed to publish task event to NATS: %w", err)
-			}
+		err = h.Bus.Task.Publish(nats.Task{TaskId: taskID})
+		if err != nil {
+			h.Logger.Error(err.Error())
+			h.rollbackFiles(uploadedFiles)
+			return nil, fmt.Errorf("failed to publish task event to NATS: %w", err)
 		}
 	}
+	// }
 
-	return nil, nil
+	return &createTasksResponse{Body: struct{ GroupId int }{GroupId: taskGroupID}}, nil
 }
 
 func (h *handler) uploadToMinio(ctx context.Context, file multipart.File, filename string) (string, error) {
@@ -79,7 +82,7 @@ func (h *handler) uploadToMinio(ctx context.Context, file multipart.File, filena
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("https://%s/%s/%s", h.MinioClient.EndpointURL(), h.BucketName, filename), nil
+	return fmt.Sprintf("%s/%s/%s", h.MinioClient.EndpointURL(), h.BucketName, filename), nil
 }
 
 func (h *handler) rollbackFiles(files []string) {
@@ -98,9 +101,9 @@ func detectFileType(filename string) task.ContentType {
 		return task.ContentTypeText
 	case "jpg", "jpeg", "png", "gif", "bmp":
 		return task.ContentTypeImage
-	case "mp3", "wav", "flac":
+	case "mp3", "wav", "flac", "ogg":
 		return task.ContentTypeAudio
-	case "mp4", "avi", "mov":
+	case "mp4", "avi", "mov", "wmv":
 		return task.ContentTypeVideo
 	default:
 		return "unknown"

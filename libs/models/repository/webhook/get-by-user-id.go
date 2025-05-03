@@ -13,7 +13,7 @@ import (
 func (r *repository) GetByUserId(ctx context.Context, userId int) (*gomodels.Webhook, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Select("*").From("webhooks").Where(squirrel.Eq{"user_id": userId}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
+	query, args, err := sq.Select("*").From("webhooks").Where(squirrel.Eq{"user_id": userId}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}

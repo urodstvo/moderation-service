@@ -13,6 +13,7 @@ replace (
 )
 
 require (
+	github.com/minio/minio-go/v7 v7.0.89
 	github.com/urodstvo/moderation-service/libs/config v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/fx v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/logger v0.0.0-00010101000000-000000000000
@@ -44,7 +45,6 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.89 // indirect
 	github.com/nats-io/nats.go v1.39.1 // indirect
 	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
