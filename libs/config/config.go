@@ -20,15 +20,15 @@ type Config struct {
 	S3Region      string `required:"false" envconfig:"CDN_REGION"`
 	S3AccessToken string `required:"false" envconfig:"CDN_ACCESS_TOKEN"`
 	S3SecretToken string `required:"false" envconfig:"CDN_SECRET_TOKEN"`
-	
-	NatsUrl       string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
+
+	NatsUrl string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {
 	fmt.Println("Loading .env from:", envPath)
 	var newCfg Config
 	_ = godotenv.Overload(envPath)
-	
+
 	fmt.Println("Postgres URL:", os.Getenv("POSTGRES_URL"))
 
 	if err := envconfig.Process("", &newCfg); err != nil {

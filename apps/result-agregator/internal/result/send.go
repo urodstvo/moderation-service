@@ -10,21 +10,21 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]interface{}) (map[string]interface{}, error) {
-	var collectedTasks []map[string]interface{}
+func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]any) (map[string]any, error) {
+	var collectedTasks []map[string]any
 
 	for _, result := range results {
 		taskID := result["task_id"].(int)
 		contentType := result["content_type"].(string)
 		recognizedText := result["recognized_text"].(string)
-		predictionsRaw := result["predictions"].(map[string]interface{})
+		predictionsRaw := result["predictions"].(map[string]any)
 
 		predictions := make(map[string]float64)
 		for key, value := range predictionsRaw {
 			predictions[key] = value.(float64)
 		}
 
-		collectedTasks = append(collectedTasks, map[string]interface{}{
+		collectedTasks = append(collectedTasks, map[string]any{
 			"task_id":         taskID,
 			"content_type":    contentType,
 			"recognized_text": recognizedText,
@@ -32,7 +32,7 @@ func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]interface
 		})
 	}
 
-	response := map[string]interface{}{
+	response := map[string]any{
 		"group_id":     taskGroup.Id,
 		"created_at":   taskGroup.CreatedAt,
 		"completed_at": taskGroup.UpdatedAt,
@@ -43,7 +43,7 @@ func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]interface
 	return response, nil
 }
 
-func SendResults(ctx context.Context, webhookUrl string, results map[string]interface{}) error {
+func SendResults(ctx context.Context, webhookUrl string, results map[string]any) error {
 	payload, err := json.Marshal(results)
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON: %w", err)

@@ -29,7 +29,7 @@ func (r *repository) GetByGroupId(ctx context.Context, groupId int) ([]*gomodels
 		task := &gomodels.Task{}
 		err = rows.Scan(
 			&task.Id, &task.GroupId, &task.Status, &task.ContentType,
-			&task.FilePath, &task.OriginalName, &task.CreatedAt, &task.UpdatedAt, &task.DeletedAt,
+			&task.FilePath, &task.CreatedAt, &task.UpdatedAt, &task.DeletedAt, &task.OriginalName,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)

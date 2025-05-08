@@ -7,6 +7,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/urodstvo/moderation-service/apps/result-agregator/internal/helpers"
 	"github.com/urodstvo/moderation-service/apps/result-agregator/internal/result"
+	res "github.com/urodstvo/moderation-service/apps/result-agregator/internal/result"
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"github.com/urodstvo/moderation-service/libs/models/service/task"
@@ -82,7 +83,6 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 		return struct{}{}
 	}
 
-	// Обновляем статус задачи на "completed"
 	err = c.task.UpdateStatus(ctx, req.TaskId, "completed")
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("Failed to update task status: %v", err))
@@ -95,7 +95,6 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 		return struct{}{}
 	}
 
-	// Проверяем, все ли задачи в группе завершены
 	allCompleted, err := c.taskGroup.AreAllTasksCompleted(ctx, taskGroup.Id)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("Failed to check task group completion: %v", err))
@@ -103,14 +102,13 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 	}
 
 	if allCompleted {
-		// Обновляем статус группы на "completed"
 		err = c.taskGroup.UpdateStatus(ctx, taskGroup.Id, "completed")
 		if err != nil {
 			c.logger.Error(fmt.Sprintf("Failed to update task group status: %v", err))
 			return struct{}{}
 		}
 
-		var allResults []map[string]interface{}
+		var allResults []map[string]any
 		tasks, err := c.task.GetByGroupId(ctx, taskGroup.Id)
 		if err != nil {
 			c.logger.Error(fmt.Sprintf("Failed to get tasks by group ID: %v", err))
@@ -123,27 +121,29 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 				c.logger.Error(fmt.Sprintf("Failed to get task result for TaskID=%d: %v", t.Id, err))
 				return struct{}{}
 			}
-			err = c.minioClient.RemoveObject(ctx, c.config.S3Bucket, helpers.ExtractFilenameFromURL(t.FilePath), minio.RemoveObjectOptions{})
-			allResults = append(allResults, result.Content)
+			_ = c.minioClient.RemoveObject(ctx, c.config.S3Bucket, helpers.ExtractFilenameFromURL(t.FilePath), minio.RemoveObjectOptions{})
+
+			converted, _ := res.Convert(result.Content, t.Id, t.ContentType)
+			allResults = append(allResults, converted)
 		}
 
-		payload, err := result.CollectResults(*taskGroup, allResults)
+		payload, err := res.CollectResults(*taskGroup, allResults)
 		if err != nil {
 			c.logger.Error(fmt.Sprintf("Failed to collect results: %v", err))
 			return struct{}{}
 		}
 
 		webhook, err := c.webhook.GetByUserId(ctx, taskGroup.UserId)
-		if err != nil {
-			c.logger.Error(fmt.Sprintf("Failed to get webhook by user ID: %v", err))
-			return struct{}{}
+		if err == nil {
+			err = result.SendResults(ctx, webhook.WebhookUrl, payload)
+			if err != nil {
+				c.logger.Error(fmt.Sprintf("Failed to send results: %v", err))
+				return struct{}{}
+			}
 		}
 
-		err = result.SendResults(ctx, webhook.WebhookUrl, payload)
-		if err != nil {
-			c.logger.Error(fmt.Sprintf("Failed to send results: %v", err))
-			return struct{}{}
-		}
+		c.logger.Info("payload", payload)
+
 	}
 
 	return struct{}{}
