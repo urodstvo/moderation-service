@@ -67,3 +67,13 @@ class ImageProcessor:
 
     def _text_recognition(self, img_path: str) -> str:
         return predict_ocr(img_path)
+
+# class Processor:
+#     def __init__(self, filename: str):
+#         pass
+
+#     def _get_file(self) -> str:
+#         pass
+
+#     def process(self) -> ImageProcessResult:
+#         pass

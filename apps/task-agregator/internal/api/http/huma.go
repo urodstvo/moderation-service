@@ -7,7 +7,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
-	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/server"
+	"github.com/urodstvo/moderation-service/libs/server"
 )
 
 func NewHuma(router *server.Server) huma.API {
@@ -34,7 +34,7 @@ func NewHuma(router *server.Server) huma.API {
 				return
 			}
 
-			ctx = huma.WithValue(ctx, "UserId", userId)			
+			ctx = huma.WithValue(ctx, "UserId", userId)
 			next(ctx)
 		},
 	)

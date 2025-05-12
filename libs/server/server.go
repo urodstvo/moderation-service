@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/urodstvo/moderation-service/apps/auth/internal/server/middlewares"
 	"github.com/urodstvo/moderation-service/libs/logger"
+	"github.com/urodstvo/moderation-service/libs/server/middlewares"
 	"go.uber.org/fx"
 )
 

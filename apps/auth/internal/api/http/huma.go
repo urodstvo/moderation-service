@@ -6,7 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humagin"
-	"github.com/urodstvo/moderation-service/apps/auth/internal/server"
+	"github.com/urodstvo/moderation-service/libs/server"
 )
 
 func NewHuma(router *server.Server) huma.API {
@@ -24,17 +24,7 @@ func NewHuma(router *server.Server) huma.API {
 		"json":             jsonFormat,
 	}
 
-	// GET /greetings/{id}
-	// PUT /greetings/{id}
-
 	api := humagin.New(router.Engine, config)
-	// api.UseMiddleware(
-	// 	func(ctx huma.Context, next func(huma.Context)) {
-	// 		ctx = huma.WithValue(ctx, dataloader.LoadersKey, loader.Load())
-
-	// 		next(ctx)
-	// 	},
-	// )
 
 	return api
 }

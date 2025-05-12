@@ -7,7 +7,6 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/urodstvo/moderation-service/apps/result-agregator/internal/helpers"
 	"github.com/urodstvo/moderation-service/apps/result-agregator/internal/result"
-	res "github.com/urodstvo/moderation-service/apps/result-agregator/internal/result"
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"github.com/urodstvo/moderation-service/libs/models/service/task"
@@ -89,7 +88,11 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 		return struct{}{}
 	}
 
-	taskGroup, err := c.taskGroup.GetById(ctx, task.GroupId)
+	return c.processTaskGroup(ctx, task.GroupId)
+}
+
+func (c *BusListener) processTaskGroup(ctx context.Context, groupId int) struct{} {
+	taskGroup, err := c.taskGroup.GetById(ctx, groupId)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("Failed to get task group: %v", err))
 		return struct{}{}
@@ -116,18 +119,18 @@ func (c *BusListener) handleTaskDone(ctx context.Context, req nats.TaskDone) str
 		}
 
 		for _, t := range tasks {
-			result, err := c.taskResult.GetByTaskId(ctx, t.Id)
+			taskResult, err := c.taskResult.GetByTaskId(ctx, t.Id)
 			if err != nil {
 				c.logger.Error(fmt.Sprintf("Failed to get task result for TaskID=%d: %v", t.Id, err))
 				return struct{}{}
 			}
 			_ = c.minioClient.RemoveObject(ctx, c.config.S3Bucket, helpers.ExtractFilenameFromURL(t.FilePath), minio.RemoveObjectOptions{})
 
-			converted, _ := res.Convert(result.Content, t.Id, t.ContentType)
+			converted, _ := result.Convert(taskResult.Content, t.Id, t.ContentType)
 			allResults = append(allResults, converted)
 		}
 
-		payload, err := res.CollectResults(*taskGroup, allResults)
+		payload, err := result.CollectResults(*taskGroup, allResults)
 		if err != nil {
 			c.logger.Error(fmt.Sprintf("Failed to collect results: %v", err))
 			return struct{}{}
