@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http"
 	moderation_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/moderation"
+	task_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/task"
 	webhook_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/webhook"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
 	"github.com/urodstvo/moderation-service/libs/minio"
@@ -47,6 +48,7 @@ func main() {
 		fx.Invoke(
 			webhook_routes.NewWebhookRoutes,
 			moderation_routes.NewModerationRoutes,
+			task_routes.NewTaskRoutes,
 		),
 	).Run()
 }

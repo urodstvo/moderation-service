@@ -21,7 +21,7 @@ def predict(audio: Union[np.ndarray, torch.Tensor, List[np.ndarray]]) -> Union[s
         raise TypeError("Unsupported input type for audio")
 
     # Подготовка данных для модели
-    inputs = processor(audio_input, sampling_rate=16000, return_tensors="pt", padding=True).to(device_num)
+    inputs = processor(audio_input, sampling_rate=16000, return_tensors="pt", padding=True).to(device)
     
     with torch.no_grad():
         logits = model(inputs.input_values).logits

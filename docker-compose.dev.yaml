@@ -130,7 +130,9 @@ services:
 
   moderation:
     container_name: moderation
-    build: ./apps/moderation
+    build:
+      context: ./apps/moderation
+      dockerfile: Dockerfile
     env_file: ".env"
     depends_on:
       postgres:

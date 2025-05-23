@@ -18,6 +18,8 @@ COPY pyproject.toml poetry.lock ./
 # Use in-project venv
 RUN poetry config virtualenvs.in-project true
 
+ENV POETRY_HTTP_TIMEOUT=120
+
 # Install only main dependencies (no dev, no root)
 RUN poetry install --no-root --only main
 

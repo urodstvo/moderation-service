@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/sse"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"github.com/urodstvo/moderation-service/libs/models/service/task"
 	task_group "github.com/urodstvo/moderation-service/libs/models/service/task-group"
@@ -47,6 +48,14 @@ func NewTaskRoutes(opts Opts) handler {
 			return a.Check(ctx, *i)
 		},
 	)
+
+	sse.Register(opts.Huma, huma.Operation{
+		OperationID: "track-progress",
+		Method:      http.MethodGet,
+		Path:        "/track-progress",
+	}, map[string]any{"status": &TrackEvent{}}, func(ctx context.Context, input *struct{}, send sse.Sender) {
+		a.Track(ctx)
+	})
 
 	return a
 }
