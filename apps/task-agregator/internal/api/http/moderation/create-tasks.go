@@ -8,11 +8,13 @@ import (
 	"mime/multipart"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/minio/minio-go/v7"
 	"github.com/urodstvo/moderation-service/libs/models/service/task"
 	"github.com/urodstvo/moderation-service/libs/nats"
+	"golang.org/x/sync/errgroup"
 )
 
 type createTasksRequest struct {
@@ -35,8 +37,6 @@ func (h *handler) CreateTasks(ctx context.Context, input createTasksRequest) (*c
 		return nil, huma.Error400BadRequest("Empty file")
 	}
 
-	uploadedFiles := []string{}
-
 	userId := ctx.Value("UserId").(int)
 
 	taskGroupID, err := h.TaskGroupService.Create(ctx, userId)
@@ -45,40 +45,60 @@ func (h *handler) CreateTasks(ctx context.Context, input createTasksRequest) (*c
 		return nil, huma.Error500InternalServerError("Failed to create task group")
 	}
 
-	// for _, files := range formData.File {
+	var (
+		uploadedFilesMu sync.Mutex
+		uploadedFiles   []string
+	)
+
+	g, ctx := errgroup.WithContext(ctx)
+	semaphore := make(chan struct{}, 5) // ограничим параллелизм (например, 5 горутин одновременно)
+
 	for _, file := range formData.Files {
-		fileType := detectFileType(file.Filename)
-		uniqueFileName := generateUniqueFileName(file.Filename)
+		file := file // захват переменной в замыкании
+		semaphore <- struct{}{}
 
-		fileURL, err := h.uploadToMinio(ctx, file.File, uniqueFileName)
-		if err != nil {
-			h.Logger.Error(err.Error())
-			h.rollbackFiles(uploadedFiles)
-			return nil, huma.Error500InternalServerError("")
-		}
-		uploadedFiles = append(uploadedFiles, uniqueFileName)
+		g.Go(func() error {
+			defer func() { <-semaphore }()
 
-		taskID, err := h.TaskService.Create(ctx, taskGroupID, fileType, fileURL, file.Filename)
-		if err != nil {
-			h.Logger.Error(err.Error())
-			h.rollbackFiles(uploadedFiles)
-			return nil, huma.Error500InternalServerError("")
-		}
+			fileType := detectFileType(file.Filename)
+			uniqueFileName := generateUniqueFileName(file.Filename)
 
-		err = h.Bus.Task.Publish(nats.Task{TaskId: taskID})
-		if err != nil {
-			h.Logger.Error(err.Error())
-			h.rollbackFiles(uploadedFiles)
-			return nil, fmt.Errorf("failed to publish task event to NATS: %w", err)
-		}
+			fileURL, err := h.uploadToMinio(ctx, file.File, file.Size, uniqueFileName)
+			if err != nil {
+				return fmt.Errorf("upload failed: %w", err)
+			}
+
+			uploadedFilesMu.Lock()
+			uploadedFiles = append(uploadedFiles, uniqueFileName)
+			uploadedFilesMu.Unlock()
+
+			taskID, err := h.TaskService.Create(ctx, taskGroupID, fileType, fileURL, file.Filename)
+			if err != nil {
+				return fmt.Errorf("task creation failed: %w", err)
+			}
+
+			if err := h.Bus.Task.Publish(nats.Task{TaskId: taskID}); err != nil {
+				return fmt.Errorf("NATS publish failed: %w", err)
+			}
+
+			return nil
+		})
 	}
-	// }
+
+	if err := g.Wait(); err != nil {
+		h.Logger.Error(err.Error())
+		h.rollbackFiles(uploadedFiles)
+		return nil, huma.Error500InternalServerError("Some files failed to process")
+	}
 
 	return &createTasksResponse{Body: struct{ GroupId int }{GroupId: taskGroupID}}, nil
 }
 
-func (h *handler) uploadToMinio(ctx context.Context, file multipart.File, filename string) (string, error) {
-	_, err := h.MinioClient.PutObject(ctx, h.BucketName, filename, file, -1, minio.PutObjectOptions{})
+func (h *handler) uploadToMinio(ctx context.Context, file multipart.File, size int64, filename string) (string, error) {
+	if size <= 0 {
+		return "", fmt.Errorf("invalid file size")
+	}
+	_, err := h.MinioClient.PutObject(ctx, h.BucketName, filename, file, size, minio.PutObjectOptions{})
 	if err != nil {
 		return "", err
 	}
