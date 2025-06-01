@@ -34,11 +34,11 @@ const LanguageInput = React.memo(() => {
     const { language, setLanguage } = useLanguageStore();
     return (
         <div>
-            <label htmlFor='inputlanguage' className='font-roboto text-[16px] leading-5'>
+            <label htmlFor='inputlanguage' className='font-roboto text-2xl leading-5'>
                 {t('language')}
             </label>
             <Select defaultValue={language} onValueChange={setLanguage}>
-                <SelectTrigger className='w-60' id='inputlanguage'>
+                <SelectTrigger className='w-60 text-xl text-bold' id='inputlanguage'>
                     <SelectValue className='!font-roboto !text-xl' />
                 </SelectTrigger>
                 <SelectContent>
@@ -58,12 +58,12 @@ const TypeInput = React.memo(() => {
     const { type, setType } = useInputTypeStore();
     return (
         <div>
-            <label htmlFor='inputtype' className='font-roboto text-[16px] leading-5'>
+            <label htmlFor='inputtype' className='font-roboto text-2xl leading-5'>
                 {t('type')}
             </label>
             <Select defaultValue={type} onValueChange={setType}>
-                <SelectTrigger className='w-60' id='inputtype'>
-                    <SelectValue className='!font-roboto !text-xl' />
+                <SelectTrigger className='w-60 !text-xl !text-bold' id='inputtype'>
+                    <SelectValue className='!font-roboto !text-xl !text-bold' />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
@@ -115,7 +115,7 @@ export const Demo = () => {
                         value={text}
                         onChange={(e) => setText(e.currentTarget.value)}
                         placeholder='Write here something'
-                        className='w-full resize-none font-roboto text-[16px] leading-5'
+                        className='w-full resize-none font-roboto text-2xl leading-5'
                         rows={10}
                     />
                 )}
@@ -136,7 +136,7 @@ export const Demo = () => {
                 <Collapsible>
                     <div className='flex items-center justify-between'>
                         <CollapsibleTrigger asChild>
-                            <Button variant='outline' className='font-roboto'>
+                            <Button variant='outline' className='font-roboto text-xl '>
                                 {t('show')} <IconChevronDown stroke={1.5} size={24} />
                             </Button>
                         </CollapsibleTrigger>

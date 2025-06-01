@@ -1,0 +1,15 @@
+go 1.23.2
+
+use (
+	./apps/auth
+	./apps/result-agregator
+	./apps/task-agregator
+	./libs/config
+	./libs/fx
+	./libs/logger
+	./libs/migrations
+	./libs/minio
+	./libs/models
+	./libs/nats
+	./libs/utils
+)

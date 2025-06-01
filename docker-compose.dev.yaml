@@ -1,0 +1,155 @@
+name: moderation-v2
+services:
+  proxy:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - task-agregator
+      - authorization
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - moderation-net
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres:5432
+      # - ADMINER_PLUGINS=enum-option json-column
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - moderation-net
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    networks:
+      - moderation-net
+
+  redis:
+    restart: always
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - moderation-net
+
+  minio:
+    image: minio/minio
+    command: server --address ":9000" --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      # MINIO_SERVER_URL: http://s3.localhost # Для API
+      # MINIO_BROWSER_REDIRECT_URL: http://console.s3.localhost # Для консоли
+      # MINIO_DOMAIN: s3.localhost
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - moderation-net
+
+  nats:
+    restart: always
+    image: nats:latest
+    container_name: nats
+    command: -js -m 8222
+    ports:
+      - "4222:4222"
+    networks:
+      - moderation-net
+
+  authorization:
+    container_name: authorization
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - moderation-net
+
+  task-agregator:
+    container_name: task-agregator
+    build:
+      context: .
+      dockerfile: ./apps/task-agregator/Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - moderation-net
+
+  result-agregator:
+    container_name: result-agregator
+    build:
+      context: .
+      dockerfile: ./apps/result-agregator/Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - moderation-net
+
+  moderation:
+    container_name: moderation
+    build:
+      context: ./apps/moderation
+      dockerfile: Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      nats:
+        condition: service_started
+    networks:
+      - moderation-net
+
+volumes:
+  redis_data:
+  postgres_data:
+  minio_data:
+  minio-config:
+
+networks:
+  moderation-net:
+    driver: bridge
