@@ -1,4 +1,4 @@
-v. 2.0-alpha
+v. 3.0-alpha
 
 Need To DO
 
@@ -13,7 +13,7 @@ Need To DO
 - test webhooks
 -
 
-what is already done
+<!-- what is already done
 
 Auth
 
@@ -38,4 +38,22 @@ Admin Analytics (Grafana)
 
 - requests in a day, a week
 - number of negative content
-- top users with negative content
+- top users with negative content -->
+
+TASKS
+
+rework database scheme
+rewrite libs/migrations
+rewrite libs/nats for jetstream support
+write libs on Python:
+
+- [] config
+- [] nats
+- [] logger
+- [] minio
+- [] models
+
+create libs/grpc
+move/rewrite logic between services
+write workers
+write cli
