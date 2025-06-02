@@ -12,7 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
-	bus "github.com/urodstvo/moderation-service/libs/nats"
 	"go.uber.org/fx"
 )
 
@@ -25,7 +24,7 @@ func CreateBaseApp(opts Opts) fx.Option {
 		fx.Provide(
 			config.NewFx,
 			newPgxPool,
-			bus.NewNatsBusFx(opts.AppName),
+			// bus.NewNatsBusFx(opts.AppName),
 			logger.NewFx(
 				logger.Opts{
 					Service: opts.AppName,

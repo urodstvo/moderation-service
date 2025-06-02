@@ -1,14 +1,12 @@
 package nats
 
-type Task struct {
-	TaskId int `json:"taskId"`
-}
-
-type TaskDone struct {
-	TaskId int `json:"taskId"`
+type TaskStatusUpdate struct {
+	TaskId     int    `json:"task_id"`
+	NodeKey    string `json:"node_key"`
+	NodeStatus string `json:"node_status"`
+	Message    any    `json:"message"`
 }
 
 type eventBus struct {
-	Task     Queue[Task, struct{}]
-	TaskDone Queue[TaskDone, struct{}]
+	TaskStatusUpdate Jetstream[TaskStatusUpdate]
 }

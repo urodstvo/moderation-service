@@ -2,8 +2,8 @@ go 1.23.2
 
 use (
 	./apps/auth
-	./apps/result-agregator
-	./apps/task-agregator
+	./apps/webhook
+	./apps/task
 	./libs/config
 	./libs/fx
 	./libs/logger
@@ -12,4 +12,5 @@ use (
 	./libs/models
 	./libs/nats
 	./libs/utils
+	./libs/grpc
 )

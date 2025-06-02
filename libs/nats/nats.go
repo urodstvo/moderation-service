@@ -1,8 +1,6 @@
 package nats
 
 import (
-	"time"
-
 	"github.com/nats-io/nats.go"
 	"github.com/urodstvo/moderation-service/libs/config"
 )
@@ -13,21 +11,21 @@ type Bus struct {
 
 func NewNatsBus(nc *nats.Conn) *Bus {
 	return &Bus{
-		&eventBus{
-			Task: NewNatsQueue[Task, struct{}](
-				nc,
-				TASK,
-				30*time.Minute,
-				nats.JSON_ENCODER,
-			),
+		// 		&eventBus{
+		// 			Task: NewNatsQueue[Task, struct{}](
+		// 				nc,
+		// 				TASK,
+		// 				30*time.Minute,
+		// 				nats.JSON_ENCODER,
+		// 			),
 
-			TaskDone: NewNatsQueue[TaskDone, struct{}](
-				nc,
-				TASK_DONE,
-				30*time.Minute,
-				nats.JSON_ENCODER,
-			),
-		},
+		// 			TaskDone: NewNatsQueue[TaskDone, struct{}](
+		// 				nc,
+		// 				TASK_DONE,
+		// 				30*time.Minute,
+		// 				nats.JSON_ENCODER,
+		// 			),
+		// 		},
 	}
 }
 

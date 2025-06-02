@@ -1,6 +1,5 @@
 package nats
 
 const (
-	TASK      = "task"
-	TASK_DONE = "event.done"
+	TASK_STATUS_UPDATE = "task.update.status"
 )
