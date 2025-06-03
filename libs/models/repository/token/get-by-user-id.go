@@ -10,22 +10,22 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) GetByUserId(ctx context.Context, userId int) (*gomodels.Token, error) {
+func (r *repository) GetByUserId(ctx context.Context, userId int) (gomodels.Token, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
 	query, args, err := sq.Select("*").From("tokens").Where(squirrel.Eq{"user_id": userId}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
+		return gomodels.Token{}, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	var t gomodels.Token
+	t := gomodels.Token{}
 	err = conn.QueryRow(ctx, query, args...).Scan(&t.UserId, &t.Token)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("token not found")
+			return gomodels.Token{}, fmt.Errorf("token not found")
 		}
-		return nil, fmt.Errorf("failed to execute query: %w", err)
+		return gomodels.Token{}, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	return &t, nil
+	return t, nil
 }

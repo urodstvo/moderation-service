@@ -14,6 +14,10 @@ type User struct {
 	UpdatedAt time.Time    `json:"updated_at"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
 
-	IsVerified bool   `json:"is_verified"`
-	Role       string `json:"role"`
+	IsVerified bool `json:"is_verified"`
+}
+
+type UserWithRole struct {
+	*User
+	Role string `json:"role"`
 }

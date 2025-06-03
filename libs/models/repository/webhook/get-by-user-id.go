@@ -10,22 +10,22 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) GetByUserId(ctx context.Context, userId int) (*gomodels.Webhook, error) {
+func (r *repository) GetByUserId(ctx context.Context, userId int) (gomodels.Webhook, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
 	query, args, err := sq.Select("*").From("webhooks").Where(squirrel.Eq{"user_id": userId}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
+		return gomodels.Webhook{}, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	var webhook gomodels.Webhook
+	webhook := gomodels.Webhook{}
 	err = conn.QueryRow(ctx, query, args...).Scan(&webhook.UserId, &webhook.WebhookUrl)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("webhook not found")
+			return gomodels.Webhook{}, fmt.Errorf("webhook not found")
 		}
-		return nil, fmt.Errorf("failed to execute query: %w", err)
+		return gomodels.Webhook{}, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	return &webhook, nil
+	return webhook, nil
 }

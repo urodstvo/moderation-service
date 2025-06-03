@@ -7,7 +7,7 @@ CREATE TYPE "node_status" AS ENUM (
   'created',
   'processing',
   'completed',
-  'error'
+  'failed'
 );
 
 CREATE TYPE "content_type" AS ENUM (

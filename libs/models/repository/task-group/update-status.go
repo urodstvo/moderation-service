@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) UpdateStatus(ctx context.Context, id int, status string) error {
+func (r *repository) UpdateStatus(ctx context.Context, id int, status gomodels.NodeStatus) error {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
 	query, args, err := sq.Update("task_groups").Set("status", status).Set("updated_at", squirrel.Expr("NOW()")).

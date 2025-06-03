@@ -1,4 +1,4 @@
-package task
+package blacklist
 
 import (
 	"context"
@@ -8,12 +8,10 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) GetByGroupId(ctx context.Context, groupId int) ([]gomodels.Task, error) {
+func (r *repository) GetByUserId(ctx context.Context, userId int) ([]gomodels.Blacklist, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Select("*").From("tasks").
-		Where(squirrel.Eq{"group_id": groupId}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
-
+	query, args, err := sq.Select("*").From("blacklists").Where(squirrel.Eq{"user_id": userId}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -24,22 +22,19 @@ func (r *repository) GetByGroupId(ctx context.Context, groupId int) ([]gomodels.
 	}
 	defer rows.Close()
 
-	var tasks []gomodels.Task
+	var t []gomodels.Blacklist
 	for rows.Next() {
-		task := gomodels.Task{}
-		err = rows.Scan(
-			&task.Id, &task.GroupId, &task.ContentType, &task.Filename,
-			&task.OriginalFilename, &task.CreatedAt, &task.UpdatedAt, &task.DeletedAt,
-		)
+		blacklist := gomodels.Blacklist{}
+		err = rows.Scan(&blacklist.UserId, &blacklist.Phrase)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
-		tasks = append(tasks, task)
+		t = append(t, blacklist)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("error while iterating over rows: %w", err)
 	}
 
-	return tasks, nil
+	return t, nil
 }

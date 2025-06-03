@@ -15,7 +15,7 @@ type repository struct {
 }
 
 type UserRepository interface {
-	GetByEmail(ctx context.Context, email string) (*gomodels.User, error)
+	GetByEmail(ctx context.Context, email string) (gomodels.User, error)
 	Create(ctx context.Context, email string, password string) (int, error)
 }
 

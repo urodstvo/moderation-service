@@ -13,8 +13,9 @@ type service struct {
 }
 
 type TaskResult struct {
-	TaskId  int                    `json:"task_id"`
-	Content map[string]interface{} `json:"content"`
+	TaskId    int            `json:"task_id"`
+	Raw       map[string]any `json:"raw"`
+	Formatted map[string]any `json:"formatted"`
 }
 
 type TaskResultService interface {
@@ -36,14 +37,25 @@ func (s *service) GetByTaskId(ctx context.Context, taskId int) (*TaskResult, err
 		return nil, err
 	}
 
-	var parsedContent map[string]interface{}
-	err = json.Unmarshal([]byte(result.Content), &parsedContent)
+	var parsedRawContent map[string]any
+	err = json.Unmarshal([]byte(result.Raw), &parsedRawContent)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse content JSON: %w", err)
 	}
 
+	var parsedFormattedContent map[string]any
+	if result.Formatted.Valid {
+		err = json.Unmarshal([]byte(result.Formatted.String), &parsedFormattedContent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse content JSON: %w", err)
+		}
+	} else {
+		parsedFormattedContent = nil
+	}
+
 	return &TaskResult{
-		TaskId:  result.TaskId,
-		Content: parsedContent,
+		TaskId:    result.TaskId,
+		Raw:       parsedRawContent,
+		Formatted: parsedFormattedContent,
 	}, nil
 }

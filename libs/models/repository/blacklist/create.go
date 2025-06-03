@@ -1,14 +1,14 @@
-package task_result
+package blacklist
 
 import (
 	"context"
 	"fmt"
 )
 
-func (r *repository) Create(ctx context.Context, taskId int, raw string) error {
+func (r *repository) Create(ctx context.Context, userId int, phrase string) error {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Insert("task_results").Columns("task_id", "raw").Values(taskId, raw).ToSql()
+	query, args, err := sq.Insert("blacklists").Columns("user_id", "phrase").Values(userId, phrase).ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}

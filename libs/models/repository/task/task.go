@@ -15,10 +15,9 @@ type repository struct {
 }
 
 type TaskRepository interface {
-	Create(ctx context.Context, groupId int, contentType string, filePath string, originalName string) (int, error)
-	GetById(ctx context.Context, id int) (*gomodels.Task, error)
-	GetByGroupId(ctx context.Context, groupId int) ([]*gomodels.Task, error)
-	UpdateStatus(ctx context.Context, id int, status string) error
+	Create(ctx context.Context, groupId int, contentType string, filename string, originalFilename string) (int, error)
+	GetById(ctx context.Context, id int) (gomodels.Task, error)
+	GetByGroupId(ctx context.Context, groupId int) ([]gomodels.Task, error)
 }
 
 func NewTaskRepository(db *pgxpool.Pool) TaskRepository {

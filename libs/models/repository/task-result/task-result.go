@@ -16,7 +16,7 @@ type repository struct {
 
 type TaskResultRepository interface {
 	Create(ctx context.Context, taskId int, result string) error
-	GetByTaskId(ctx context.Context, taskId int) (*gomodels.TaskResult, error)
+	GetByTaskId(ctx context.Context, taskId int) (gomodels.TaskResult, error)
 }
 
 func NewTaskResultRepository(db *pgxpool.Pool) TaskResultRepository {

@@ -1,4 +1,4 @@
-package token
+package blacklist
 
 import (
 	"context"
@@ -14,13 +14,12 @@ type repository struct {
 	getter *trmpgx.CtxGetter
 }
 
-type TokenRepository interface {
-	Create(ctx context.Context, token string, userId int) error
-	GetByUserId(ctx context.Context, userId int) (gomodels.Token, error)
-	GetByToken(ctx context.Context, token string) (gomodels.Token, error)
+type BlacklistRepository interface {
+	Create(ctx context.Context, userId int, phrase string) error
+	GetByUserId(ctx context.Context, userId int) ([]gomodels.Blacklist, error)
 }
 
-func NewTokenRepository(db *pgxpool.Pool) TokenRepository {
+func NewTokenRepository(db *pgxpool.Pool) BlacklistRepository {
 	return &repository{
 		db:     db,
 		getter: trmpgx.DefaultCtxGetter,

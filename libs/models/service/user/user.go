@@ -12,7 +12,7 @@ type service struct {
 }
 
 type UserService interface {
-	GetByEmail(ctx context.Context, email string) (*gomodels.User, error)
+	GetByEmail(ctx context.Context, email string) (gomodels.User, error)
 	Create(ctx context.Context, email string, password string) (int, error)
 }
 
@@ -20,7 +20,7 @@ func NewUserService(repo repo.UserRepository) UserService {
 	return &service{repo: repo}
 }
 
-func (s *service) GetByEmail(ctx context.Context, email string) (*gomodels.User, error) {
+func (s *service) GetByEmail(ctx context.Context, email string) (gomodels.User, error) {
 	return s.repo.GetByEmail(ctx, email)
 }
 
