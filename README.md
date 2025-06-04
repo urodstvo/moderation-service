@@ -45,17 +45,17 @@ TASKS
 rework database scheme
 rewrite libs/migrations
 rewrite libs/nats for jetstream support
-
-<!-- --> rewrite libs/models for new tables
+rewrite libs/models for new tables
 
 write libs on Python:
 
 - [] config
-- [] nats
 - [] logger
 - [] minio
+- [] nats
 
-create libs/grpc
+<!-- --> create libs/grpc
+
 move/rewrite logic between services
 write workers
 write cli

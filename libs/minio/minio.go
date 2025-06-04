@@ -12,10 +12,7 @@ import (
 )
 
 func New(l logger.Logger, config config.Config, lc fx.Lifecycle) (*minio.Client, error) {
-	var creds *credentials.Credentials
-	creds = credentials.NewStaticV4(config.S3AccessToken, config.S3SecretToken, "")
-
-	l.Info("Creating minio client")
+	creds := credentials.NewStaticV4(config.S3AccessToken, config.S3SecretToken, "")
 
 	client, err := minio.New(
 		config.S3Host,
