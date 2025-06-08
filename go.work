@@ -2,15 +2,15 @@ go 1.23.2
 
 use (
 	./apps/auth
-	./apps/webhook
 	./apps/task
+	./apps/webhook
 	./libs/config
 	./libs/fx
+	./libs/grpc
 	./libs/logger
 	./libs/migrations
 	./libs/minio
 	./libs/models
 	./libs/nats
 	./libs/utils
-	./libs/grpc
 )

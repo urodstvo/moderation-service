@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/urodstvo/moderation-service/libs/grpc/task";
+package task;
+
+// import "google/protobuf/empty.proto";
+
+
+service TaskService {
+  rpc Create(CreateRequest) returns (CreateResponse);
+}
+
+message CreateRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message CreateResponse {
+  string token = 1;
+}

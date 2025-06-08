@@ -56,6 +56,10 @@ write libs on Python:
 
 <!-- --> create libs/grpc
 
+write grpc server initialisation on services
+
 move/rewrite logic between services
 write workers
 write cli
+
+configure prometheus + grafana
