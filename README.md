@@ -46,7 +46,6 @@ rework database scheme
 rewrite libs/migrations
 rewrite libs/nats for jetstream support
 rewrite libs/models for new tables
-
 write libs on Python:
 
 - [] config
@@ -54,9 +53,9 @@ write libs on Python:
 - [] minio
 - [] nats
 
-<!-- --> create libs/grpc
+create libs/grpc
 
-write grpc server initialisation on services
+<!-- -->write grpc server initialisation on services
 
 move/rewrite logic between services
 write workers

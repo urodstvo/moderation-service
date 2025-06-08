@@ -1,20 +1,19 @@
 package main
 
 import (
-	"github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http"
-	moderation_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/moderation"
-	task_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/task"
-	webhook_routes "github.com/urodstvo/moderation-service/apps/task-agregator/internal/api/http/webhook"
+	"github.com/urodstvo/moderation-service/apps/task/internal/grpc"
+	blacklist_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/blacklist"
+	status_tree_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/status-tree"
+	task_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/task"
+	task_group_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/task-group"
+	task_result_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/task-result"
+	blacklist_service "github.com/urodstvo/moderation-service/apps/task/internal/service/blacklist"
+	status_tree_service "github.com/urodstvo/moderation-service/apps/task/internal/service/status-tree"
+	task_service "github.com/urodstvo/moderation-service/apps/task/internal/service/task"
+	task_group_service "github.com/urodstvo/moderation-service/apps/task/internal/service/task-group"
+	task_result_service "github.com/urodstvo/moderation-service/apps/task/internal/service/task-result"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
 	"github.com/urodstvo/moderation-service/libs/minio"
-	task_repo "github.com/urodstvo/moderation-service/libs/models/repository/task"
-	task_group_repo "github.com/urodstvo/moderation-service/libs/models/repository/task-group"
-	webhook_repo "github.com/urodstvo/moderation-service/libs/models/repository/webhook"
-	task_service "github.com/urodstvo/moderation-service/libs/models/service/task"
-	task_group_service "github.com/urodstvo/moderation-service/libs/models/service/task-group"
-	webhook_service "github.com/urodstvo/moderation-service/libs/models/service/webhook"
-	"github.com/urodstvo/moderation-service/libs/server"
-	"github.com/urodstvo/moderation-service/libs/server/middlewares"
 
 	"go.uber.org/fx"
 )
@@ -23,32 +22,31 @@ func main() {
 	fx.New(
 		baseapp.CreateBaseApp(
 			baseapp.Opts{
-				AppName: "Task Agregator Service",
+				AppName: "Task Service",
 			},
 		),
 		// repositories
 		fx.Provide(
 			task_group_repo.NewTaskGroupRepository,
 			task_repo.NewTaskRepository,
-			webhook_repo.NewWebhookRepository,
+			task_result_repo.NewTaskResultRepository,
+			status_tree_repo.NewStatusTreeRepository,
+			blacklist_repo.NewBlacklistRepository,
 		),
 		// services
 		fx.Provide(
 			task_group_service.NewTaskGroupService,
 			task_service.NewTaskService,
-			webhook_service.NewWebhookService,
+			task_result_service.NewTaskResultService,
+			status_tree_service.NewStatusTreeService,
+			blacklist_service.NewBlacklistService,
 		),
 		// app itself
 		fx.Provide(
 			minio.New,
-			middlewares.New,
-			server.New,
-			http.NewHuma,
 		),
 		fx.Invoke(
-			webhook_routes.NewWebhookRoutes,
-			moderation_routes.NewModerationRoutes,
-			task_routes.NewTaskRoutes,
+			grpc.New,
 		),
 	).Run()
 }

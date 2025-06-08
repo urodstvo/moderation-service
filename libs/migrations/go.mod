@@ -1,6 +1,6 @@
 module github.com/urodstvo/moderation-service/libs/migrations
 
-go 1.23.2
+go 1.24.2
 
 replace github.com/urodstvo/moderation-service/libs/config => ../config
 

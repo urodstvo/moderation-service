@@ -1,15 +1,14 @@
 package main
 
 import (
-	"github.com/urodstvo/moderation-service/apps/auth/internal/api/http"
-	"github.com/urodstvo/moderation-service/apps/auth/internal/api/http/routes/auth"
+	"github.com/urodstvo/moderation-service/apps/auth/internal/grpc"
+	role_repo "github.com/urodstvo/moderation-service/apps/auth/internal/repository/role"
+	token_repo "github.com/urodstvo/moderation-service/apps/auth/internal/repository/token"
+	user_repo "github.com/urodstvo/moderation-service/apps/auth/internal/repository/user"
+	role_service "github.com/urodstvo/moderation-service/apps/auth/internal/service/role"
+	token_service "github.com/urodstvo/moderation-service/apps/auth/internal/service/token"
+	user_service "github.com/urodstvo/moderation-service/apps/auth/internal/service/user"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
-	token_repo "github.com/urodstvo/moderation-service/libs/models/repository/token"
-	user_repo "github.com/urodstvo/moderation-service/libs/models/repository/user"
-	token_service "github.com/urodstvo/moderation-service/libs/models/service/token"
-	user_service "github.com/urodstvo/moderation-service/libs/models/service/user"
-	"github.com/urodstvo/moderation-service/libs/server"
-	"github.com/urodstvo/moderation-service/libs/server/middlewares"
 
 	"go.uber.org/fx"
 )
@@ -23,22 +22,20 @@ func main() {
 		),
 		// repositories
 		fx.Provide(
-			user_repo.NewUsersRepository,
+			user_repo.NewUserRepository,
 			token_repo.NewTokenRepository,
+			role_repo.NewRoleRepository,
 		),
 		// services
 		fx.Provide(
 			token_service.NewTokenService,
 			user_service.NewUserService,
+			role_service.NewRoleService,
 		),
 		// app itself
-		fx.Provide(
-			middlewares.New,
-			server.New,
-			http.NewHuma,
-		),
+		fx.Provide(),
 		fx.Invoke(
-			auth.NewAuthRoutes,
+			grpc.New,
 		),
 	).Run()
 }

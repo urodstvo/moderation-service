@@ -1,51 +1,51 @@
-package auth
+// package auth
 
-import (
-	"context"
+// import (
+// 	"context"
 
-	"github.com/danielgtaylor/huma/v2"
-	tokengenerator "github.com/urodstvo/moderation-service/apps/auth/internal/token-generator"
-	"golang.org/x/crypto/bcrypt"
-)
+// 	"github.com/danielgtaylor/huma/v2"
+// 	tokengenerator "github.com/urodstvo/moderation-service/apps/auth/internal/token-generator"
+// 	"golang.org/x/crypto/bcrypt"
+// )
 
-type registerRequest struct {
-	Email    string `json:"email" minLength:"10" maxLength:"100" required:"true"`
-	Password string `json:"password" minLength:"4" maxLength:"32" required:"true"`
-}
+// type registerRequest struct {
+// 	Email    string `json:"email" minLength:"10" maxLength:"100" required:"true"`
+// 	Password string `json:"password" minLength:"4" maxLength:"32" required:"true"`
+// }
 
-type registerResponse struct {
-	Body struct {
-		Token string `json:"token"`
-	}
-}
+// type registerResponse struct {
+// 	Body struct {
+// 		Token string `json:"token"`
+// 	}
+// }
 
-func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerResponse, error) {
-	_, err := h.UserService.GetByEmail(ctx, input.Email)
-	if err == nil {
-		return nil, huma.Error400BadRequest("User with this email already exists")
-	}
+// func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerResponse, error) {
+// 	_, err := h.UserService.GetByEmail(ctx, input.Email)
+// 	if err == nil {
+// 		return nil, huma.Error400BadRequest("User with this email already exists")
+// 	}
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
-	if err != nil {
-		h.Logger.Error(err.Error())
-		return nil, huma.Error500InternalServerError("Failed to hash password")
-	}
+// 	bytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
+// 	if err != nil {
+// 		h.Logger.Error(err.Error())
+// 		return nil, huma.Error500InternalServerError("Failed to hash password")
+// 	}
 
-	userId, err := h.UserService.Create(ctx, input.Email, string(bytes))
-	if err != nil {
-		h.Logger.Error(err.Error())
-		return nil, huma.Error500InternalServerError("Failed to create user")
-	}
+// 	userId, err := h.UserService.Create(ctx, input.Email, string(bytes))
+// 	if err != nil {
+// 		h.Logger.Error(err.Error())
+// 		return nil, huma.Error500InternalServerError("Failed to create user")
+// 	}
 
-	token := tokengenerator.GenerateToken()
+// 	token := tokengenerator.GenerateToken()
 
-	err = h.TokenService.Create(ctx, token, userId)
-	if err != nil {
-		h.Logger.Error(err.Error())
-		return nil, huma.Error500InternalServerError("Failed to create token")
-	}
+// 	err = h.TokenService.Create(ctx, token, userId)
+// 	if err != nil {
+// 		h.Logger.Error(err.Error())
+// 		return nil, huma.Error500InternalServerError("Failed to create token")
+// 	}
 
-	res := &registerResponse{}
-	res.Body.Token = token
-	return res, nil
-}
+// 	res := &registerResponse{}
+// 	res.Body.Token = token
+// 	return res, nil
+// }

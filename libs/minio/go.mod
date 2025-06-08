@@ -1,6 +1,6 @@
 module github.com/urodstvo/moderation-service/libs/minio
 
-go 1.23.2
+go 1.24.2
 
 replace (
 	github.com/urodstvo/moderation-service/libs/config => ../../libs/config

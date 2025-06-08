@@ -1,15 +1,12 @@
-module github.com/urodstvo/moderation-service/apps/result-agregator
+module github.com/urodstvo/moderation-service/apps/webhook
 
-go 1.23.2
+go 1.24.2
 
 replace (
 	github.com/urodstvo/moderation-service/libs/config => ../../libs/config
 	github.com/urodstvo/moderation-service/libs/fx => ../../libs/fx
 	github.com/urodstvo/moderation-service/libs/logger => ../../libs/logger
-	github.com/urodstvo/moderation-service/libs/minio => ../../libs/minio
 	github.com/urodstvo/moderation-service/libs/models => ../../libs/models
-	github.com/urodstvo/moderation-service/libs/nats => ../../libs/nats
-	github.com/urodstvo/moderation-service/libs/utils => ../../libs/utils
 )
 
 require (
@@ -17,7 +14,6 @@ require (
 	github.com/urodstvo/moderation-service/libs/config v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/fx v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/logger v0.0.0-00010101000000-000000000000
-	github.com/urodstvo/moderation-service/libs/minio v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/models v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/nats v0.0.0-00010101000000-000000000000
 	go.uber.org/fx v1.23.0
