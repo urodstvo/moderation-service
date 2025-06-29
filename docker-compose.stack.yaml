@@ -1,33 +1,21 @@
+name: moderation-v2
 services:
   proxy:
     image: nginx:latest
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.stack.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
     ports:
       - "80:80"
       - "443:443"
     depends_on:
-      - task-aggregator
+      - task-agregator
       - authorization
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 10s
       timeout: 5s
       retries: 3
-    networks:
-      - moderation-net
-
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - "8888:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=postgres:5432
-      - ADMINER_PLUGINS=enum-types enum-option json-column
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - moderation-net
 
@@ -44,43 +32,19 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-      placement:
-        constraints:
-          - node.role == manager
-    networks:
-      - moderation-net
-
-  redis:
-    image: redis:latest
-    volumes:
-      - redis_data:/data
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 3s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-      placement:
-        constraints:
-          - node.role == manager
+    ports:
+      - "5432:5432"
     networks:
       - moderation-net
 
   minio:
     image: minio/minio
-    command: server --address 0.0.0.0:9000 --console-address ":9001" /data
+    command: server --address ":9000" --console-address ":9001" /data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
-      - minio-config:/root/.minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -88,32 +52,19 @@ services:
       - moderation-net
 
   nats:
+    restart: always
     image: nats:latest
-    deploy:
-      mode: replicated
-      replicas: 3
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      placement:
-        constraints:
-          - node.role == manager
+    container_name: nats
     command: -js -m 8222
+    ports:
+      - "4222:4222"
     networks:
       - moderation-net
 
   authorization:
-    image: authorization
-    build: ./auth
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-    environment:
-      REDIS_HOST: "redis:6379"
+    container_name: authorization
+    image: urodstvo/moderation-service-v2:authorization
+    env_file: ".env"
     depends_on:
       postgres:
         condition: service_healthy
@@ -122,18 +73,10 @@ services:
     networks:
       - moderation-net
 
-  task-aggregator:
-    image: task-aggregator
-    build: ./task-aggregator
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-    environment:
-      MINIO_URL: ${MINIO_URL}
-      POSTGRES_URL: ${POSTGRES_URL}
+  task-agregator:
+    container_name: task-agregator
+    image: urodstvo/moderation-service-v2:task
+    env_file: ".env"
     depends_on:
       postgres:
         condition: service_healthy
@@ -142,18 +85,10 @@ services:
     networks:
       - moderation-net
 
-  result-aggregator:
-    image: result-aggregator
-    build: ./result-aggregator
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-    environment:
-      MINIO_URL: ${MINIO_URL}
-      POSTGRES_URL: ${POSTGRES_URL}
+  result-agregator:
+    container_name: result-agregator
+    image: urodstvo/moderation-service-v2:result
+    env_file: ".env"
     depends_on:
       postgres:
         condition: service_healthy
@@ -163,22 +98,40 @@ services:
       - moderation-net
 
   moderation:
-    image: moderation
-    build: ./moderation-service
-    deploy:
-      update_config:
-        parallelism: 2
-      restart_policy:
-        condition: any
-        delay: 30s
-        max_attempts: 30
-      endpoint_mode: dnsrr
-      mode: replicated
-      replicas: 3
-    environment:
-      REDIS_URL: ${REDIS_URL}
+    container_name: moderation
+    image: urodstvo/moderation-service-v2:moderation
+    env_file: ".env"
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      nats:
+        condition: service_started
+    networks:
+      - moderation-net
+
+  test-webhook:
+    container_name: test-webhook
+    image: urodstvo/moderation-service-v2:test
+    env_file: ".env"
+    networks:
+      - moderation-net
+
+  migrations:
+    container_name: migrations
+    image: urodstvo/moderation-service-v2:migrations
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - moderation-net
+
+  web:
+    container_name: web
+    image: urodstvo/moderation-service-v2:web
+    env_file: ".env"
     networks:
       - moderation-net
 

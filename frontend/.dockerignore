@@ -1,7 +1,41 @@
-Dockerfile
-.dockerignore
-node_modules
-npm-debug.log
-README.md
-.next
+# IDE / VCS
 .git
+.vscode
+.idea
+
+# Logs / env / configs
+*.log
+*.env
+*.tmp
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
+# Node
+node_modules/
+frontend/node_modules
+**/node_modules
+
+# Go build artifacts
+*.out
+*.a
+*.exe
+*.test
+bin/
+
+# ML artifacts / datasets / weights
+*.pt
+*.pth
+*.onnx
+*.h5
+*.tflite
+*.pb
+*.csv
+*.npz
+*.npy
+*.zip*

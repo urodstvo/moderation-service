@@ -8,7 +8,13 @@ RUN apk add --no-cache git
 WORKDIR /app
 
 # Копируем структуру проекта, включая все локальные библиотеки и приложения
-COPY . .
+COPY ./go.work ./go.work
+COPY ./go.work.sum ./go.work.sum
+COPY ./libs ./libs
+COPY ./apps/auth ./apps/auth
+COPY ./apps/task-agregator ./apps/task-agregator
+COPY ./apps/result-agregator ./apps/result-agregator
+COPY ./apps/test ./apps/test
 
 # Собираем программу для Linux
 RUN GOOS=linux GOARCH=amd64 go build -o /app/main ./apps/result-agregator/cmd/main.go

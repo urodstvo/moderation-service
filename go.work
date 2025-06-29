@@ -4,6 +4,7 @@ use (
 	./apps/auth
 	./apps/result-agregator
 	./apps/task-agregator
+	./apps/test
 	./libs/config
 	./libs/fx
 	./libs/logger

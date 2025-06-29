@@ -3,6 +3,7 @@ package listener
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/urodstvo/moderation-service/apps/result-agregator/internal/helpers"
@@ -136,15 +137,15 @@ func (c *BusListener) processTaskGroup(ctx context.Context, groupId int) struct{
 			return struct{}{}
 		}
 
-		// webhook, err := c.webhook.GetByUserId(ctx, taskGroup.UserId)
-		// if err == nil {
-		// 	err = result.SendResults(ctx, webhook.WebhookUrl, payload)
-		// 	if err != nil {
-		// 		c.logger.Error(fmt.Sprintf("Failed to send results: %v", err))
-		// 		return struct{}{}
-		// 	}
-		// }
-
+		webhook, err := c.webhook.GetByUserId(ctx, taskGroup.UserId)
+		if err == nil {
+			err = result.SendResults(ctx, webhook.WebhookUrl, payload)
+			if err != nil {
+				c.logger.Error(fmt.Sprintf("Failed to send results: %v", err))
+				return struct{}{}
+			}
+		}
+		c.logger.Info("webhook", slog.Any("webhook_url", webhook.WebhookUrl))
 		c.logger.Info("payload", payload)
 
 	}

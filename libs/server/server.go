@@ -27,11 +27,12 @@ func New(opts Opts) *Server {
 	r.Use(
 		cors.New(
 			cors.Config{
-				AllowAllOrigins:  true,
-				AllowMethods:     []string{"*"},
-				AllowHeaders:     []string{"*"},
-				ExposeHeaders:    []string{"*"},
-				AllowCredentials: true,
+				AllowAllOrigins:           true,
+				AllowMethods:              []string{"*"},
+				AllowHeaders:              []string{"*"},
+				ExposeHeaders:             []string{"*"},
+				AllowCredentials:          true,
+				OptionsResponseStatusCode: 204,
 			},
 		),
 	)

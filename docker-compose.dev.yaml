@@ -50,24 +50,12 @@ services:
     networks:
       - moderation-net
 
-  redis:
-    restart: always
-    image: redis:latest
-    container_name: redis
-    volumes:
-      - redis_data:/data
-    networks:
-      - moderation-net
-
   minio:
     image: minio/minio
     command: server --address ":9000" --console-address ":9001" /data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      # MINIO_SERVER_URL: http://s3.localhost # Для API
-      # MINIO_BROWSER_REDIRECT_URL: http://console.s3.localhost # Для консоли
-      # MINIO_DOMAIN: s3.localhost
     volumes:
       - minio_data:/data
     ports:
@@ -95,8 +83,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_started
     networks:
       - moderation-net
 
@@ -141,6 +127,40 @@ services:
         condition: service_started
       nats:
         condition: service_started
+    networks:
+      - moderation-net
+
+  test-webhook:
+    container_name: test-webhook
+    build:
+      context: .
+      dockerfile: ./apps/test/Dockerfile
+    env_file: ".env"
+    networks:
+      - moderation-net
+
+  web:
+    container_name: web
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - ./frontend/node_modules:/app/node_modules
+    env_file: ".env"
+    ports:
+      - "3000:5173"
+      - "3080:80"
+    networks:
+      - moderation-net
+
+  migrations:
+    container_name: migrations
+    build:
+      context: .
+      dockerfile: ./libs/migrations/Dockerfile
+    env_file: ".env"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - moderation-net
 
