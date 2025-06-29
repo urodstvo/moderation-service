@@ -4,7 +4,6 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx.stack.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
     ports:
       - "80:80"
       - "443:443"
@@ -32,8 +31,6 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
-    ports:
-      - "5432:5432"
     networks:
       - moderation-net
 
@@ -45,9 +42,6 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     networks:
       - moderation-net
 
@@ -56,8 +50,6 @@ services:
     image: nats:latest
     container_name: nats
     command: -js -m 8222
-    ports:
-      - "4222:4222"
     networks:
       - moderation-net
 
