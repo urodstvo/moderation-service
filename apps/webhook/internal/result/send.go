@@ -10,11 +10,11 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]any) (map[string]any, error) {
+func CollectResults(request gomodels.Request, results []map[string]any) (map[string]any, error) {
 	var collectedTasks []map[string]any
 
 	for _, result := range results {
-		taskID := result["task_id"].(int)
+		fileID := result["file_id"].(int)
 		contentType := result["content_type"].(string)
 		recognizedText := result["recognized_text"].(string)
 		predictionsRaw := result["predictions"].(map[string]any)
@@ -25,7 +25,7 @@ func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]any) (map
 		}
 
 		collectedTasks = append(collectedTasks, map[string]any{
-			"task_id":         taskID,
+			"task_id":         fileID,
 			"content_type":    contentType,
 			"recognized_text": recognizedText,
 			"predictions":     predictions,
@@ -33,9 +33,9 @@ func CollectResults(taskGroup gomodels.TaskGroup, results []map[string]any) (map
 	}
 
 	response := map[string]any{
-		"group_id":     taskGroup.Id,
-		"created_at":   taskGroup.CreatedAt,
-		"completed_at": taskGroup.UpdatedAt,
+		"request_id":   request.Id,
+		"created_at":   request.CreatedAt,
+		"completed_at": request.UpdatedAt,
 		"total_tasks":  len(collectedTasks),
 		"tasks":        collectedTasks,
 	}

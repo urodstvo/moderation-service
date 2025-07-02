@@ -16,6 +16,7 @@ type repository struct {
 
 type WebhookRepository interface {
 	Create(ctx context.Context, webhookUrl string, userId int) error
+	Update(ctx context.Context, webhookUrl string, userId int) error
 	GetByUserId(ctx context.Context, userId int) (gomodels.Webhook, error)
 }
 

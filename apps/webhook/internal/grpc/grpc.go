@@ -29,7 +29,7 @@ func New(opts Opts) error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
-	webhook.RegisterWebhookServiceServer(grpcServer, opts.Service)
+	webhook.RegisterWebhookServiceServer(grpcServer, &opts.Service)
 
 	opts.LC.Append(
 		fx.Hook{

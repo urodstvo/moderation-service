@@ -15,7 +15,6 @@ require (
 	github.com/urodstvo/moderation-service/libs/fx v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/logger v0.0.0-00010101000000-000000000000
 	github.com/urodstvo/moderation-service/libs/models v0.0.0-00010101000000-000000000000
-	github.com/urodstvo/moderation-service/libs/nats v0.0.0-00010101000000-000000000000
 	go.uber.org/fx v1.23.0
 )
 
