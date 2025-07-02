@@ -1,8 +1,8 @@
-module github.com/urodstvo/moderation-service/libs/migrations
+module github.com/urodstvo/moderation-service/migrations
 
 go 1.24.2
 
-replace github.com/urodstvo/moderation-service/libs/config => ../config
+replace github.com/urodstvo/moderation-service/libs/config => ../libs/config
 
 require (
 	github.com/jackc/pgx/v5 v5.7.2

@@ -1,0 +1,21 @@
+permissions:
+  - key: TASK_GROUP:CREATE
+    description: "Создание группы задач"
+  - key: TASK_GROUP:READ
+    description: "Чтение информации о группе задач"
+  - key: TASK_GROUP:UPDATE
+    description: "Изменение группы задач"
+  - key: TASK_GROUP:DELETE
+    description: "Удаление группы задач"
+
+roles:
+  USER:
+    permissions:
+      - TASK_GROUP:CREATE
+      - TASK_GROUP:READ
+  ADMIN:
+    permissions:
+      - TASK_GROUP:CREATE
+      - TASK_GROUP:READ
+      - TASK_GROUP:UPDATE
+      - TASK_GROUP:DELETE

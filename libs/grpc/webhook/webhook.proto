@@ -3,18 +3,20 @@ syntax = "proto3";
 option go_package = "github.com/urodstvo/moderation-service/libs/grpc/webhook";
 package webhook;
 
-// import "google/protobuf/empty.proto";
+import "google/protobuf/empty.proto";
 
 
 service WebhookService {
-  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc UpdateWebhook(UpdateWebhookRequest) returns (google.protobuf.Empty);
+  rpc SendByWebhook(SendByWebhookRequest) returns (google.protobuf.Empty);
 }
 
-message LoginRequest {
-  string username = 1;
-  string password = 2;
+message UpdateWebhookRequest {
+  int32 userId = 1;
+  string webhookUrl = 2;
 }
 
-message LoginResponse {
-  string token = 1;
+message SendByWebhookRequest {
+  int32 userId = 1;
+  string message = 2;
 }

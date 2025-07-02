@@ -206,3 +206,5 @@ assets/test
 *.pt
 onnx
 *.onnx
+
+node_modules

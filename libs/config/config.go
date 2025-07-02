@@ -22,6 +22,8 @@ type Config struct {
 	S3SecretToken string `required:"false" envconfig:"CDN_SECRET_TOKEN"`
 
 	NatsUrl string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
+
+	JWTSecret string `required:"false" default:"jwt-secret" envconfig:"JWT_SECRET"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {
