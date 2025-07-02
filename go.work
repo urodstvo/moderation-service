@@ -4,13 +4,15 @@ use (
 	./apps/auth
 	./apps/task
 	./apps/webhook
+	./cli
 	./libs/config
 	./libs/fx
 	./libs/grpc
 	./libs/logger
-	./libs/migrations
 	./libs/minio
 	./libs/models
 	./libs/nats
+	./libs/server
 	./libs/utils
+	./migrations
 )
