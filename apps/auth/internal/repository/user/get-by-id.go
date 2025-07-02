@@ -10,10 +10,10 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) GetByEmail(ctx context.Context, email string) (gomodels.User, error) {
+func (r *repository) GetById(ctx context.Context, id int) (gomodels.User, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Select("*").From("users").Where(squirrel.Eq{"email": email}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
+	query, args, err := sq.Select("*").From("users").Where(squirrel.Eq{"id": id}).Where(squirrel.Expr("deleted_at IS NULL")).ToSql()
 	if err != nil {
 		return gomodels.User{}, fmt.Errorf("failed to build query: %w", err)
 	}

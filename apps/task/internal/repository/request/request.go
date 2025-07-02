@@ -1,4 +1,4 @@
-package user
+package request
 
 import (
 	"context"
@@ -14,13 +14,13 @@ type repository struct {
 	getter *trmpgx.CtxGetter
 }
 
-type UserRepository interface {
-	GetByEmail(ctx context.Context, email string) (gomodels.User, error)
-	GetById(ctx context.Context, id int) (gomodels.User, error)
-	Create(ctx context.Context, email string, password string) (int, error)
+type RequestRepository interface {
+	Create(ctx context.Context, userId int) (int, error)
+	GetById(ctx context.Context, id int) (gomodels.Request, error)
+	UpdateStatus(ctx context.Context, id int, status gomodels.Status) error
 }
 
-func NewUserRepository(db *pgxpool.Pool) UserRepository {
+func NewRequestRepository(db *pgxpool.Pool) RequestRepository {
 	return &repository{
 		db:     db,
 		getter: trmpgx.DefaultCtxGetter,
