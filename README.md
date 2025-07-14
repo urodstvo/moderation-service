@@ -48,17 +48,45 @@ rewrite libs/nats for jetstream support
 rewrite libs/models for new tables
 write libs on Python:
 
-- [] config
-- [] logger
-- [] minio
-- [] nats
+[x] config
+
+[x] logger
+
+[x] minio
+
+[x] nats
 
 create libs/grpc
+write grpc server initialisation on services
+write cli for permission and grpc codegen
+write libs/jwt
+write apps/auth
 
-<!-- -->write grpc server initialisation on services
+<!-- --> write apps/task
 
-move/rewrite logic between services
-write workers
-write cli
+update migrations (sync models)
+
+write workers:
+
+[] text
+
+[] audio
+
+[] video
+
+[] image
 
 configure prometheus + grafana
+
+collect dataset for yolo11
+train yolo11
+
+collect dataset for span_detector
+train span_detector
+
+update configs (docker, etc.)
+
+## Prerequisites
+
+- protoc
+- protoc-gen-go-grpc

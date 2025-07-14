@@ -15,8 +15,9 @@ const (
 )
 
 type File struct {
-	Id        int `json:"id"`
-	RequestId int `json:"request_id"`
+	Id        int    `json:"id"`
+	RequestId int    `json:"request_id"`
+	StatusId  Status `json:"status"`
 
 	ContentType      ContentType `json:"content_type"`
 	Filename         string      `json:"filename"`

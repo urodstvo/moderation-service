@@ -1,47 +1,45 @@
-// package webhook_routes
+package webhook
 
-// import (
-// 	"context"
-// 	"net/http"
+import (
+	"net/http"
 
-// 	"github.com/danielgtaylor/huma/v2"
-// 	"github.com/urodstvo/moderation-service/libs/logger"
-// 	"github.com/urodstvo/moderation-service/libs/models/service/webhook"
-// 	"go.uber.org/fx"
-// )
+	"github.com/danielgtaylor/huma/v2"
+	grpc "github.com/urodstvo/moderation-service/libs/grpc/webhook"
+	"github.com/urodstvo/moderation-service/libs/logger"
+	"go.uber.org/fx"
+)
 
-// type handler struct {
-// 	Logger         logger.Logger
-// 	WebhookService webhook.WebhookService
-// }
+type handler struct {
+	Logger logger.Logger
 
-// type Opts struct {
-// 	fx.In
+	client grpc.WebhookServiceClient
+}
 
-// 	Logger         logger.Logger
-// 	WebhookService webhook.WebhookService
-// 	Huma           huma.API
-// }
+type Opts struct {
+	fx.In
 
-// func NewWebhookRoutes(opts Opts) handler {
-// 	a := handler{
-// 		Logger:         opts.Logger,
-// 		WebhookService: opts.WebhookService,
-// 	}
+	Huma   huma.API
+	Logger logger.Logger
+	client grpc.WebhookServiceClient
+}
 
-// 	huma.Register(
-// 		opts.Huma,
-// 		huma.Operation{
-// 			OperationID: "webhook-register",
-// 			Method:      http.MethodPost,
-// 			Path:        "/webhook",
-// 			Tags:        []string{"Webhook"},
-// 			Summary:     "Webhook Register",
-// 		},
-// 		func(ctx context.Context, i *registerRequest) (*struct{}, error) {
-// 			return a.Register(ctx, *i)
-// 		},
-// 	)
+func NewWebhookRoutes(opts Opts) handler {
+	h := handler{
+		Logger: opts.Logger,
+		client: opts.client,
+	}
 
-// 	return a
-// }
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "webhook-register",
+			Method:      http.MethodPost,
+			Path:        "/webhook",
+			Tags:        []string{"Webhook"},
+			Summary:     "Webhook Registration",
+		},
+		h.Register,
+	)
+
+	return h
+}

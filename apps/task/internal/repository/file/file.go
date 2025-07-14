@@ -18,6 +18,7 @@ type FileRepository interface {
 	Create(ctx context.Context, requestId int, contentType string, filename string, originalFilename string) (int, error)
 	GetById(ctx context.Context, id int) (gomodels.File, error)
 	GetByRequestId(ctx context.Context, requestId int) ([]gomodels.File, error)
+	UpdateStatus(ctx context.Context, id int, status gomodels.Status) error
 }
 
 func NewFileRepository(db *pgxpool.Pool) FileRepository {

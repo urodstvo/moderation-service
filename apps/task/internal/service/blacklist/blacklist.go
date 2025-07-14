@@ -15,6 +15,7 @@ type BlacklistService interface {
 	Create(ctx context.Context, userId int, phrase string) error
 	GetByUserId(ctx context.Context, userId int) ([]gomodels.Blacklist, error)
 	GetOnlyPhrassesByUserId(ctx context.Context, userId int) ([]string, error)
+	Delete(ctx context.Context, id int) error
 }
 
 func NewBlacklistService(repo repo.BlacklistRepository) BlacklistService {
@@ -41,4 +42,8 @@ func (s *service) GetOnlyPhrassesByUserId(ctx context.Context, userId int) ([]st
 	}
 
 	return phrases, nil
+}
+
+func (s *service) Delete(ctx context.Context, id int) error {
+	return s.repo.Delete(ctx, id)
 }

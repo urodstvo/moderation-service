@@ -23,6 +23,8 @@ type Config struct {
 
 	NatsUrl string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
 
+	TemporalHost string `required:"false" default:"localhost:7233" envconfig:"TEMPORAL_HOST"`
+
 	JWTSecret string `required:"false" default:"jwt-secret" envconfig:"JWT_SECRET"`
 }
 

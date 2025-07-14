@@ -17,6 +17,7 @@ type repository struct {
 type BlacklistRepository interface {
 	Create(ctx context.Context, userId int, phrase string) error
 	GetByUserId(ctx context.Context, userId int) ([]gomodels.Blacklist, error)
+	Delete(ctx context.Context, id int) error
 }
 
 func NewBlacklistRepository(db *pgxpool.Pool) BlacklistRepository {

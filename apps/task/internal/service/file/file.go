@@ -15,6 +15,7 @@ type FileService interface {
 	Create(ctx context.Context, requestId int, contentType gomodels.ContentType, filename string, originalFilename string) (int, error)
 	GetById(ctx context.Context, id int) (gomodels.File, error)
 	GetByRequestId(ctx context.Context, requestId int) ([]gomodels.File, error)
+	UpdateStatus(ctx context.Context, id int, status gomodels.Status) error
 }
 
 func NewFileService(repo repo.FileRepository) FileService {
@@ -31,4 +32,8 @@ func (s *service) GetById(ctx context.Context, id int) (gomodels.File, error) {
 
 func (s *service) GetByRequestId(ctx context.Context, requestId int) ([]gomodels.File, error) {
 	return s.repo.GetByRequestId(ctx, requestId)
+}
+
+func (s *service) UpdateStatus(ctx context.Context, id int, status gomodels.Status) error {
+	return s.repo.UpdateStatus(ctx, id, status)
 }
