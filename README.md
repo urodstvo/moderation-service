@@ -64,8 +64,6 @@ write apps/auth
 
 <!-- --> write apps/task
 
-update migrations (sync models)
-
 write workers:
 
 [] text
@@ -76,7 +74,7 @@ write workers:
 
 [] image
 
-configure prometheus + grafana
+update migrations (sync models)
 
 collect dataset for yolo11
 train yolo11
@@ -84,6 +82,7 @@ train yolo11
 collect dataset for span_detector
 train span_detector
 
+configure prometheus + grafana
 update configs (docker, etc.)
 
 ## Prerequisites

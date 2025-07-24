@@ -34,7 +34,7 @@ func NewStatusRoutes(opts Opts) handler {
 		huma.Operation{
 			OperationID: "status-check",
 			Method:      http.MethodGet,
-			Path:        "/status/{requestId}",
+			Path:        "/request/{requestId}/status",
 			Tags:        []string{"Status"},
 			Summary:     "Status Check",
 		},
