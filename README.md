@@ -62,7 +62,8 @@ write cli for permission and grpc codegen
 write libs/jwt
 write apps/auth
 
-<!-- --> write apps/task
+move webhook registration to apps/webhook
+write grpc/auth for getting user_settings
 
 write workers:
 
@@ -74,13 +75,16 @@ write workers:
 
 [] image
 
+<!-- --> complete write apps/task
+
 update migrations (sync models)
+
+write frontend
+
+configure nginx
 
 collect dataset for yolo11
 train yolo11
-
-collect dataset for span_detector
-train span_detector
 
 configure prometheus + grafana
 update configs (docker, etc.)

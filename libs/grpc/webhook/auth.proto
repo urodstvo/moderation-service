@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/urodstvo/moderation-service/libs/grpc/auth";
+package auth;
+
+service WebhookService {
+  rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse); 
+}
+
+message GetUserSettingsRequest {
+  int32 userId = 1;
+}
+
+message GetUserSettingsResponse {
+  int32 userId = 1;
+  string ToxicityClassificationModelName = 2;
+}

@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/urodstvo/moderation-service/apps/task/internal/constants"
-	grpc "github.com/urodstvo/moderation-service/libs/grpc/webhook"
+	"github.com/urodstvo/moderation-service/apps/webhook/internal/constants"
 )
 
 type registerRequest struct {
@@ -15,12 +14,9 @@ type registerRequest struct {
 }
 
 func (h *handler) Register(ctx context.Context, req *registerRequest) (*struct{}, error) {
-	userId := ctx.Value(constants.UserIdContextKey).(int32)
+	userId := ctx.Value(constants.UserIdContextKey).(int)
 
-	_, err := h.client.UpdateWebhook(ctx, &grpc.UpdateWebhookRequest{
-		UserId:     userId,
-		WebhookUrl: req.Body.WebhookUrl,
-	})
+	err := h.Service.CreateOrUpdate(ctx, req.Body.WebhookUrl, userId)
 	if err != nil {
 		return nil, huma.Error500InternalServerError("Failed to register webhook")
 	}

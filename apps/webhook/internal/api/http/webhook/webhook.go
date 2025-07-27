@@ -4,15 +4,14 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
-	grpc "github.com/urodstvo/moderation-service/libs/grpc/webhook"
+	"github.com/urodstvo/moderation-service/apps/webhook/internal/service/webhook"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"go.uber.org/fx"
 )
 
 type handler struct {
-	Logger logger.Logger
-
-	client grpc.WebhookServiceClient
+	Logger  logger.Logger
+	Service webhook.WebhookService
 }
 
 type Opts struct {
@@ -20,13 +19,14 @@ type Opts struct {
 
 	Huma   huma.API
 	Logger logger.Logger
-	client grpc.WebhookServiceClient
+
+	Service webhook.WebhookService
 }
 
 func NewWebhookRoutes(opts Opts) handler {
 	h := handler{
-		Logger: opts.Logger,
-		client: opts.client,
+		Logger:  opts.Logger,
+		Service: opts.Service,
 	}
 
 	huma.Register(
