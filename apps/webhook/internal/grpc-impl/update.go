@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/urodstvo/moderation-service/libs/grpc/webhook"
+	"github.com/urodstvo/moderation-service/libs/grpc/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (i *Impl) UpdateWebhook(ctx context.Context, req *webhook.UpdateWebhookRequest) (*emptypb.Empty, error) {
+func (i *Impl) UpdateWebhook(ctx context.Context, req *proto.UpdateWebhookRequest) (*emptypb.Empty, error) {
 	url := req.WebhookUrl
 	userId := req.UserId
 

@@ -21,6 +21,7 @@ type Result struct {
 type ResultService interface {
 	Create(ctx context.Context, requestId int, result string) error
 	GetByTaskId(ctx context.Context, requestId int) (*Result, error)
+	UpdateFormatted(ctx context.Context, requestId int, result string) error
 }
 
 func NewResultService(repo repo.ResultRepository) ResultService {
@@ -58,4 +59,8 @@ func (s *service) GetByTaskId(ctx context.Context, requestId int) (*Result, erro
 		Raw:       parsedRawContent,
 		Formatted: parsedFormattedContent,
 	}, nil
+}
+
+func (s *service) UpdateFormatted(ctx context.Context, requestId int, result string) error {
+	return s.repo.UpdateFormatted(ctx, requestId, result)
 }

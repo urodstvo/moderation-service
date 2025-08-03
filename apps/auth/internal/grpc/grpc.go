@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	grpcimpl "github.com/urodstvo/moderation-service/apps/webhook/internal/grpc-impl"
+	grpcimpl "github.com/urodstvo/moderation-service/apps/auth/internal/grpc-impl"
 	"github.com/urodstvo/moderation-service/libs/grpc/constants"
 	"github.com/urodstvo/moderation-service/libs/grpc/proto"
 	"github.com/urodstvo/moderation-service/libs/logger"
@@ -23,13 +23,13 @@ type Opts struct {
 }
 
 func New(opts Opts) error {
-	grpcNetListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", constants.WEBHOOK_SERVER_PORT))
+	grpcNetListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", constants.AUTH_SERVER_PORT))
 	if err != nil {
 		return err
 	}
 
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
-	proto.RegisterWebhookServiceServer(grpcServer, &opts.Service)
+	proto.RegisterAuthServiceServer(grpcServer, &opts.Service)
 
 	opts.LC.Append(
 		fx.Hook{

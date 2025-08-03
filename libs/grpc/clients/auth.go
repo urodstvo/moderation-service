@@ -8,14 +8,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewGRPCWebhookClient(env string) proto.WebhookServiceClient {
-	serverAddress := createClientAddr(env, "webhook", constants.WEBHOOK_SERVER_PORT)
+func NewGRPCAuthClient(env string) proto.AuthServiceClient {
+	serverAddress := createClientAddr(env, "auth", constants.AUTH_SERVER_PORT)
 
 	conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
 	if err != nil {
 		log.Fatalf("did not created conn: %v", err)
 	}
-	c := proto.NewWebhookServiceClient(conn)
+	c := proto.NewAuthServiceClient(conn)
 
 	return c
 }

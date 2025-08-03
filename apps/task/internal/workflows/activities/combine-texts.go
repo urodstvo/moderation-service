@@ -1,15 +1,13 @@
 package activities
 
-type TextItem struct {
-	Id       int    `json:"id"`
-	Filename string `json:"filename"`
-	Text     string `json:"text"`
-}
+import (
+	"context"
 
-type TextItems []TextItem
+	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/types"
+)
 
-func (a *Activity) CombineTexts(input []TextItems) TextItems {
-	var result TextItems
+func (a *Activity) CombineTexts(ctx context.Context, input [][]types.ResultItem) []types.ResultItem {
+	var result []types.ResultItem
 	for _, part := range input {
 		result = append(result, part...)
 	}

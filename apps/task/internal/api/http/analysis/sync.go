@@ -9,6 +9,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/urodstvo/moderation-service/apps/task/internal/constants"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/types"
+	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 	"go.temporal.io/sdk/client"
 )
 
@@ -36,8 +37,10 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 	}
 
 	var (
-		errorFilesMu sync.Mutex
-		errorFiles   []string
+		errorFilesMu   sync.Mutex
+		errorFiles     []string
+		successFilesMu sync.Mutex
+		successFiles   = make(map[gomodels.ContentType][]types.FileTypeParams)
 
 		wg        sync.WaitGroup
 		semaphore = make(chan struct{}, 5)
@@ -69,12 +72,21 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 				return
 			}
 
-			if _, err := h.FileService.Create(ctx, requestId, fileType, uniqueFileName, file.Filename); err != nil {
+			fileId, err := h.FileService.Create(ctx, requestId, fileType, uniqueFileName, file.Filename)
+			if err != nil {
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
 				return
 			}
+
+			successFilesMu.Lock()
+			successFiles[fileType] = append(successFiles[fileType], types.FileTypeParams{
+				Filename:         uniqueFileName,
+				OriginalFilename: file.Filename,
+				Id:               fileId,
+			})
+			successFilesMu.Unlock()
 		}()
 	}
 
@@ -83,8 +95,19 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 	workflowID := fmt.Sprintf("request-%d-%d", requestId, time.Now().UnixNano())
 
 	workflowParams := types.WorkflowParams{
+		UserId:    userId,
 		RequestId: requestId,
 		IsAsync:   true,
+		Files: struct {
+			Images []types.FileTypeParams
+			Videos []types.FileTypeParams
+			Audios []types.FileTypeParams
+			Texts  []types.FileTypeParams
+		}{Images: successFiles[gomodels.ContentTypeImage],
+			Texts:  successFiles[gomodels.ContentTypeText],
+			Audios: successFiles[gomodels.ContentTypeAudio],
+			Videos: successFiles[gomodels.ContentTypeVideo],
+		},
 	}
 
 	run, err := h.Temporal.ExecuteWorkflow(ctx, client.StartWorkflowOptions{

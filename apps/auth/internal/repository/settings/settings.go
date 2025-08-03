@@ -1,4 +1,4 @@
-package result
+package settings
 
 import (
 	"context"
@@ -14,13 +14,11 @@ type repository struct {
 	getter *trmpgx.CtxGetter
 }
 
-type ResultRepository interface {
-	Create(ctx context.Context, requestId int, result string) error
-	GetByRequestId(ctx context.Context, requestId int) (gomodels.RequestResult, error)
-	UpdateFormatted(ctx context.Context, requestId int, result string) error
+type SettingsRepository interface {
+	GetByUserId(ctx context.Context, userId int) (gomodels.Settings, error)
 }
 
-func NewResultRepository(db *pgxpool.Pool) ResultRepository {
+func NewSettingsRepository(db *pgxpool.Pool) SettingsRepository {
 	return &repository{
 		db:     db,
 		getter: trmpgx.DefaultCtxGetter,

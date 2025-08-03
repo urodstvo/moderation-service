@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/urodstvo/moderation-service/libs/grpc/webhook"
+	"github.com/urodstvo/moderation-service/libs/grpc/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (i *Impl) SendByWebhook(ctx context.Context, req *webhook.SendByWebhookRequest) (*emptypb.Empty, error) {
+func (i *Impl) SendByWebhook(ctx context.Context, req *proto.SendByWebhookRequest) (*emptypb.Empty, error) {
 	userAgent := "moderation-service"
 
 	webhook, err := i.WebhookService.GetByUserId(ctx, int(req.UserId))

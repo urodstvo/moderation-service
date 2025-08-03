@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-option go_package = "github.com/urodstvo/moderation-service/libs/grpc/auth";
-package auth;
+option go_package = "github.com/urodstvo/moderation-service/libs/grpc/proto";
+package proto;
 
-service WebhookService {
+service AuthService {
   rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse); 
 }
 
