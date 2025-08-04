@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/urodstvo/moderation-service/apps/task/internal/api/http"
+	"github.com/urodstvo/moderation-service/apps/task/internal/api/http/analysis"
+	"github.com/urodstvo/moderation-service/apps/task/internal/api/http/blacklist"
+	"github.com/urodstvo/moderation-service/apps/task/internal/api/http/status"
 	blacklist_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/blacklist"
 	file_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/file"
 	request_repo "github.com/urodstvo/moderation-service/apps/task/internal/repository/request"
@@ -52,6 +55,10 @@ func main() {
 			http.NewHuma,
 			grpc_clients.NewGRPCWebhookClient,
 		),
-		fx.Invoke(),
+		fx.Invoke(
+			analysis.NewAnalysisRoutes,
+			blacklist.NewBlacklistRoutes,
+			status.NewStatusRoutes,
+		),
 	).Run()
 }

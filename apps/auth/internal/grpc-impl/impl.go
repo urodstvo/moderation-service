@@ -4,6 +4,7 @@ import (
 	service "github.com/urodstvo/moderation-service/apps/auth/internal/service/settings"
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/grpc/proto"
+	"go.uber.org/fx"
 )
 
 type Impl struct {
@@ -11,4 +12,18 @@ type Impl struct {
 
 	SettingsService service.SettingsService
 	Config          config.Config
+}
+
+type Opts struct {
+	fx.In
+
+	SettingsService service.SettingsService
+	Config          config.Config
+}
+
+func NewImpl(opts Opts) *Impl {
+	return &Impl{
+		SettingsService: opts.SettingsService,
+		Config:          opts.Config,
+	}
 }
