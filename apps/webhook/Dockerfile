@@ -1,29 +1,19 @@
 # Этап сборки
-FROM golang:1.23.2-alpine AS builder
+FROM golang:1.24-alpine AS builder
+RUN apk add --no-cache git ca-certificates
 
-# Установка зависимостей для работы с Go workspace
-RUN apk add --no-cache git
-
-# Указываем рабочую директорию в контейнере
-WORKDIR /app
-
-# Копируем структуру проекта, включая все локальные библиотеки и приложения
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
 COPY . .
 
-# Собираем программу для Linux
-RUN GOOS=linux GOARCH=amd64 go build -o /app/main ./apps/result-agregator/cmd/main.go
+# Build webhook service
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /app/main ./apps/webhook/cmd
 
-# Этап для запуска
 FROM alpine:latest
-
-# Устанавливаем рабочую директорию в контейнере
+RUN apk add --no-cache ca-certificates
 WORKDIR /app
-
-# Копируем бинарник из этапа сборки
 COPY --from=builder /app/main .
-
-# Делаем бинарник исполнимым
-RUN chmod +x ./main
-
-# Запускаем бинарник
+RUN chmod +x /app/main
+EXPOSE 8000
 CMD ["/app/main"]

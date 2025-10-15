@@ -1,207 +1,166 @@
 version: "3.9"
 
-name: moderation-service-v3-dev
-
 services:
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - "8888:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=postgres:5432
-      - ADMINER_PLUGINS=enum-option json-column
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - moderation-net
-
   postgres:
-    image: postgres:latest
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-moderation}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 2s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
       timeout: 5s
       retries: 10
     ports:
       - "5432:5432"
-    networks:
-      - moderation-net
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-01-01T00-00-00Z
     command: server --address ":9000" --console-address ":9001" /data
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123}
     volumes:
       - minio_data:/data
     ports:
       - "9000:9000"
       - "9001:9001"
-    networks:
-      - moderation-net
 
-  nats:
-    restart: always
-    image: nats:latest
-    container_name: nats
-    command: -js -m 8222
+  # nats:
+  #   image: nats:2.10.6
+  #   command: -js -m 8222
+  #   ports:
+  #     - "4222:4222"
+  #     - "8222:8222"
+
+  adminer:
+    image: adminer
     ports:
-      - "4222:4222"
-      - "8222:8222"
-    networks:
-      - moderation-net
+      - "8888:8080"
+    depends_on:
+      - postgres
 
-  # auth-service:
-  #   container_name: authorization-service
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/auth/Dockerfile
-  #   env_file: ".env"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   networks:
-  #     - moderation-net
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+    ports:
+      - "8001:8000"
 
-  # task-service:
-  #   container_name: task-service
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/task/Dockerfile
-  #   env_file: ".env"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #   networks:
-  #     - moderation-net
+  task-service:
+    build:
+      context: .
+      dockerfile: ./apps/task/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+      # - nats  # Uncomment if you enable NATS
+    ports:
+      - "8000:8000"
 
-  # webhook-service:
-  #   container_name: webhook-service
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/webhook/Dockerfile
-  #   env_file: ".env"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #   networks:
-  #     - moderation-net
+  webhook:
+    build:
+      context: .
+      dockerfile: ./apps/webhook/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "8002:8000"
 
-  # text-worker:
-  #   container_name: text-analysis-worker
-  #   build: ./apps/workers/text
-  #   env_file: ".env"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #     nats:
-  #       condition: service_started
-  #   networks:
-  #     - moderation-net
+  text-worker:
+    build:
+      context: ./apps/workers/text
+      dockerfile: Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+      # - nats  # Uncomment if you enable NATS
 
-  # ...
+  image-worker:
+    build:
+      context: ./apps/workers/image
+      dockerfile: Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+      # - nats  # Uncomment if you enable NATS
 
-  # moderation:
-  #   container_name: moderation
-  #   build:
-  #     context: ./apps/moderation
-  #     dockerfile: Dockerfile
-  #   env_file: ".env"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     minio:
-  #       condition: service_started
-  #     nats:
-  #       condition: service_started
-  #   networks:
-  #     - moderation-net
+  audio-worker:
+    build:
+      context: ./apps/workers/audio
+      dockerfile: Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+      # - nats  # Uncomment if you enable NATS
+
+  video-worker:
+    build:
+      context: ./apps/workers/video
+      dockerfile: Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+      - nats
 
   temporal:
-    image: temporalio/auto-setup
-    restart: unless-stopped
+    image: temporalio/auto-setup:1.20.0
     depends_on:
       - postgres
     environment:
       - DB=postgresql
       - DB_PORT=5432
-      # this is db addr
       - POSTGRES_SEEDS=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PWD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD:-postgres}
       - POSTGRES_DB=temporal
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/temporal.yaml
+      - DYNAMIC_CONFIG_FILE_PATH=/etc/temporal/config/dynamicconfig/temporal.yaml
     volumes:
       - ./configs/temporal:/etc/temporal/config/dynamicconfig
-    networks:
-      - moderation-net
     ports:
       - "7233:7233"
 
-  temporal-admin-tools:
-    image: temporalio/admin-tools
-    restart: unless-stopped
-    depends_on:
-      - temporal
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CLI_ADDRESS=temporal:7233
-    networks:
-      - moderation-net
-    stdin_open: true
-    tty: true
-
   temporal-ui:
     image: temporalio/ui:2.21.0
-    restart: unless-stopped
     depends_on:
       - temporal
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
-    networks:
-      - moderation-net
     ports:
       - "7234:8080"
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     ports:
-      - 9090:9090
+      - "9090:9090"
     volumes:
-      - .configs/prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - moderation-net
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:9.0.0
     ports:
-      - 3000:3000
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=your_password
-    networks:
-      - moderation-net
 
 volumes:
   postgres_data:
   minio_data:
 
 networks:
-  moderation-net:
+  default:
     driver: bridge
-    external: true

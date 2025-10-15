@@ -1,0 +1,8 @@
+version: 1
+services:
+  frontend:
+    enabled: true
+  matching:
+    enabled: true
+  worker:
+    enabled: true
