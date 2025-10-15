@@ -14,8 +14,8 @@ type Opts struct {
 
 	Logger logger.Logger
 
-	WebhoockClient proto.WebhookServiceClient
-	AuthClient     proto.AuthServiceClient
+	WebhookClient proto.WebhookServiceClient
+	AuthClient    proto.AuthServiceClient
 
 	BlacklistService blacklist.BlacklistService
 	ResultService    result.ResultService
@@ -25,8 +25,8 @@ type Opts struct {
 type Activity struct {
 	Logger logger.Logger
 
-	WebhoockClient proto.WebhookServiceClient
-	AuthClient     proto.AuthServiceClient
+	WebhookClient proto.WebhookServiceClient
+	AuthClient    proto.AuthServiceClient
 
 	BlacklistService blacklist.BlacklistService
 	RequestService   request.RequestService
@@ -36,7 +36,7 @@ type Activity struct {
 func New(opts Opts) *Activity {
 	return &Activity{
 		Logger:           opts.Logger,
-		WebhoockClient:   opts.WebhoockClient,
+		WebhookClient:    opts.WebhookClient,
 		AuthClient:       opts.AuthClient,
 		BlacklistService: opts.BlacklistService,
 		ResultService:    opts.ResultService,

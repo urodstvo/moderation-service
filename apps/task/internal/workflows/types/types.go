@@ -38,7 +38,16 @@ type WorkflowResultFile struct {
 	Filename       string               `json:"filename"` //original
 	ContentType    gomodels.ContentType `json:"content_type"`
 	RecognizedText *string              `json:"recognized_text"`
-	Classification any                  `json:"classification"`
+	Classification Classification       `json:"classification"`
+	Words          []DeletedWord        `json:"words,omitempty"`
+}
+
+type DeletedWord struct {
+	Word  string  `json:"word"`
+	Score float64 `json:"score"`
+	Start int     `json:"start"`
+	End   int     `json:"end"`
+	Label string  `json:"label"`
 }
 
 type TextResultItem struct {
@@ -47,7 +56,17 @@ type TextResultItem struct {
 	Filename         string
 	RecognizedText   string
 	ContentType      gomodels.ContentType
-	Classification   string
+	Classification   Classification
+	Words            []DeletedWord
+}
+
+type Classification struct {
+	Toxicity       float64 `json:"toxicity"`
+	SevereToxicity float64 `json:"severe_toxicity"`
+	Obscene        float64 `json:"obscene"`
+	Threat         float64 `json:"threat"`
+	Insult         float64 `json:"insult"`
+	IdentityAttack float64 `json:"identity_attack"`
 }
 
 type ResultItem struct {

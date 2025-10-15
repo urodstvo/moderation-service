@@ -19,7 +19,7 @@ func (a *Activity) CallWebhook(ctx context.Context, userId int, input any) error
 		Message: string(inputBytes),
 	}
 
-	if _, err := a.WebhoockClient.SendByWebhook(ctx, req); err != nil {
+	if _, err := a.WebhookClient.SendByWebhook(ctx, req); err != nil {
 		return fmt.Errorf("failed to send webhook: %w", err)
 	}
 	return nil

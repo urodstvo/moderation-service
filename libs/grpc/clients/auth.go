@@ -13,7 +13,7 @@ func NewGRPCAuthClient(env string) proto.AuthServiceClient {
 
 	conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
 	if err != nil {
-		log.Fatalf("did not created conn: %v", err)
+		log.Fatalf("failed to create conn: %v", err)
 	}
 	c := proto.NewAuthServiceClient(conn)
 

@@ -14,6 +14,7 @@ class Config:
     CDNAccessToken: str
     CDNSecretToken: str
     NatsUrl: str = "localhost:4222"
+    TemporalClientUrl: str = "localhost:7233"
 
 
 def get_config() -> Config:
@@ -32,6 +33,7 @@ def get_config() -> Config:
         CDNAccessToken=os.getenv("S3_ACCESS_TOKEN"),
         CDNSecretToken=os.getenv("S3_SECRET_TOKEN"),
         NatsUrl=os.getenv("NATS_URL", "localhost:4222"),
+        TemporalClientUrl=os.getenv("TEMPORAL_CLIENT_URL", "localhost:7233"),
     )
 
     validate_config(config)
@@ -51,3 +53,5 @@ def validate_config(config: Config) -> None:
         raise ValueError("S3_ACCESS_TOKEN is required")
     if not config.S3SecretToken:
         raise ValueError("S3_SECRET_TOKEN is required")
+    if not config.TemporalClientUrl:
+        raise ValueError("TEMPORAL_CLIENT_URL is required")

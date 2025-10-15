@@ -8,6 +8,7 @@ use (
 	./libs/config
 	./libs/fx
 	./libs/grpc
+	./libs/jwt
 	./libs/logger
 	./libs/minio
 	./libs/models

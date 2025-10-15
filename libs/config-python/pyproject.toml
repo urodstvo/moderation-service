@@ -1,11 +1,9 @@
 [tool.poetry]
 name = "config"
-version = "0.0.0"
+version = "0.1.0"
 description = ""
-authors = [
-    {name = "urodstvo"}
-]
-license = {text = "MIT"}    
+license = "MIT"
+authors = []
 packages = [{include = "config"}]
 
 [tool.poetry.dependencies]

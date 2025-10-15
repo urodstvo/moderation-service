@@ -13,7 +13,7 @@ func NewGRPCWebhookClient(env string) proto.WebhookServiceClient {
 
 	conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
 	if err != nil {
-		log.Fatalf("did not created conn: %v", err)
+		log.Fatalf("failed to create conn: %v", err)
 	}
 	c := proto.NewWebhookServiceClient(conn)
 

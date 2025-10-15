@@ -24,6 +24,7 @@ func (a *Activity) AssembleResult(ctx context.Context, requestId int, text []typ
 			ContentType:    t.ContentType,
 			RecognizedText: &t.RecognizedText,
 			Classification: t.Classification,
+			Words:          t.Words,
 		})
 	}
 

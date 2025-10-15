@@ -1,11 +1,9 @@
 [tool.poetry]
 name = "logger"
-version = "0.0.0"
+version = "0.1.0"
 description = ""
-authors = [
-    {name = "urodstvo"}
-]
-license = {text = "MIT"}    
+authors = []
+license = "MIT"   
 packages = [{include = "logger"}]
 
 [tool.poetry.dependencies]

@@ -1,12 +1,10 @@
 [tool.poetry]
-name = "minio"
-version = "0.0.0"
+name = "minio_client"
+version = "0.1.0"
 description = ""
-authors = [
-    {name = "urodstvo"}
-]
-license = {text = "MIT"}    
-packages = [{include = "minio"}]
+authors = []
+license = "MIT"
+packages = [{include = "minio_client"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4"
