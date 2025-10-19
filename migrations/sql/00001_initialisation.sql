@@ -37,21 +37,21 @@ CREATE TABLE "webhooks" (
   "webhook_url" text NOT NULL
 );
 
-CREATE TABLE "task_status_nodes" (
-  "task_id" INTEGER NOT NULL,
-  "node_key" VARCHAR(255) NOT NULL,
+CREATE TABLE "status_nodes" (
+  "request_id" INTEGER NOT NULL,
+  "title" VARCHAR(255) NOT NULL,
   "status" node_status NOT NULL DEFAULT (node_status.created),
   "details" jsonb,
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now()),
-  PRIMARY KEY ("task_id", "node_key")
+  PRIMARY KEY ("request_id", "title")
 );
 
-CREATE TABLE "task_status_node_relations" (
-  "task_id" INTEGER NOT NULL,
-  "parent_key" VARCHAR(255) NOT NULL,
-  "child_key" VARCHAR(255) NOT NULL,
-  PRIMARY KEY ("task_id", "parent_key", "child_key")
+CREATE TABLE "status_node_relations" (
+  "request_id" INTEGER NOT NULL,
+  "parent_title" VARCHAR(255) NOT NULL,
+  "child_title" VARCHAR(255) NOT NULL,
+  PRIMARY KEY ("request_id", "parent_title", "child_title")
 );
 
 CREATE TABLE "task_groups" (

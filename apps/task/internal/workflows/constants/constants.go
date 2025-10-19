@@ -11,6 +11,8 @@ const (
 	ImageWorkflowName      = "image_workflow"
 	AudioWorkflowName      = "audio_workflow"
 	VideoWorkflowName      = "video_workflow"
+	CreateStatusSignalName = "create_status_signal"
+	UpdateStatusSignalName = "update_status_signal"
 )
 
 type EventsWorkflowExecutionState struct{}

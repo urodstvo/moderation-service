@@ -15,6 +15,9 @@ import (
 	request_service "github.com/urodstvo/moderation-service/apps/task/internal/service/request"
 	result_service "github.com/urodstvo/moderation-service/apps/task/internal/service/result"
 	status_service "github.com/urodstvo/moderation-service/apps/task/internal/service/status"
+	"github.com/urodstvo/moderation-service/apps/task/internal/temporal"
+	"github.com/urodstvo/moderation-service/apps/task/internal/workflows"
+	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/activities"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
 	grpc_clients "github.com/urodstvo/moderation-service/libs/grpc/clients"
 	"github.com/urodstvo/moderation-service/libs/minio"
@@ -54,11 +57,14 @@ func main() {
 			server.New,
 			http.NewHuma,
 			grpc_clients.NewGRPCWebhookClient,
+			activities.New,
+			workflows.New,
 		),
 		fx.Invoke(
 			analysis.NewAnalysisRoutes,
 			blacklist.NewBlacklistRoutes,
 			status.NewStatusRoutes,
+			temporal.NewMainWorker,
 		),
 	).Run()
 }

@@ -41,6 +41,8 @@ func NewMainWorker(opts Opts) error {
 	temporalWorker.RegisterActivity(opts.Activities.CallWebhook)
 	temporalWorker.RegisterActivity(opts.Activities.CombineTexts)
 	temporalWorker.RegisterActivity(opts.Activities.GetBlacklist)
+	temporalWorker.RegisterActivity(opts.Activities.PersistCreateNode)
+	temporalWorker.RegisterActivity(opts.Activities.PersistUpdateNodeStatus)
 
 	opts.Lc.Append(
 		fx.Hook{

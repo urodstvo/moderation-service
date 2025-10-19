@@ -7,25 +7,24 @@ import (
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
-func (r *repository) CreateNode(ctx context.Context, node gomodels.StatusNode) error {
+func (r *repository) CreateNode(ctx context.Context, node gomodels.StatusNode) (int, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
 	query, args, err := sq.Insert("status_nodes").
 		Columns("request_id", "title", "details").
-		Values(node.RequestId, node.Title, node.Details).ToSql()
+		Values(node.RequestId, node.Title, node.Details).
+		Suffix("RETURNING id").
+		ToSql()
 
 	if err != nil {
-		return fmt.Errorf("failed to build query: %w", err)
+		return 0, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	cmdTag, err := conn.Exec(ctx, query, args...)
+	var id int
+	err = conn.QueryRow(ctx, query, args...).Scan(&id)
 	if err != nil {
-		return fmt.Errorf("failed to execute query: %w", err)
+		return 0, fmt.Errorf("failed to execute query: %w", err)
 	}
 
-	if cmdTag.RowsAffected() == 0 {
-		return fmt.Errorf("no rows inserted")
-	}
-
-	return nil
+	return id, nil
 }

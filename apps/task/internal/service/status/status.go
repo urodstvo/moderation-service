@@ -12,7 +12,7 @@ type service struct {
 }
 
 type StatusTreeService interface {
-	CreateNode(ctx context.Context, requestId int, title string, details *string) error
+	CreateNode(ctx context.Context, requestId int, title string, details *string) (int, error)
 	CreateRelation(ctx context.Context, requestId int, parentId int, childId int) error
 	UpdateStatus(ctx context.Context, requestId int, status gomodels.Status) error
 
@@ -32,9 +32,10 @@ func (s *service) CreateRelation(ctx context.Context, requestId int, parentId in
 	return s.repo.CreateRelation(ctx, relation)
 }
 
-func (s *service) CreateNode(ctx context.Context, requestId int, title string, details *string) error {
+func (s *service) CreateNode(ctx context.Context, requestId int, title string, details *string) (int, error) {
 	if details == nil {
-		*details = ""
+		empty := ""
+		details = &empty
 	}
 
 	treeNode := gomodels.StatusNode{

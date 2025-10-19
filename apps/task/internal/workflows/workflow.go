@@ -32,6 +32,31 @@ func New(opts Opts) *Workflow {
 }
 
 func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*types.WorkflowResult, error) {
+	createCh := workflow.GetSignalChannel(ctx, constants.CreateStatusSignalName)
+	updateCh := workflow.GetSignalChannel(ctx, constants.UpdateStatusSignalName)
+
+	selector := workflow.NewSelector(ctx)
+	selector.AddReceive(createCh, func(c workflow.ReceiveChannel, _ bool) {
+		var payload map[string]interface{}
+		c.Receive(ctx, &payload)
+		_ = workflow.ExecuteActivity(ctx, w.Activity.PersistCreateNode, payload).Get(ctx, nil)
+	})
+	selector.AddReceive(updateCh, func(c workflow.ReceiveChannel, _ bool) {
+		var payload map[string]interface{}
+		c.Receive(ctx, &payload)
+		_ = workflow.ExecuteActivity(ctx, w.Activity.PersistUpdateNodeStatus, payload).Get(ctx, nil)
+	})
+
+	stopCh := workflow.NewChannel(ctx)
+	workflow.Go(ctx, func(ctx workflow.Context) {
+		for {
+			selector.Select(ctx)
+			var stop bool
+			if stopCh.ReceiveAsync(&stop) && stop {
+				return
+			}
+		}
+	})
 	audioCtx := createChildContext(ctx, constants.AudioWorkflowQueueName)
 	audioFuture := workflow.ExecuteChildWorkflow(audioCtx, constants.AudioWorkflowName, params.RequestId, params.UserId, params.Files.Audios)
 
@@ -101,6 +126,8 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		}
 		return nil, nil
 	}
+
+	stopCh.Send(ctx, true)
 
 	return &finalResult, nil
 }

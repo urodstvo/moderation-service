@@ -15,7 +15,7 @@ type repository struct {
 }
 
 type StatusTreeRepository interface {
-	CreateNode(ctx context.Context, node gomodels.StatusNode) error
+	CreateNode(ctx context.Context, node gomodels.StatusNode) (int, error)
 	GetByRequestId(ctx context.Context, requestId int) ([]gomodels.StatusNode, error)
 	GetRelationsByRequestId(ctx context.Context, requestkId int) ([]gomodels.StatusNodeRelation, error)
 	UpdateNodeStatus(ctx context.Context, nodeId int, status gomodels.Status) error
