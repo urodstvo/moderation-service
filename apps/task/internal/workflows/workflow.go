@@ -39,12 +39,12 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 	selector.AddReceive(createCh, func(c workflow.ReceiveChannel, _ bool) {
 		var payload map[string]interface{}
 		c.Receive(ctx, &payload)
-		_ = workflow.ExecuteActivity(ctx, w.Activity.PersistCreateNode, payload).Get(ctx, nil)
+		_ = workflow.ExecuteActivity(ctx, w.Activity.CreateNode, payload).Get(ctx, nil)
 	})
 	selector.AddReceive(updateCh, func(c workflow.ReceiveChannel, _ bool) {
 		var payload map[string]interface{}
 		c.Receive(ctx, &payload)
-		_ = workflow.ExecuteActivity(ctx, w.Activity.PersistUpdateNodeStatus, payload).Get(ctx, nil)
+		_ = workflow.ExecuteActivity(ctx, w.Activity.UpdateNodeStatus, payload).Get(ctx, nil)
 	})
 
 	stopCh := workflow.NewChannel(ctx)
