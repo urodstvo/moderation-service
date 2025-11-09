@@ -10,12 +10,12 @@ import (
 )
 
 func createClientAddr(env, service string, port int) string {
-	ip := fmt.Sprintf("dns:///%s", service)
-	if env != "production" {
-		ip = "127.0.0.1"
-	}
-
-	return fmt.Sprintf("%s:%v", ip, port)
+    if env == "production" {
+        // DNS‑SRV только в проде
+        return fmt.Sprintf("dns:///%s:%d", service, port)
+    }
+    // Локально – обычный TCP
+    return fmt.Sprintf("127.0.0.1:%d", port)
 }
 
 var defaultClientsOptions = []grpc.DialOption{

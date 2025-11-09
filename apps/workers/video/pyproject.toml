@@ -8,8 +8,8 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-config = { path = "../../../libs/config-python"}
-logger = { path = "../../../libs/logger-python"}
+app_config = { path = "../../../libs/config-python"}
+app_logger = { path = "../../../libs/logger-python"}
 minio_client = { path = "../../../libs/minio-python"}
 temporalio = ">=1.15.0,<2.0.0"
 numpy = "^2.3.3"

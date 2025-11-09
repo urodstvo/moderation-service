@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from temporalio import activity
 from typing import List
 from .retrieve import DeletedWord, TextRetrievingResult
 from .classify import ClassificationResult, Classification as ItemClassification
@@ -19,6 +20,7 @@ class Item:
     filename: str
     text: str  
 
+@activity.defn
 def assemble_result(
     workflow_id: int,
     items: List[Item],

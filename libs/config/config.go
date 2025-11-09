@@ -23,24 +23,31 @@ type Config struct {
 
 	NatsUrl string `required:"false" default:"localhost:4222" envconfig:"NATS_URL"`
 
-	TemporalHost string `required:"false" default:"localhost:7233" envconfig:"TEMPORAL_HOST"`
-
 	JWTSecret string `required:"false" default:"jwt-secret" envconfig:"JWT_SECRET"`
+
+	// Temporal configuration
+	TemporalHost string `required:"false" default:"localhost" envconfig:"TEMPORAL_HOST"`
+	TemporalPort int    `required:"false" default:"7233" envconfig:"TEMPORAL_PORT"`
+
+	// Server configuration
+	Port int `required:"false" default:"8000" envconfig:"PORT"`
 }
-
 func NewWithEnvPath(envPath string) (*Config, error) {
-	fmt.Println("Loading .env from:", envPath)
-	var newCfg Config
-	_ = godotenv.Overload(envPath)
-
-	fmt.Println("Postgres URL:", os.Getenv("POSTGRES_URL"))
-
-	if err := envconfig.Process("", &newCfg); err != nil {
-		return nil, err
+	if envPath != "" {
+		fmt.Println("Loading .env from:", envPath)
+		if err := godotenv.Overload(envPath); err != nil {
+			return nil, fmt.Errorf("godotenv overload %s: %w", envPath, err)
+		}
+	} else {
+		fmt.Println("No .env file found – using system environment only")
 	}
 
-	// fmt.Println(newCfg.DatabaseUrl)
-	return &newCfg, nil
+	var cfg Config
+	if err := envconfig.Process("", &cfg); err != nil {
+		return nil, fmt.Errorf("envconfig process: %w", err)
+	}
+
+	return &cfg, nil
 }
 
 func New() (*Config, error) {
@@ -49,16 +56,27 @@ func New() (*Config, error) {
 		return nil, err
 	}
 
+	// Специфика проекта: если мы внутри /workspace/* → считаем корень /workspace
 	if strings.HasPrefix(wd, "/workspace") {
 		wd = "/workspace"
-	} else {
-		wd = filepath.Join(wd, "..", "..")
 	}
 
-	envPath := filepath.Join(wd, ".env")
-	// fmt.Println(envPath)
+	dir := wd
+	for {
+		envPath := filepath.Join(dir, ".env")
+		if _, err := os.Stat(envPath); err == nil {
+			return NewWithEnvPath(envPath)
+		}
 
-	return NewWithEnvPath(envPath)
+		parent := filepath.Dir(dir)
+		if parent == dir { // корень файловой системы
+			break
+		}
+		dir = parent
+	}
+
+	// .env не найден → работаем без него
+	return NewWithEnvPath("")
 }
 
 func NewFx() Config {

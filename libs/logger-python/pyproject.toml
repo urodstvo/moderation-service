@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "logger"
+name = "app_logger"
 version = "0.1.0"
 description = ""
 authors = []
 license = "MIT"   
-packages = [{include = "logger"}]
+packages = [{include = "app_logger"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4"
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

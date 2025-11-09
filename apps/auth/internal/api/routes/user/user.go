@@ -1,6 +1,9 @@
 package user
 
 import (
+	"context"
+	"net/http"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/urodstvo/moderation-service/apps/auth/internal/service/token"
 	"github.com/urodstvo/moderation-service/apps/auth/internal/service/user"
@@ -33,6 +36,22 @@ func NewUserRoutes(opts Opts) User {
 		TokenService: opts.TokenService,
 		Config:       opts.Config,
 	}
+
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "user-get-me",
+			Method:      http.MethodGet,
+			Path:        "/user/get-me",
+			Tags:        []string{"User"},
+			Summary:     "User Get Me",
+		},
+		func(
+			ctx context.Context, i *getMeRequest,
+		) (*getMeResponse, error) {
+			return u.GetMe(ctx, *i)
+		},
+	)
 
 	return u
 }

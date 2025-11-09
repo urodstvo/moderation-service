@@ -1,32 +1,48 @@
-# Use official Python runtime as base image
 FROM python:3.11-slim
 
-ENV POETRY_HOME="/opt/poetry" \
+ENV PYTHONUNBUFFERED=1 \
+    POETRY_VERSION=1.8.3 \
     POETRY_VIRTUALENVS_CREATE=false \
-    PATH="/opt/poetry/bin:$PATH" \
-    PYTHONUNBUFFERED=1
+    PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
-# Install system dependencies and Poetry
+# Установка системных зависимостей для OpenCV, EasyOCR, Pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     build-essential \
     curl \
     ca-certificates \
-    git \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libjpeg62-turbo-dev \
+    zlib1g-dev \
+    libtiff5-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -sSL https://install.python-poetry.org | python3 - --version 1.6.1 && \
-    ln -s /root/.local/bin/poetry /opt/poetry/bin/poetry || true
+    && pip install --user poetry==$POETRY_VERSION
 
-# Copy Poetry files and install dependencies first for better caching
-COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-interaction --no-ansi --no-root
+# Копирование локальных библиотек (для path-зависимостей)
+COPY libs ./libs
 
-# Copy application source
-COPY . .
+# Копирование файлов Poetry в правильную директорию
+COPY apps/workers/image/poetry.lock \
+     apps/workers/image/pyproject.toml \
+     apps/workers/image/poetry.toml \
+     /app/apps/workers/image/
 
-# Create non-root user
+# Установка зависимостей
+RUN cd /app/apps/workers/image && \
+    poetry install --no-interaction --no-ansi --no-root
+
+# Копирование кода
+COPY apps/workers/image ./apps/workers/image
+
+WORKDIR /app/apps/workers/image
+
+# Пользователь
 RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 

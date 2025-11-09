@@ -6,12 +6,9 @@ RUN apk add --no-cache git ca-certificates
 
 WORKDIR /src
 
-# Use go modules download step to leverage Docker cache
-COPY go.mod go.sum ./
-RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
-
 # Copy the rest of the repo (services and libs)
 COPY . .
+RUN go env -w GOPROXY=https://proxy.golang.org && go mod download && go work sync
 
 # Build a small static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /app/main ./apps/auth/cmd

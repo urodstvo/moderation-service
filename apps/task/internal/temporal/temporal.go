@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/activities"
@@ -25,9 +26,10 @@ type Opts struct {
 }
 
 func NewMainWorker(opts Opts) error {
+	hostPort := fmt.Sprintf("%s:%d", opts.Config.TemporalHost, opts.Config.TemporalPort)
 	c, err := client.Dial(
 		client.Options{
-			HostPort: opts.Config.TemporalHost,
+			HostPort: hostPort,
 			Logger:   log.NewStructuredLogger(opts.Logger.GetSlog()),
 		},
 	)

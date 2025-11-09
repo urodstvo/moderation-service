@@ -10,6 +10,7 @@ import (
 
 func NewGRPCWebhookClient(env string) proto.WebhookServiceClient {
 	serverAddress := createClientAddr(env, "webhook", constants.WEBHOOK_SERVER_PORT)
+	log.Printf("Dialing webhook service at %s", serverAddress)
 
 	conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
 	if err != nil {

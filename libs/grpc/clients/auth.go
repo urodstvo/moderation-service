@@ -9,13 +9,12 @@ import (
 )
 
 func NewGRPCAuthClient(env string) proto.AuthServiceClient {
-	serverAddress := createClientAddr(env, "auth", constants.AUTH_SERVER_PORT)
+    serverAddress := createClientAddr(env, "auth", constants.AUTH_SERVER_PORT)
+    log.Printf("Dialing auth service at %s", serverAddress)
 
-	conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
-	if err != nil {
-		log.Fatalf("failed to create conn: %v", err)
-	}
-	c := proto.NewAuthServiceClient(conn)
-
-	return c
+    conn, err := grpc.NewClient(serverAddress, defaultClientsOptions...)
+    if err != nil {
+        log.Fatalf("failed to create conn: %v", err)
+    }
+    return proto.NewAuthServiceClient(conn)
 }

@@ -18,12 +18,13 @@ import (
 	"github.com/urodstvo/moderation-service/apps/task/internal/temporal"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/activities"
+	"github.com/urodstvo/moderation-service/libs/config"
 	baseapp "github.com/urodstvo/moderation-service/libs/fx"
 	grpc_clients "github.com/urodstvo/moderation-service/libs/grpc/clients"
+	"github.com/urodstvo/moderation-service/libs/grpc/proto"
 	"github.com/urodstvo/moderation-service/libs/minio"
 	"github.com/urodstvo/moderation-service/libs/server"
 	"github.com/urodstvo/moderation-service/libs/server/middlewares"
-
 	"go.uber.org/fx"
 )
 
@@ -56,7 +57,12 @@ func main() {
 			middlewares.New,
 			server.New,
 			http.NewHuma,
-			grpc_clients.NewGRPCWebhookClient,
+			func(config config.Config) proto.WebhookServiceClient {
+				return grpc_clients.NewGRPCWebhookClient(config.AppEnv)
+			},
+			func(config config.Config) proto.AuthServiceClient {
+				return grpc_clients.NewGRPCAuthClient(config.AppEnv)
+			},
 			activities.New,
 			workflows.New,
 		),

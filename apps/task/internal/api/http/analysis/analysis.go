@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -12,6 +13,7 @@ import (
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/log"
 	"go.uber.org/fx"
 )
 
@@ -36,7 +38,6 @@ type Opts struct {
 	Config config.Config
 	Minio  *minio.Client
 
-	Temporal client.Client
 	Workflow *workflows.Workflow
 
 	RequestService request.RequestService
@@ -44,12 +45,23 @@ type Opts struct {
 	StatusService  status.StatusTreeService
 }
 
-func NewAnalysisRoutes(opts Opts) handler {
-	h := handler{
+func NewAnalysisRoutes(opts Opts) (*handler, error) {
+	hostPort := fmt.Sprintf("%s:%d", opts.Config.TemporalHost, opts.Config.TemporalPort)
+	c, err := client.Dial(
+		client.Options{
+			HostPort: hostPort,
+			Logger:   log.NewStructuredLogger(opts.Logger.GetSlog()),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	h := &handler{
 		Config:         opts.Config,
 		Logger:         opts.Logger,
 		Minio:          opts.Minio,
-		Temporal:       opts.Temporal,
+		Temporal:       c,
 		StatusService:  opts.StatusService,
 		RequestService: opts.RequestService,
 		FileService:    opts.FileService,
@@ -79,5 +91,5 @@ func NewAnalysisRoutes(opts Opts) handler {
 		h.Async,
 	)
 
-	return h
+	return h, nil
 }

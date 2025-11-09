@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/urodstvo/moderation-service/apps/webhook/internal/api/http"
 	"github.com/urodstvo/moderation-service/apps/webhook/internal/api/http/webhook"
 	"github.com/urodstvo/moderation-service/apps/webhook/internal/grpc"
 	grpcimpl "github.com/urodstvo/moderation-service/apps/webhook/internal/grpc-impl"
@@ -25,7 +26,7 @@ func main() {
 			webhook_repo.NewWebhookRepository,
 		),
 		// services
-		fx.Provide(
+		fx.Provide( 
 			webhook_service.NewWebhookService,
 		),
 		// app itself
@@ -33,6 +34,7 @@ func main() {
 			middlewares.New,
 			server.New,
 			grpcimpl.NewImpl,
+			http.NewHuma,
 		),
 		fx.Invoke(
 			grpc.New,

@@ -19,7 +19,7 @@ type Opts struct {
 
 	LC      fx.Lifecycle
 	Logger  logger.Logger
-	Service grpcimpl.Impl
+	Service *grpcimpl.Impl
 }
 
 func New(opts Opts) error {
@@ -29,7 +29,7 @@ func New(opts Opts) error {
 	}
 
 	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
-	proto.RegisterWebhookServiceServer(grpcServer, &opts.Service)
+	proto.RegisterWebhookServiceServer(grpcServer, opts.Service)
 
 	opts.LC.Append(
 		fx.Hook{

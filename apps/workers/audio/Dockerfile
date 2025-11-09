@@ -1,33 +1,46 @@
-# Use official Python runtime as base image
 FROM python:3.11-slim
 
-ENV POETRY_HOME="/opt/poetry" \
+ENV PYTHONUNBUFFERED=1 \
+    POETRY_VERSION=1.8.3 \
     POETRY_VIRTUALENVS_CREATE=false \
-    PATH="/opt/poetry/bin:$PATH" \
-    PYTHONUNBUFFERED=1
+    PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
-# Install system dependencies and Poetry
+# Установка системных зависимостей + ffmpeg
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     build-essential \
     curl \
     ca-certificates \
-    git \
+    ffmpeg \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -sSL https://install.python-poetry.org | python3 - --version 1.6.1 && \
-    ln -s /root/.local/bin/poetry /opt/poetry/bin/poetry || true
+    && pip install --user poetry==$POETRY_VERSION \
+    && poetry --version
 
-# Copy Poetry files and install dependencies first for better caching
-COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-interaction --no-ansi --no-root
+# Копирование локальных библиотек (для path-зависимостей)
+COPY libs ./libs
 
-# Copy application source
-COPY . .
+# Копирование файлов Poetry в правильную директорию
+COPY apps/workers/audio/poetry.lock \
+     apps/workers/audio/pyproject.toml \
+     apps/workers/audio/poetry.toml \
+     /app/apps/workers/audio/
 
-# Create non-root user
-RUN useradd -m appuser && chown -R appuser:appuser /app
+# Установка зависимостей (в правильной директории)
+RUN cd /app/apps/workers/audio && \
+    poetry install --no-interaction --no-ansi --no-root
+
+# Копируем код ПОСЛЕ установки зависимостей
+COPY apps/workers/audio ./apps/workers/audio
+
+WORKDIR /app/apps/workers/audio
+
+# Создаём пользователя
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+
 USER appuser
 
 CMD ["poetry", "run", "python", "main.py"]

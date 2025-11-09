@@ -1,33 +1,43 @@
-# Use official Python runtime as base image
 FROM python:3.11-slim
 
-ENV POETRY_HOME="/opt/poetry" \
+ENV PYTHONUNBUFFERED=1 \
+    POETRY_VERSION=1.8.3 \
     POETRY_VIRTUALENVS_CREATE=false \
-    PATH="/opt/poetry/bin:$PATH" \
-    PYTHONUNBUFFERED=1
+    PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
-# Install system dependencies and Poetry
+# Установка системных зависимостей и Poetry
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     build-essential \
-    curl \
     ca-certificates \
-    git \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -sSL https://install.python-poetry.org | python3 - --version 1.6.1 && \
-    ln -s /root/.local/bin/poetry /opt/poetry/bin/poetry || true
+    && pip install --user poetry==$POETRY_VERSION
 
-# Copy Poetry files and install dependencies first for better caching
-COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-interaction --no-ansi --no-root
+# Копирование локальных библиотек (для path-зависимостей)
+COPY libs ./libs
 
-# Copy application source
-COPY . .
+# Копирование файлов Poetry в правильную директорию
+COPY apps/workers/text/poetry.lock \
+     apps/workers/text/pyproject.toml \
+     apps/workers/text/poetry.toml \
+     /app/apps/workers/text/
 
-# Create non-root user
-RUN useradd -m appuser && chown -R appuser:appuser /app
+# Установка зависимостей (в правильной директории)
+RUN cd /app/apps/workers/text && \
+    poetry install --no-interaction --no-ansi --no-root
+
+# Копирование исходного кода
+COPY apps/workers/text /app/apps/workers/text
+
+# Рабочая директория
+WORKDIR /app/apps/workers/text
+
+# Создание пользователя
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app
+
 USER appuser
 
 CMD ["poetry", "run", "python", "main.py"]

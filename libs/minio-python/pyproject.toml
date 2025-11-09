@@ -9,7 +9,7 @@ packages = [{include = "minio_client"}]
 [tool.poetry.dependencies]
 python = ">=3.11,<4"
 minio = ">=7.2.15,<8.0.0"
-config = { path = "../config-python"}
+app_config = { path = "../config-python"}
 
 
 [build-system]

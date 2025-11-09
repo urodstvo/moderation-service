@@ -1,7 +1,8 @@
 import asyncio
-from src.utils import CONFIG
+from src.utils import CONFIG, logger
+
 from temporalio.client import Client
-from temporalio.worker import Worker
+from temporalio.worker import Worker, UnsandboxedWorkflowRunner
 
 from src.workflow import Workflow
 import src.activity as activities
@@ -19,9 +20,12 @@ async def main():
             activities.transcribe,
             activities.assemble_result,
         ],
+        workflow_runner=UnsandboxedWorkflowRunner(),
     )
 
-    await worker.run()
+    logger.info("Worker is starting...")
+    await worker.run()    
+    logger.info("Stopped gracefully")
 
 if __name__ == "__main__":
     asyncio.run(main())

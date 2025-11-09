@@ -4,7 +4,7 @@ import logging
 from minio import Minio
 from minio.error import S3Error
 
-from config import Config
+from app_config import Config
 
 class MinioClient:
     def __init__(self, config: Config, logger: logging.Logger):

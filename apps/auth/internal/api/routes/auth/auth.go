@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"context"
+	"net/http"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/urodstvo/moderation-service/apps/auth/internal/service/token"
 	"github.com/urodstvo/moderation-service/apps/auth/internal/service/user"
@@ -34,57 +37,57 @@ func NewAuthRoutes(opts Opts) Auth {
 		Config:       opts.Config,
 	}
 
-	// huma.Register(
-	// 	opts.Huma,
-	// 	huma.Operation{
-	// 		OperationID: "auth-login",
-	// 		Method:      http.MethodPost,
-	// 		Path:        "/login",
-	// 		Tags:        []string{"Auth"},
-	// 		Summary:     "Auth Login",
-	// 	},
-	// 	func(
-	// 		ctx context.Context, i *struct {
-	// 			Body loginRequest
-	// 		},
-	// 	) (*loginResponse, error) {
-	// 		return a.Login(ctx, i.Body)
-	// 	},
-	// )
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "auth-login",
+			Method:      http.MethodPost,
+			Path:        "/login",
+			Tags:        []string{"Auth"},
+			Summary:     "Auth Login",
+		},
+		func(
+			ctx context.Context, i *struct {
+				Body loginRequest
+			},
+		) (*loginResponse, error) {
+			return a.Login(ctx, i.Body)
+		},
+	)
 
-	// huma.Register(
-	// 	opts.Huma,
-	// 	huma.Operation{
-	// 		OperationID: "auth-register",
-	// 		Method:      http.MethodPost,
-	// 		Path:        "/register",
-	// 		Tags:        []string{"Auth"},
-	// 		Summary:     "Auth Register",
-	// 	},
-	// 	func(
-	// 		ctx context.Context, i *struct {
-	// 			Body registerRequest
-	// 		},
-	// 	) (*registerResponse, error) {
-	// 		return a.Register(ctx, i.Body)
-	// 	},
-	// )
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "auth-register",
+			Method:      http.MethodPost,
+			Path:        "/register",
+			Tags:        []string{"Auth"},
+			Summary:     "Auth Register",
+		},
+		func(
+			ctx context.Context, i *struct {
+				Body registerRequest
+			},
+		) (*registerResponse, error) {
+			return a.Register(ctx, i.Body)
+		},
+	)
 
-	// huma.Register(
-	// 	opts.Huma,
-	// 	huma.Operation{
-	// 		OperationID: "auth-check",
-	// 		Method:      http.MethodGet,
-	// 		Path:        "/check",
-	// 		Tags:        []string{"Auth"},
-	// 		Summary:     "Auth Check",
-	// 	},
-	// 	func(
-	// 		ctx context.Context, i *checkRequest,
-	// 	) (*checkResponse, error) {
-	// 		return a.Check(ctx, *i)
-	// 	},
-	// )
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "auth-check",
+			Method:      http.MethodGet,
+			Path:        "/check",
+			Tags:        []string{"Auth"},
+			Summary:     "Auth Check",
+		},
+		func(
+			ctx context.Context, i *checkRequest,
+		) (*checkResponse, error) {
+			return a.Verify(ctx, *i)
+		},
+	)
 
 	return a
 }

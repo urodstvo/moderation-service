@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
 	"github.com/urodstvo/moderation-service/libs/server/middlewares"
 	"go.uber.org/fx"
@@ -15,6 +17,7 @@ type Opts struct {
 	LC          fx.Lifecycle
 	Logger      logger.Logger
 	Middlewares *middlewares.Middlewares
+	Config      config.Config
 }
 
 type Server struct {
@@ -50,7 +53,7 @@ func New(opts Opts) *Server {
 			OnStart: func(ctx context.Context) error {
 				opts.Logger.Info("Starting server")
 				go func() {
-					server.StartServer()
+					server.StartServer(opts.Config.Port)
 				}()
 				return nil
 			},
@@ -64,8 +67,8 @@ func New(opts Opts) *Server {
 	return server
 }
 
-func (s *Server) StartServer() {
-	s.Run(":8000")
+func (s *Server) StartServer(port int) {
+	s.Run(fmt.Sprintf(":%d", port))
 }
 
 func (s *Server) StopServer() {

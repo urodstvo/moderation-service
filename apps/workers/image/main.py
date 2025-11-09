@@ -1,7 +1,7 @@
 import asyncio
-from src.utils import CONFIG
+from src.utils import CONFIG, logger
 from temporalio.client import Client
-from temporalio.worker import Worker
+from temporalio.worker import Worker, UnsandboxedWorkflowRunner
 
 from src.workflow import Workflow
 import src.activity as activities
@@ -15,14 +15,17 @@ async def main():
         task_queue=task_queue,
         workflows=[Workflow],
         activities=[
-            activities.classify_texts,
-            activities.get_texts_from_minio,
+            activities.process_ocr,
+            activities.get_images_from_minio,
             activities.assemble_result,
-            activities.retrieve_words,
         ],
+        workflow_runner=UnsandboxedWorkflowRunner(),
     )
 
-    await worker.run()
+    logger.info("Image Worker is starting...")
+    await worker.run()    
+    logger.info("Worker stopped gracefully")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
