@@ -13,10 +13,11 @@ type getResponse struct {
 }
 
 func (h *handler) Get(ctx context.Context, _ *struct{}) (*getResponse, error) {
-	userId := ctx.Value(constants.UserIdContextKey).(int32)
+	userId := ctx.Value(constants.UserIdContextKey).(int)
 
-	blacklist, err := h.Service.GetByUserId(ctx, int(userId))
+	blacklist, err := h.Service.GetByUserId(ctx, userId)
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to get blacklist")
 	}
 

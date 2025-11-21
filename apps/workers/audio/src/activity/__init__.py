@@ -1,4 +1,4 @@
-from .transribe import transcribe, TranscriptionInput
+from .transcribe import transcribe, TranscriptionInput
 from .get_from_minio import get_files_from_minio
 from .assemble import assemble_result
 

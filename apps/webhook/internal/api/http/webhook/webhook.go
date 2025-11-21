@@ -34,7 +34,7 @@ func NewWebhookRoutes(opts Opts) handler {
 		huma.Operation{
 			OperationID: "webhook-register",
 			Method:      http.MethodPost,
-			Path:        "/webhook",
+			Path:        "/register",
 			Tags:        []string{"Webhook"},
 			Summary:     "Webhook Registration",
 		},

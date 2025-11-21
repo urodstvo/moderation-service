@@ -15,11 +15,11 @@ class ResultItem:
     original_filename: str
     filename: str
     recognized_text: str
-    content_type: str
 
 @dataclass
 class OCRResult:
-    id: int
+    id: int    
+    original_filename: str
     filename: str
     text: str
     confidence: float
@@ -37,10 +37,9 @@ async def assemble_result(ocr_results: List[OCRResult]) -> List[ResultItem]:
             recognized_text = ocr_result.text if not ocr_result.error else ""
             result_item = ResultItem(
                 id=ocr_result.id,
-                original_filename=ocr_result.filename,
+                original_filename=ocr_result.original_filename,
                 filename=ocr_result.filename,
                 recognized_text=recognized_text,
-                content_type='image'
             )
             results.append(result_item)
             

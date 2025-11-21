@@ -55,7 +55,7 @@ def merge_adjacent_ranges(predictions: List[Dict[str, Any]], original_text: str)
     return merged
 
 @activity.defn
-async def retrieve_words(texts: List[TextInput]) -> Dict[int, TextDeletionResult]:
+async def retrieve_words(texts: List[TextInput]) -> TextRetrievingResult:
     results = {}
     
     for text_input in texts:

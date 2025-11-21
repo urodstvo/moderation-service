@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/danielgtaylor/huma/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -21,6 +22,7 @@ type loginResponse struct {
 func (h *Auth) Login(ctx context.Context, input loginRequest) (*loginResponse, error) {
 	user, err := h.UserService.GetByEmail(ctx, input.Email)
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error400BadRequest("User with this email does not exists")
 	}
 

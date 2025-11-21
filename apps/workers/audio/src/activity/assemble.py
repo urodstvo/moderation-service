@@ -9,15 +9,14 @@ class ResultItem:
     original_filename: str
     filename: str
     recognized_text: str
-    content_type: str
 
 @dataclass 
 class TranscriptionResult:
-    id: int
+    id: int    
+    original_filename: str
     filename: str
     text: str
     language: str
-    duration: float
     error: Optional[str] = None
 
 @activity.defn
@@ -26,14 +25,12 @@ async def assemble_result(transcription_results: List[TranscriptionResult]) -> L
         results = []
         
         for trans_result in transcription_results:
-            content_type = 'audio'
             recognized_text = trans_result.text if not trans_result.error else ""
             result_item = ResultItem(
                 id=trans_result.id,
-                original_filename=trans_result.filename,
-                filename=trans_result.filename,  # или можно генерировать новое имя, если нужно
-                recognized_text=recognized_text,
-                content_type=content_type
+                original_filename=trans_result.original_filename,
+                filename=trans_result.filename,
+                recognized_text=recognized_text
             )
             results.append(result_item)
             

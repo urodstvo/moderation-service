@@ -21,7 +21,6 @@ func (a *Activity) AssembleResult(ctx context.Context, requestId int, text []typ
 		result.Files = append(result.Files, types.WorkflowResultFile{
 			FileId:         t.Id,
 			Filename:       t.OriginalFilename,
-			ContentType:    t.ContentType,
 			RecognizedText: &t.RecognizedText,
 			Classification: t.Classification,
 			Words:          t.Words,

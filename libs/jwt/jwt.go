@@ -22,12 +22,12 @@ func GenerateJWT(userID int, permissions []string, secret string) (string, error
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(secret)
+	return token.SignedString([]byte(secret))
 }
 
 func VerifyJWT(tokenString, secret string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (any, error) {
-		return secret, nil
+		return []byte(secret), nil
 	})
 	if err != nil {
 		return nil, err

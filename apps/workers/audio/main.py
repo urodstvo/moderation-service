@@ -16,7 +16,6 @@ async def main():
         task_queue=task_queue,
         workflows=[Workflow],
         activities=[
-            activities.get_files_from_minio,
             activities.transcribe,
             activities.assemble_result,
         ],

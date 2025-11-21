@@ -25,7 +25,7 @@ func (r *repository) GetByUserId(ctx context.Context, userId int) ([]gomodels.Bl
 	var t []gomodels.Blacklist
 	for rows.Next() {
 		blacklist := gomodels.Blacklist{}
-		err = rows.Scan(&blacklist.UserId, &blacklist.Phrase)
+		err = rows.Scan(&blacklist.Id, &blacklist.UserId, &blacklist.Phrase)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}

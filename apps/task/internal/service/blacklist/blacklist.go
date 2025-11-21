@@ -31,19 +31,21 @@ func (s *service) GetByUserId(ctx context.Context, userId int) ([]gomodels.Black
 }
 
 func (s *service) GetOnlyPhrassesByUserId(ctx context.Context, userId int) ([]string, error) {
-	blacklists, err := s.repo.GetByUserId(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
+    blacklists, err := s.repo.GetByUserId(ctx, userId)
+    if err != nil {
+        return nil, err
+    }
 
-	var phrases []string
-	for _, blacklist := range blacklists {
-		phrases = append(phrases, blacklist.Phrase)
-	}
+    phrases := make([]string, 0, len(blacklists))
 
-	return phrases, nil
+    for _, blacklist := range blacklists {
+        if blacklist.Phrase != "" {
+            phrases = append(phrases, blacklist.Phrase)
+        }
+    }
+
+    return phrases, nil
 }
-
 func (s *service) Delete(ctx context.Context, id int) error {
 	return s.repo.Delete(ctx, id)
 }

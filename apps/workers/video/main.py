@@ -18,10 +18,7 @@ async def main():
         task_queue=task_queue,
         workflows=[Workflow],
         activities=[
-            activities.get_files_from_minio,
             activities.extract_audio_from_video,
-            activities.transcribe,
-            activities.assemble_result,
         ],
         workflow_runner=UnsandboxedWorkflowRunner(),
         activity_executor=executor,

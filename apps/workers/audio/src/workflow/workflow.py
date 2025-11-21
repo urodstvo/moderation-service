@@ -1,60 +1,38 @@
 from dataclasses import dataclass
 from datetime import timedelta
+import datetime
+from typing import Any, Dict, List, Optional
 from typing import List
 from temporalio import workflow
 from temporalio.exceptions import FailureError
+from temporalio.common import RetryPolicy
 
 import src.activity as activities
-from src.signal import UPDATE_STATUS_SIGNAL_NAME, CREATE_STATUS_SIGNAL_NAME
-from src.signal.signal import send_create_node, send_update_node
 
 @dataclass
 class Item:
     id: int
+    original_filename: str
     filename: str
 
 @dataclass
 class ResultItem:
     id: int
+    original_filename: str
     filename: str
     recognized_text: str
-    content_type: str
 
-@workflow.defn
+@workflow.defn(name="audio_workflow")
 class Workflow:
-    @workflow.signal
-    async def create_node(self, user_id: int, workflow_id: int, parent_node_id: int, details: dict):
-        await send_create_node(
-            self.parent_workflow_id,
-            user_id,
-            workflow_id,
-            parent_node_id,
-            details,
-            CREATE_STATUS_SIGNAL_NAME,
-        )
-
-    @workflow.signal
-    async def update_node(self, node_id: int, status: str, details: dict):
-        await send_update_node(
-            self.parent_workflow_id,
-            node_id,
-            status,
-            details,
-            UPDATE_STATUS_SIGNAL_NAME,
-        )
-
     @workflow.run
     async def run(self, workflow_id: int, user_id: int, items: List[Item]) -> List[ResultItem]:
         try:
-            minio_results = await workflow.execute_activity(
-                activities.get_files_from_minio,
-                items,
-                start_to_close_timeout=timedelta(minutes=1),
-            )
+            minio_results = await activities.get_files_from_minio(items)
             
             transcription_inputs = [
                 activities.TranscriptionInput(
                     id=result.id,
+                    original_filename=result.original_filename,
                     filename=result.filename,
                     audio_bytes=result.audio_bytes
                 )
@@ -66,12 +44,14 @@ class Workflow:
                 activities.transcribe,
                 transcription_inputs,
                 start_to_close_timeout=timedelta(minutes=5),
+                retry_policy=RetryPolicy(maximum_attempts=3),
             )
             
             final_results = await workflow.execute_activity(
                 activities.assemble_result,
                 transcription_results,
                 start_to_close_timeout=timedelta(minutes=1),
+                retry_policy=RetryPolicy(maximum_attempts=3),
             )
             
             return final_results

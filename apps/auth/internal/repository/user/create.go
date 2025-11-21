@@ -20,5 +20,15 @@ func (r *repository) Create(ctx context.Context, email string, password string) 
 		return 0, fmt.Errorf("failed to execute query: %w", err)
 	}
 
+	createUserSettingsQuery := sq.Insert("user_settings").Columns("user_id").Values(userID)
+	query, args, err = createUserSettingsQuery.ToSql()
+	if err != nil {
+		return 0, fmt.Errorf("failed to build query: %w", err)
+	}
+	_, err = conn.Exec(ctx, query, args...)
+	if err != nil {
+		return 0, fmt.Errorf("failed to execute query: %w", err)
+	}
+
 	return userID, nil
 }

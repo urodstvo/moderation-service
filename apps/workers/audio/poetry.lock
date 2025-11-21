@@ -583,7 +583,7 @@ urllib3 = "*"
 
 [[package]]
 name = "minio-client"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 optional = false
 python-versions = ">=3.11,<4"
@@ -592,7 +592,7 @@ files = []
 develop = false
 
 [package.dependencies]
-app_config = {path = "../config-python"}
+app_config = {path = "../config-python", develop = true}
 minio = ">=7.2.15,<8.0.0"
 
 [package.source]

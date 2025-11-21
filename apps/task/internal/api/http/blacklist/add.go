@@ -14,9 +14,9 @@ type addRequest struct {
 }
 
 func (h *handler) Add(ctx context.Context, req *addRequest) (*struct{}, error) {
-	userId := ctx.Value(constants.UserIdContextKey).(int32)
+	userId := ctx.Value(constants.UserIdContextKey).(int)
 
-	err := h.Service.Create(ctx, int(userId), req.Body.Phrase)
+	err := h.Service.Create(ctx, userId, req.Body.Phrase)
 	if err != nil {
 		return nil, huma.Error500InternalServerError("Failed to add phrase to blacklist")
 	}

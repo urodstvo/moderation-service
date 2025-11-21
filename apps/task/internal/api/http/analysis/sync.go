@@ -1,13 +1,16 @@
 package analysis
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"sync"
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/urodstvo/moderation-service/apps/task/internal/constants"
+	flow_constants "github.com/urodstvo/moderation-service/apps/task/internal/workflows/constants"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/types"
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 	"go.temporal.io/sdk/client"
@@ -37,10 +40,11 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 	}
 
 	var (
-		errorFilesMu   sync.Mutex
-		errorFiles     []string
-		successFilesMu sync.Mutex
-		successFiles   = make(map[gomodels.ContentType][]types.FileTypeParams)
+		errorFilesMu      sync.Mutex
+		errorFiles        []string
+		successFilesMu    sync.Mutex
+		successFiles      = make(map[gomodels.ContentType][]types.FileTypeParams)
+		successFilesCount = 0
 
 		wg        sync.WaitGroup
 		semaphore = make(chan struct{}, 5)
@@ -55,8 +59,21 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			fileType, err := detectFileType(file.Filename)
+			var buf bytes.Buffer
+			tee := io.TeeReader(file.File, &buf)
+
+			_, err := io.Copy(io.Discard, tee)
+			if err != nil && err != io.EOF {
+				h.Logger.Error("failed to read file", "error", err, "file", file.Filename)
+				errorFilesMu.Lock()
+				errorFiles = append(errorFiles, file.Filename)
+				errorFilesMu.Unlock()
+				return
+			}
+
+			fileType, err := detectFileTypeFromReader(bytes.NewReader(buf.Bytes()), file.Filename)
 			if err != nil {
+				h.Logger.Error("detection failed", "error", err, "file", file.Filename)
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -65,7 +82,8 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 
 			uniqueFileName := generateUniqueFileName(file.Filename)
 
-			if err := h.uploadToMinio(ctx, file.File, file.Size, uniqueFileName); err != nil {
+			if err := h.uploadToMinioFromBytes(ctx, buf.Bytes(), uniqueFileName); err != nil {
+				h.Logger.Error("upload failed", "error", err, "file", file.Filename)
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -74,6 +92,7 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 
 			fileId, err := h.FileService.Create(ctx, requestId, fileType, uniqueFileName, file.Filename)
 			if err != nil {
+				h.Logger.Error(err.Error())
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -86,6 +105,7 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 				OriginalFilename: file.Filename,
 				Id:               fileId,
 			})
+			successFilesCount++
 			successFilesMu.Unlock()
 		}()
 	}
@@ -94,16 +114,22 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 
 	workflowID := fmt.Sprintf("request-%d-%d", requestId, time.Now().UnixNano())
 
+	if successFilesCount == 0 {
+		h.Logger.Error("All files failed to process")
+		return nil, huma.Error400BadRequest("All files failed to process: " + fmt.Sprint(errorFiles))
+	}
+
 	workflowParams := types.WorkflowParams{
 		UserId:    userId,
 		RequestId: requestId,
-		IsAsync:   true,
+		IsAsync:   false,
 		Files: struct {
 			Images []types.FileTypeParams
 			Videos []types.FileTypeParams
 			Audios []types.FileTypeParams
 			Texts  []types.FileTypeParams
-		}{Images: successFiles[gomodels.ContentTypeImage],
+		}{
+			Images: successFiles[gomodels.ContentTypeImage],
 			Texts:  successFiles[gomodels.ContentTypeText],
 			Audios: successFiles[gomodels.ContentTypeAudio],
 			Videos: successFiles[gomodels.ContentTypeVideo],
@@ -112,7 +138,7 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 
 	run, err := h.Temporal.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		ID:        workflowID,
-		TaskQueue: fmt.Sprintf("process-request-%d", requestId),
+		TaskQueue: flow_constants.WorkerQueueName,
 	}, h.Workflow.Flow, workflowParams)
 
 	if err != nil {
@@ -123,6 +149,8 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 	if err := run.Get(ctx, &result); err != nil {
 		return nil, huma.Error500InternalServerError("Workflow execution failed", err)
 	}
+
+	h.Logger.Info(string(result.Status))
 
 	response := syncResponse{}
 

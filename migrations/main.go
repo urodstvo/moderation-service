@@ -36,7 +36,7 @@ func main() {
 		panic("cannot to up migrations: " + err.Error())
 	}
 
-	// if err := goose.DownTo(db, "sql", 5, goose.WithAllowMissing()); err != nil {
+	// if err := goose.DownTo(db, "sql", 0, goose.WithAllowMissing()); err != nil {
 	// 	panic(err)
 	// }
 }

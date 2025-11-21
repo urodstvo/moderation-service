@@ -1,35 +1,34 @@
 from dataclasses import dataclass
 from typing import List, Optional
 from temporalio import activity
-from minio_client import MinioClient
+from src.utils import minio_client
 
 @dataclass
 class VideoInput:
     id: int
     filename: str
+    original_filename: str
 
 @dataclass
 class VideoResult:
     id: int
     filename: str
+    original_filename: str
     video_bytes: bytes
     error: Optional[str] = None
 
-@activity.defn
-async def get_files_from_minio(videos: List[VideoInput]) -> List[VideoResult]:
-    minio_client = MinioClient()
-    
+def get_files_from_minio(videos: List[VideoInput]) -> List[VideoResult]:
     try:
         results = []
         
         for video_input in videos:
             try:
-                # Загружаем видеофайл из MinIO как bytes
                 video_bytes = minio_client.get_file(video_input.filename)
                 
                 results.append(VideoResult(
                     id=video_input.id,
                     filename=video_input.filename,
+                    original_filename=video_input.original_filename,
                     video_bytes=video_bytes
                 ))
                 
@@ -40,6 +39,7 @@ async def get_files_from_minio(videos: List[VideoInput]) -> List[VideoResult]:
                 results.append(VideoResult(
                     id=video_input.id,
                     filename=video_input.filename,
+                    original_filename=video_input.original_filename,
                     video_bytes=b"",
                     error=str(file_error)
                 ))

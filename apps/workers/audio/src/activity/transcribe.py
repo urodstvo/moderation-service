@@ -9,16 +9,17 @@ from temporalio import activity
 @dataclass
 class TranscriptionInput:
     id: int
+    original_filename: str
     filename: str
     audio_bytes: bytes
 
 @dataclass
 class TranscriptionResult:
     id: int
+    original_filename: str
     filename: str
     text: str
     language: str
-    duration: float
     error: Optional[str] = None
 
 def _bytes_to_audio_array(audio_bytes: bytes) -> np.ndarray:
@@ -34,7 +35,7 @@ def _bytes_to_audio_array(audio_bytes: bytes) -> np.ndarray:
             if max_val > 0:
                 audio_array /= max_val
         
-        return audio_array, len(audio_array) / 16000.0
+        return audio_array
         
     except Exception as e:
         raise Exception(f"Error converting audio bytes to array: {str(e)}")
@@ -51,7 +52,7 @@ async def transcribe(audio_files: List[TranscriptionInput]) -> List[Transcriptio
                 if not audio_file.audio_bytes:
                     raise ValueError("Empty audio data")
                 
-                audio_array, duration = _bytes_to_audio_array(audio_file.audio_bytes)
+                audio_array = _bytes_to_audio_array(audio_file.audio_bytes)
                 
                 whisper_result = model.transcribe(
                     audio_array,
@@ -63,10 +64,10 @@ async def transcribe(audio_files: List[TranscriptionInput]) -> List[Transcriptio
                 
                 results.append(TranscriptionResult(
                     id=audio_file.id,
+                    original_filename=audio_file.original_filename,
                     filename=audio_file.filename,
                     text=whisper_result["text"].strip(),
-                    language=whisper_result.get("language", "ru"),
-                    duration=duration
+                    language=whisper_result.get("language", "ru")
                 ))
                 
                 activity.logger.info(f"Successfully transcribed: {audio_file.filename}")
@@ -75,10 +76,10 @@ async def transcribe(audio_files: List[TranscriptionInput]) -> List[Transcriptio
                 activity.logger.error(f"Error transcribing file {audio_file.filename}: {file_error}")
                 results.append(TranscriptionResult(
                     id=audio_file.id,
+                    original_filename=audio_file.original_filename,
                     filename=audio_file.filename,
                     text="",
                     language="",
-                    duration=0.0,
                     error=str(file_error)
                 ))
         

@@ -1,132 +1,108 @@
+from datetime import datetime, timedelta, timezone
 import subprocess
+import tempfile
+import os
 from dataclasses import dataclass
 from typing import List, Optional
 from temporalio import activity
-
-@dataclass
-class AudioExtractionInput:
-    id: int
-    filename: str
-    video_bytes: bytes
+from src.utils import minio_client as MINIO, CONFIG
+from .get_from_minio import get_files_from_minio, VideoInput
 
 @dataclass
 class AudioExtractionResult:
     id: int
-    audio_bytes: bytes
+    original_filename: str
+    filename: str
     error: Optional[str] = None
 
-def _extract_audio_in_memory(video_bytes: bytes) -> bytes:
-    cmd = [
-        'ffmpeg',
-        '-i', 'pipe:0',           # Вход из stdin
-        '-f', 'wav',              # Формат вывода WAV
-        '-ac', '1',               # Моно
-        '-ar', '16000',           # 16kHz
-        '-acodec', 'pcm_s16le',   # PCM 16-bit
-        '-y',                     # Перезаписать выходной файл без подтверждения
-        'pipe:1'                  # Выход в stdout
-    ]
-    
-    try:
-        # Запускаем ffmpeg процесс
-        process = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=10**8  # Большой буфер для больших файлов
-        )
-        
-        # Передаем видео байты и получаем аудио байты
-        audio_bytes, stderr = process.communicate(input=video_bytes)
-        
-        if process.returncode != 0:
-            error_msg = stderr.decode('utf-8', errors='ignore')
-            raise Exception(f"FFmpeg error (code {process.returncode}): {error_msg}")
-        
-        return audio_bytes
-        
-    except Exception as e:
-        raise Exception(f"FFmpeg processing failed: {str(e)}")
-
-def _get_video_duration(video_bytes: bytes) -> float:
-    cmd = [
-        'ffmpeg',
-        '-i', 'pipe:0',
-        '-f', 'null',
-        '-'
-    ]
-    
-    try:
-        process = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=10**8
-        )
-        
-        _, stderr = process.communicate(input=video_bytes)
-        stderr_str = stderr.decode('utf-8', errors='ignore')
-        
-        for line in stderr_str.split('\n'):
-            if 'Duration:' in line:
-                duration_str = line.split('Duration:')[1].split(',')[0].strip()
-                parts = duration_str.split(':')
-                if len(parts) == 3:
-                    hours = float(parts[0])
-                    minutes = float(parts[1])
-                    seconds = float(parts[2])
-                    total_seconds = hours * 3600 + minutes * 60 + seconds
-                    return total_seconds
-        
-        return 0.0
-        
-    except Exception:
-        return 0.0
-
 @activity.defn
-async def extract_audio_from_video(video_files: List[AudioExtractionInput]) -> List[AudioExtractionResult]:
+async def extract_audio_from_video(input: List[VideoInput]) -> List[AudioExtractionResult]:
+    video_files = get_files_from_minio(input)
+    results = []
+    minio_client = MINIO.client
+    
     try:
-        results = []
-        
-        for video_file in video_files:
-            try:
-                if not video_file.video_bytes:
-                    raise ValueError("Empty video data")
+       if not minio_client.bucket_exists(CONFIG.S3Bucket): 
+           minio_client.make_bucket(CONFIG.S3Bucket)
+    except Exception as e:
+        activity.logger.error(f"MinIO initialization failed: {e}")
+        return [
+            AudioExtractionResult(
+                id=video_file.id,
+                audio_key="",
+                filename=video_file.filename,
+                error=f"Storage initialization failed: {str(e)}"
+            )
+            for video_file in video_files
+        ]
+    
+    for video_file in video_files:        
+        try:
+            activity.logger.info(f"Processing: {video_file.filename}, size: {len(video_file.video_bytes)} bytes")
+            
+            if not video_file.video_bytes:
+                raise ValueError("Empty video data")
+            
+            # Создаем временную директорию
+            with tempfile.TemporaryDirectory() as temp_dir:
+                video_path = os.path.join(temp_dir, "input.video")
+                audio_path = os.path.join(temp_dir, "output.wav")
                 
-                duration = _get_video_duration(video_file.video_bytes)
-                audio_bytes = _extract_audio_in_memory(video_file.video_bytes)
+                with open(video_path, "wb") as f:
+                    f.write(video_file.video_bytes)
                 
-                if not audio_bytes:
-                    raise ValueError("No audio data extracted")
+                cmd = [
+                    'ffmpeg', '-i', video_path, 
+                    '-vn',                    # Без видео
+                    '-acodec', 'pcm_s16le',   # Кодек
+                    '-ac', '1',               # Моно
+                    '-ar', '16000',           # Частота дискретизации
+                    '-f', 'wav',              # Формат
+                    '-y',                     # Перезаписать
+                    audio_path
+                ]
                 
-                original_name = video_file.filename
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
                 
-                results.append(AudioExtractionResult(
-                    id=video_file.id,
-                    audio_bytes=audio_bytes,
-                ))
+                if result.returncode != 0:
+                    raise ValueError(f"FFmpeg error: {result.stderr}")
                 
-                activity.logger.info(
-                    f"Successfully extracted audio from {original_name}, "
-                    f"duration: {duration:.2f}s, "
-                    f"audio size: {len(audio_bytes)} bytes"
+                if not os.path.exists(audio_path):
+                    raise ValueError("Audio file not created")
+                
+                file_size = os.path.getsize(audio_path)
+                if file_size < 1024:
+                    raise ValueError(f"Audio file too small: {file_size} bytes")
+                
+                
+                expiration_time = datetime.now(timezone.utc) + timedelta(hours=24)
+
+                object_name = video_file.filename.rsplit('.', 1)[0] + ".wav"
+                minio_client.fput_object(
+                    CONFIG.S3Bucket,
+                    object_name,
+                    audio_path,
+                    content_type="audio/wav",
+                     metadata={
+                        'x-amz-expiration': f"expiry-date=\"{expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')}\""
+                    }
                 )
                 
-            except Exception as file_error:
-                activity.logger.error(f"Error extracting audio from {video_file.filename}: {file_error}")
+                activity.logger.info(f"Successfully extracted and uploaded audio: {object_name}, size: {file_size} bytes")
+                
                 results.append(AudioExtractionResult(
                     id=video_file.id,
-                    original_filename=video_file.filename,
-                    audio_filename="",
-                    audio_bytes=b"",
-                    duration=0.0,
-                    error=str(file_error)
+                    filename=object_name,
+                    original_filename=video_file.original_filename,
                 ))
-        
-        return results
-        
-    except Exception as e:
-        activity.logger.error(f"Error in extract_audio_from_video activity: {e}")
-        raise
+                
+        except Exception as e:
+            activity.logger.error(f"Error processing {video_file.filename}: {e}")
+            results.append(AudioExtractionResult(
+                id=video_file.id,
+                filename=video_file.filename,                
+                original_filename=video_file.original_filename,
+                error=str(e)
+            ))
+    
+    return results

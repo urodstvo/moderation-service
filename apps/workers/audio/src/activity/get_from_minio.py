@@ -1,24 +1,23 @@
 from dataclasses import dataclass
 from typing import List, Optional
 from temporalio import activity
-from minio_client import MinioClient
+from src.utils import minio_client
 
 @dataclass
 class FileInput:
     id: int
+    original_filename: str
     filename: str
 
 @dataclass
 class MinioResult:
     id: int
+    original_filename: str
     filename: str
     audio_bytes: bytes
     error: Optional[str] = None
 
-@activity.defn
-async def get_files_from_minio(files: List[FileInput]) -> List[MinioResult]:
-    minio_client = MinioClient()
-    
+async def get_files_from_minio(files: List[FileInput]) -> List[MinioResult]:  
     try:
         results = []
         
@@ -29,6 +28,7 @@ async def get_files_from_minio(files: List[FileInput]) -> List[MinioResult]:
                 
                 results.append(MinioResult(
                     id=file_input.id,
+                    original_filename=file_input.original_filename,
                     filename=file_input.filename,
                     audio_bytes=audio_bytes
                 ))
@@ -39,6 +39,7 @@ async def get_files_from_minio(files: List[FileInput]) -> List[MinioResult]:
                 activity.logger.error(f"Error loading file {file_input.filename}: {file_error}")
                 results.append(MinioResult(
                     id=file_input.id,
+                    original_filename=file_input.original_filename,
                     filename=file_input.filename,
                     audio_bytes=b"",
                     error=str(file_error)

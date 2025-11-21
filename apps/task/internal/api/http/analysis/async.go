@@ -1,8 +1,10 @@
 package analysis
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -58,7 +60,10 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			fileType, err := detectFileType(file.Filename)
+			var buf bytes.Buffer
+			tee := io.TeeReader(file.File, &buf)
+
+			fileType, err := detectFileTypeFromReader(tee, file.Filename)
 			if err != nil {
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
@@ -68,7 +73,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 
 			uniqueFileName := generateUniqueFileName(file.Filename)
 
-			if err := h.uploadToMinio(ctx, file.File, file.Size, uniqueFileName); err != nil {
+			if err := h.uploadToMinioFromBytes(ctx, buf.Bytes(), uniqueFileName); err != nil {
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -102,11 +107,12 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 		RequestId: requestId,
 		IsAsync:   true,
 		Files: struct {
-			Images []types.FileTypeParams
+			Images []types.FileTypeParams 
 			Videos []types.FileTypeParams
 			Audios []types.FileTypeParams
 			Texts  []types.FileTypeParams
-		}{Images: successFiles[gomodels.ContentTypeImage],
+		}{
+			Images: successFiles[gomodels.ContentTypeImage],
 			Texts:  successFiles[gomodels.ContentTypeText],
 			Audios: successFiles[gomodels.ContentTypeAudio],
 			Videos: successFiles[gomodels.ContentTypeVideo],

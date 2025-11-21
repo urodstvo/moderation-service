@@ -10,12 +10,14 @@ import easyocr
 @dataclass
 class OCRInput:
     id: int
+    original_filename: str
     filename: str
     image_bytes: bytes
 
 @dataclass
 class OCRResult:
     id: int
+    original_filename: str
     filename: str
     text: str
     confidence: float
@@ -87,10 +89,8 @@ def _postprocess_text(text: str) -> str:
 @activity.defn
 async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
     try:
-        # Инициализируем EasyOCR reader для русского и английского
-        reader = OCRProcessor.get_reader(['ru', 'en'])
-        
         results = []
+        reader = OCRProcessor.get_reader(['ru', 'en'])
         
         for image_input in images:
             try:
@@ -100,10 +100,8 @@ async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
                 processed_image = _preprocess_image(image_input.image_bytes)
                 ocr_results = reader.readtext(
                     processed_image,
-                    detail=1,
-                    paragraph=True,  # Группируем текст в параграфы
-                    batch_size=1,    # Обрабатываем по одному изображению за раз
-                    width_ths=0.5,   # Порог для объединения текстовых блоков
+                    paragraph=True,
+                    width_ths=0.5,
                     height_ths=0.5
                 )
                 
@@ -111,11 +109,31 @@ async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
                 total_confidence = 0.0
                 valid_results = 0
                 
-                for bbox, text, confidence in ocr_results:
-                    if confidence > 0.1:  # Фильтруем результаты с низкой уверенностью
-                        all_text.append(text)
-                        total_confidence += confidence
-                        valid_results += 1
+                for item in ocr_results:
+                    if not isinstance(item, (list, tuple)) or len(item) < 2:
+                        activity.logger.debug(f"Skipping invalid OCR item: {item}")
+                        continue
+
+                    text = item[1].strip()
+                    if not text:
+                        continue
+
+                    confidence = 0.0
+                    if len(item) > 2:
+                        conf_field = item[2]
+                        try:
+                            if isinstance(conf_field, (list, tuple)):
+                                confidences = [c for c in conf_field if isinstance(c, (int, float))]
+                                if confidences:
+                                    confidence = max(float(c) for c in confidences)
+                            else:
+                                confidence = float(conf_field or 0.0)
+                        except (ValueError, TypeError) as e:
+                            activity.logger.warning(f"Confidence parse error: {conf_field} — {e}")
+
+                    all_text.append(text)
+                    total_confidence += confidence
+                    valid_results += 1
                 
                 combined_text = ' '.join(all_text)
                 combined_text = _postprocess_text(combined_text)
@@ -135,6 +153,7 @@ async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
                 
                 results.append(OCRResult(
                     id=image_input.id,
+                    original_filename=image_input.original_filename,
                     filename=image_input.filename,
                     text=combined_text,
                     confidence=avg_confidence,
@@ -150,7 +169,8 @@ async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
             except Exception as file_error:
                 activity.logger.error(f"Error processing OCR for {image_input.filename}: {file_error}")
                 results.append(OCRResult(
-                    id=image_input.id,
+                    id=image_input.id,                    
+                    original_filename=image_input.original_filename,
                     filename=image_input.filename,
                     text="",
                     confidence=0.0,

@@ -8,14 +8,15 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-app_config = { path = "../../../libs/config-python"}
-app_logger = { path = "../../../libs/logger-python"}
-minio_client = { path = "../../../libs/minio-python"}
+app_config = { path = "../../../libs/config-python", develop = true}
+app_logger = { path = "../../../libs/logger-python", develop = true}
+minio_client = { path = "../../../libs/minio-python", develop = true}
 temporalio = ">=1.15.0,<2.0.0"
 numpy = "^2.3.3"
 openai-whisper = "^20250625"
 pydub = "^0.25.1"
 ffmpeg-python = "^0.2.0"
+moviepy = "^2.2.1"
 
 
 [build-system]

@@ -2,6 +2,7 @@ package grpcimpl
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/urodstvo/moderation-service/libs/grpc/proto"
@@ -12,7 +13,8 @@ func (i *Impl) GetUserSettings(ctx context.Context, req *proto.GetUserSettingsRe
 
 	settings, err := i.SettingsService.GetByUserId(ctx, userId)
 	if err != nil {
-		return nil, huma.Error500InternalServerError("Failed to create webhook")
+		i.Logger.Error("Failed to get user settings", slog.Any("error", err), slog.Any("userId", userId))
+		return nil, huma.Error500InternalServerError("Failed to get settings")
 	}
 	return &proto.GetUserSettingsResponse{
 		UserId:                          req.UserId,

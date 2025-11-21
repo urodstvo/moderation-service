@@ -20,7 +20,6 @@ async def main():
         workflows=[Workflow],
         activities=[
             activities.classify_texts,
-            activities.get_texts_from_minio,
             activities.assemble_result,
             activities.retrieve_words,
         ],

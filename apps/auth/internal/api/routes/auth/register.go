@@ -33,11 +33,13 @@ func (h *Auth) Register(ctx context.Context, input registerRequest) (*registerRe
 
 	userId, err := h.UserService.Create(ctx, input.Email, string(bytes))
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to create user")
 	}
 
 	token, err := jwt.GenerateJWT(userId, permissions.RolePermissions["USER"], h.Config.JWTSecret)
 	if err != nil {
+		h.Logger.Error(err.Error())
 		return nil, huma.Error500InternalServerError("Failed to generate token")
 	}
 

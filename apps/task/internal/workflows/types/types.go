@@ -1,15 +1,16 @@
 package types
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
 )
 
 type FileTypeParams struct {
-	Id               int
-	OriginalFilename string
-	Filename         string
+	Id               int    `json:"id"`
+	OriginalFilename string `json:"original_filename"`
+	Filename         string `json:"filename"`
 }
 
 type WorkflowParams struct {
@@ -19,9 +20,9 @@ type WorkflowParams struct {
 		Audios []FileTypeParams
 		Texts  []FileTypeParams
 	}
-	RequestId int
-	UserId    int
-	IsAsync   bool
+	RequestId int  `json:"request_id"`
+	UserId    int  `json:"user_id"`
+	IsAsync   bool `json:"is_async"`
 }
 
 type WorkflowResult struct {
@@ -51,13 +52,12 @@ type DeletedWord struct {
 }
 
 type TextResultItem struct {
-	Id               int
-	OriginalFilename string
-	Filename         string
-	RecognizedText   string
-	ContentType      gomodels.ContentType
-	Classification   Classification
-	Words            []DeletedWord
+	Id               int            `json:"id"`
+	OriginalFilename string         `json:"original_filename"`
+	Filename         string         `json:"filename"`
+	RecognizedText   string         `json:"recognized_text"`
+	Classification   Classification `json:"classification"`
+	Words            []DeletedWord  `json:"words,omitempty"`
 }
 
 type Classification struct {
@@ -70,9 +70,30 @@ type Classification struct {
 }
 
 type ResultItem struct {
-	Id               int
-	OriginalFilename string
-	Filename         string
-	RecognizedText   string
-	ContentType      gomodels.ContentType
+	Id               int    `json:"id"`
+	OriginalFilename string `json:"original_filename"`
+	Filename         string `json:"filename"`
+	RecognizedText   string `json:"recognized_text"`
+}
+
+type ActivityStatus struct {
+	ParentNodeID int             `json:"parent_node_id"`
+	NodeID       int             `json:"node_id"`
+	Status       gomodels.Status `json:"status"`
+	Title        string          `json:"title"`
+	Details      json.RawMessage `json:"details,omitempty"`
+	ErrorMessage *string         `json:"error_message,omitempty"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type WorkflowState struct {
+	WorkflowID string                          `json:"workflow_id"`
+	Status     gomodels.Status                 `json:"status"`
+	Activities map[int]map[int]*ActivityStatus `json:"activities"` // ParentNodeID -> NodeID -> ActivityStatus
+	Error      *string                         `json:"error,omitempty"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

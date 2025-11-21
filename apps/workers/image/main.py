@@ -16,7 +16,6 @@ async def main():
         workflows=[Workflow],
         activities=[
             activities.process_ocr,
-            activities.get_images_from_minio,
             activities.assemble_result,
         ],
         workflow_runner=UnsandboxedWorkflowRunner(),

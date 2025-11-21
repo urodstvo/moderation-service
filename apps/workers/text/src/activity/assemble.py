@@ -10,15 +10,15 @@ class TextResultItem:
     original_filename: str
     filename: str
     recognized_text: str
-    content_type: str
     classification: ItemClassification
     words: List[DeletedWord]
 
 @dataclass
 class Item:
     id: int
+    original_filename: str
     filename: str
-    text: str  
+    recognized_text: str  
 
 @activity.defn
 def assemble_result(
@@ -34,10 +34,9 @@ def assemble_result(
         deleted_words = words[item.id].deleted_words if item.id in words and words[item.id] is not None else []
         result_items.append(TextResultItem(
             id=item.id,
-            original_filename=item.filename,
+            original_filename=item.original_filename,
             filename=item.filename,
-            recognized_text=item.text,
-            content_type='text',
+            recognized_text=item.recognized_text,
             classification=cls,
             words=deleted_words,
         ))

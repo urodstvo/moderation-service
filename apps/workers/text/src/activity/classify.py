@@ -25,9 +25,9 @@ async def classify_texts(texts: List[TextInput]) -> ClassificationResult:
         text_contents = [text_input.text for text_input in texts]        
         results = detoxify.predict(text_contents)
         
-        classification_results = {}
+        classification_results: Dict[int, Classification] = {}
         for i, text_input in enumerate(texts):
-            classification_results[text_input.id] = ClassificationResult(
+            classification_results[text_input.id] = Classification(
                 toxicity=results['toxicity'][i],
                 severe_toxicity=results['severe_toxicity'][i],
                 obscene=results['obscene'][i],

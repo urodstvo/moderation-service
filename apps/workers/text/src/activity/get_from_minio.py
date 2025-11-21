@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
+from src.utils import minio_client
 
 from temporalio import activity
 from minio_client import MinioClient
@@ -7,19 +8,18 @@ from minio_client import MinioClient
 @dataclass
 class FileInput:
     id: int
+    original_filename: str
     filename: str
 
 @dataclass
 class MinioResult:
     id: int
+    original_filename: str
     filename: str
-    text: str
+    recognized_text: str
     error: Optional[str] = None
 
-@activity.defn
 async def get_texts_from_minio(files: List[FileInput]) -> List[MinioResult]:
-    minio_client = MinioClient()
-    
     try:
         texts = []
         
@@ -29,15 +29,17 @@ async def get_texts_from_minio(files: List[FileInput]) -> List[MinioResult]:
                 text_content = data.decode('utf-8')                
                 texts.append(MinioResult(
                     id=file_input.id,
+                    original_filename=file_input.original_filename,
                     filename=file_input.filename,
-                    text=text_content
+                    recognized_text=text_content
                 ))
                 
             except Exception as file_error:
                 texts.append(MinioResult(
                     id=file_input.id,
+                    original_filename=file_input.original_filename,
                     filename=file_input.filename,
-                    text=None,
+                    recognized_text=None,
                     error=str(file_error)
                 ))
         

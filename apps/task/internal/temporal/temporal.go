@@ -43,12 +43,14 @@ func NewMainWorker(opts Opts) error {
 	temporalWorker.RegisterActivity(opts.Activities.CallWebhook)
 	temporalWorker.RegisterActivity(opts.Activities.CombineTexts)
 	temporalWorker.RegisterActivity(opts.Activities.GetBlacklist)
-	temporalWorker.RegisterActivity(opts.Activities.CreateNode)
-	temporalWorker.RegisterActivity(opts.Activities.UpdateNodeStatus)
+	temporalWorker.RegisterActivity(opts.Activities.SaveRawResults)
+	temporalWorker.RegisterActivity(opts.Activities.SaveFormattedResults)
+	temporalWorker.RegisterActivity(opts.Activities.GetSettings)
 
 	opts.Lc.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {
+				opts.Logger.Info("Main Worker starting...")
 				return temporalWorker.Start()
 			},
 			OnStop: func(ctx context.Context) error {

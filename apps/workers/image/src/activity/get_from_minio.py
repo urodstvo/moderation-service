@@ -1,24 +1,23 @@
 from dataclasses import dataclass
 from typing import List, Optional
 from temporalio import activity
-from minio_client import MinioClient
+from src.utils import minio_client
 
 @dataclass
 class ImageInput:
     id: int
+    original_filename: str
     filename: str
 
 @dataclass
 class ImageResult:
     id: int
+    original_filename: str
     filename: str
     image_bytes: bytes
     error: Optional[str] = None
 
-@activity.defn
 async def get_images_from_minio(images: List[ImageInput]) -> List[ImageResult]:
-    minio_client = MinioClient()
-    
     try:
         results = []
         
@@ -29,6 +28,7 @@ async def get_images_from_minio(images: List[ImageInput]) -> List[ImageResult]:
                 
                 results.append(ImageResult(
                     id=image_input.id,
+                    original_filename=image_input.original_filename,
                     filename=image_input.filename,
                     image_bytes=image_bytes
                 ))
@@ -39,6 +39,7 @@ async def get_images_from_minio(images: List[ImageInput]) -> List[ImageResult]:
                 activity.logger.error(f"Error loading image {image_input.filename}: {file_error}")
                 results.append(ImageResult(
                     id=image_input.id,
+                    original_filename=image_input.original_filename,
                     filename=image_input.filename,
                     image_bytes=b"",
                     error=str(file_error)

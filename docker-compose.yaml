@@ -1,6 +1,21 @@
 name: moderation-service-v3
 
 services:
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./configs/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - postgres
+      - minio
+      - adminer
+    environment:
+      - NGINX_HOST=localhost
+    networks:
+      - default
+
   postgres:
     image: postgres:15-alpine
     environment:

@@ -13,12 +13,11 @@ type getMeRequest struct {
 }
 
 type UserResponse struct {
-	Id        int        `json:"id"`
-	Email     string     `json:"email"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
-	Role      string     `json:"role"`
+	Id        int       `json:"id"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Role      string    `json:"role"`
 }
 
 type getMeResponse struct {
@@ -54,12 +53,6 @@ func (h *User) GetMe(ctx context.Context, req getMeRequest) (*getMeResponse, err
 		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-	}
-
-	if user.DeletedAt.Valid {
-		response.Body.User.DeletedAt = &user.DeletedAt.Time
-	} else {
-		response.Body.User.DeletedAt = nil
 	}
 
 	return response, nil
