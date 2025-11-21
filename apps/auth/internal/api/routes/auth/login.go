@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/danielgtaylor/huma/v2"
 	"golang.org/x/crypto/bcrypt"
