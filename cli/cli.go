@@ -8,11 +8,12 @@ import (
 	"github.com/urodstvo/moderation-service/cli/codegen"
 )
 
+var rootCmd = &cobra.Command{
+	Use:   "cli",
+	Short: "CLI for project management",
+}
+
 func main() {
-	rootCmd := &cobra.Command{
-		Use:   "cli",
-		Short: "CLI for project management",
-	}
 	codegenCmd := &cobra.Command{
 		Use:   "codegen",
 		Short: "Run code generation commands",
