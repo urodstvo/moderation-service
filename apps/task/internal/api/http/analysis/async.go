@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
+	flow_constants "github.com/urodstvo/moderation-service/apps/task/internal/workflows/constants"
 	"github.com/urodstvo/moderation-service/apps/task/internal/constants"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/types"
 	"github.com/urodstvo/moderation-service/libs/models/gomodels"
@@ -46,7 +47,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 		errorFiles     []string
 		successFilesMu sync.Mutex
 		successFiles   = make(map[gomodels.ContentType][]types.FileTypeParams)
-
+		successFilesCount = 0
 		wg        sync.WaitGroup
 		semaphore = make(chan struct{}, 5)
 	)
@@ -63,8 +64,18 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 			var buf bytes.Buffer
 			tee := io.TeeReader(file.File, &buf)
 
-			fileType, err := detectFileTypeFromReader(tee, file.Filename)
+			_, err := io.Copy(io.Discard, tee)
+			if err != nil && err != io.EOF {
+				h.Logger.Error("failed to read file", "error", err, "file", file.Filename)
+				errorFilesMu.Lock()
+				errorFiles = append(errorFiles, file.Filename)
+				errorFilesMu.Unlock()
+				return
+			}
+
+			fileType, err := detectFileTypeFromReader(bytes.NewReader(buf.Bytes()), file.Filename)
 			if err != nil {
+				h.Logger.Error("detection failed", "error", err, "file", file.Filename)
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -74,6 +85,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 			uniqueFileName := generateUniqueFileName(file.Filename)
 
 			if err := h.uploadToMinioFromBytes(ctx, buf.Bytes(), uniqueFileName); err != nil {
+				h.Logger.Error("upload failed", "error", err, "file", file.Filename)
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -82,6 +94,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 
 			fileId, err := h.FileService.Create(ctx, requestId, fileType, uniqueFileName, file.Filename)
 			if err != nil {
+				h.Logger.Error(err.Error())
 				errorFilesMu.Lock()
 				errorFiles = append(errorFiles, file.Filename)
 				errorFilesMu.Unlock()
@@ -94,6 +107,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 				OriginalFilename: file.Filename,
 				Id:               fileId,
 			})
+			successFilesCount++
 			successFilesMu.Unlock()
 		}()
 	}
@@ -101,6 +115,11 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 	wg.Wait()
 
 	workflowID := fmt.Sprintf("request-%d-%d", requestId, time.Now().UnixNano())
+	
+	if successFilesCount == 0 {
+		h.Logger.Error("All files failed to process")
+		return nil, huma.Error400BadRequest("All files failed to process: " + fmt.Sprint(errorFiles))
+	}
 
 	workflowParams := types.WorkflowParams{
 		UserId:    userId,
@@ -119,14 +138,15 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 		},
 	}
 
-	_, err = h.Temporal.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+	run, err := h.Temporal.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
 		ID:        workflowID,
-		TaskQueue: fmt.Sprintf("process-request-%d", requestId),
+		TaskQueue: flow_constants.WorkerQueueName,
 	}, h.Workflow.Flow, workflowParams)
-
 	if err != nil {
 		return nil, huma.Error500InternalServerError("Failed to start workflow", err)
 	}
+
+	h.RequestService.UpdateFlowData(ctx, requestId, run.GetID(), run.GetRunID())
 
 	response := asyncResponse{}
 	response.Body.RequestId = requestId

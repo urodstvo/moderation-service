@@ -1,8 +1,10 @@
 package workflows
 
 import (
+	"context"
 	"time"
 
+	"github.com/urodstvo/moderation-service/apps/task/internal/service/request"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/activities"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/constants"
 	"github.com/urodstvo/moderation-service/apps/task/internal/workflows/types"
@@ -18,21 +20,26 @@ type Opts struct {
 
 	Logger   logger.Logger
 	Activity *activities.Activity
+	Request  request.RequestService
 }
 
 type Workflow struct {
 	Logger   logger.Logger
 	Activity *activities.Activity
+	Request  request.RequestService
 }
 
 func New(opts Opts) *Workflow {
 	return &Workflow{
 		Logger:   opts.Logger,
 		Activity: opts.Activity,
+		Request:  opts.Request,
 	}
 }
 
 func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*types.WorkflowResult, error) {
+	w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusProcessing)
+	
 	ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
 		StartToCloseTimeout:    time.Minute * 10,
 		ScheduleToCloseTimeout: time.Minute * 15, // опционально, но надёжнее
@@ -73,6 +80,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 
 		err := future.Get(ctx, &videoExtractedAudios)
 		if err != nil {
+			w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 			return nil, err
 		}
 	} else {
@@ -140,6 +148,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		}
 
 		if firstErr != nil {
+			w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 			return nil, firstErr
 		}
 	}
@@ -157,34 +166,41 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 
 	var combined []types.ResultItem
 	if err := workflow.ExecuteActivity(ctx, w.Activity.CombineTexts, [][]types.ResultItem{imageRes, audioRes, textReq}).Get(ctx, &combined); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	if err := workflow.ExecuteActivity(ctx, w.Activity.SaveRawResults, params.RequestId, combined).Get(ctx, nil); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	var blacklist []string
 	if err := workflow.ExecuteActivity(ctx, w.Activity.GetBlacklist, params.UserId).Get(ctx, &blacklist); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	var settings gomodels.Settings
 	if err := workflow.ExecuteActivity(ctx, w.Activity.GetSettings, params.UserId).Get(ctx, &settings); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	textCtx, _ := createChildContext(ctx, constants.TextWorkflowQueueName)
 	if err := workflow.ExecuteChildWorkflow(textCtx, constants.TextWorkflowName, params.RequestId, params.UserId, combined, blacklist, settings).Get(textCtx, &textRes); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	var finalResult types.WorkflowResult
 	if err := workflow.ExecuteActivity(ctx, w.Activity.AssembleResult, params.RequestId, textRes).Get(ctx, &finalResult); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
 	if err := workflow.ExecuteActivity(ctx, w.Activity.SaveFormattedResults, params.RequestId, finalResult).Get(ctx, nil); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}
 
@@ -192,10 +208,13 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		if err := workflow.ExecuteActivity(ctx, w.Activity.CallWebhook, params.UserId, finalResult).Get(ctx, nil); err != nil {
 			return nil, err
 		}
+		stopCh.Send(ctx, true)
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusCompleted)
 
 		return nil, nil
 	}
 
+	w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusCompleted)
 	stopCh.Send(ctx, true)
 
 	return &finalResult, nil

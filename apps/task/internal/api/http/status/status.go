@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/urodstvo/moderation-service/apps/task/internal/service/request"
 	"github.com/urodstvo/moderation-service/apps/task/internal/service/status"
 	"github.com/urodstvo/moderation-service/libs/config"
 	"github.com/urodstvo/moderation-service/libs/logger"
@@ -16,6 +17,7 @@ import (
 type handler struct {
 	Logger logger.Logger
 
+	RequestService request.RequestService
 	StatusService status.StatusTreeService
 	Temporal      client.Client
 }
@@ -26,8 +28,8 @@ type Opts struct {
 	Config        config.Config
 	Huma          huma.API
 	Logger        logger.Logger
+	RequestService request.RequestService
 	StatusService status.StatusTreeService
-	Temporal      client.Client
 }
 
 func NewStatusRoutes(opts Opts) handler {
@@ -45,8 +47,21 @@ func NewStatusRoutes(opts Opts) handler {
 	a := handler{
 		Logger:        opts.Logger,
 		StatusService: opts.StatusService,
+		RequestService: opts.RequestService,
 		Temporal:      c,
 	}
+
+	huma.Register(
+		opts.Huma,
+		huma.Operation{
+			OperationID: "status-check",
+			Method:      http.MethodGet,
+			Path:        "/request/active/status",
+			Tags:        []string{"Status"},
+			Summary:     "Active Status Check",
+		},
+		a.GetActive,
+	)
 
 	huma.Register(
 		opts.Huma,
@@ -59,6 +74,8 @@ func NewStatusRoutes(opts Opts) handler {
 		},
 		a.Get,
 	)
+
+
 
 	return a
 }

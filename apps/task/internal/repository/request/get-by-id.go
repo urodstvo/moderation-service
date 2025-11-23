@@ -19,7 +19,7 @@ func (r *repository) GetById(ctx context.Context, id int) (gomodels.Request, err
 	}
 
 	t := gomodels.Request{}
-	err = conn.QueryRow(ctx, query, args...).Scan(&t.Id, &t.UserId, &t.Status, &t.CreatedAt, &t.UpdatedAt, &t.DeletedAt)
+	err = conn.QueryRow(ctx, query, args...).Scan(&t.Id, &t.UserId, &t.Status, &t.WorkflowId, &t.RunId, &t.CreatedAt, &t.UpdatedAt, &t.DeletedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return gomodels.Request{}, fmt.Errorf("request not found")

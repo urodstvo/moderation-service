@@ -18,6 +18,8 @@ type RequestRepository interface {
 	Create(ctx context.Context, userId int) (int, error)
 	GetById(ctx context.Context, id int) (gomodels.Request, error)
 	UpdateStatus(ctx context.Context, id int, status gomodels.Status) error
+	GetActive(ctx context.Context, userId int) ([]gomodels.Request, error)
+	UpdateFlowData(ctx context.Context, id int, workflowId, runId string) error
 }
 
 func NewRequestRepository(db *pgxpool.Pool) RequestRepository {

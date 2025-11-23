@@ -10,6 +10,9 @@ type Request struct {
 	UserId int    `json:"user_id"`
 	Status Status `json:"status"`
 
+	WorkflowId string `json:"workflow_id"`
+	RunId      string `json:"run_id"`
+
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	DeletedAt sql.NullTime `json:"deleted_at"`

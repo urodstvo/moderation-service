@@ -23,7 +23,7 @@ type syncRequest struct {
 }
 
 type syncResponse struct {
-	Body struct{} `json:"body"`
+	Body types.WorkflowResult `json:"body"`
 }
 
 func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, error) {
@@ -140,19 +140,20 @@ func (h *handler) Sync(ctx context.Context, input *syncRequest) (*syncResponse, 
 		ID:        workflowID,
 		TaskQueue: flow_constants.WorkerQueueName,
 	}, h.Workflow.Flow, workflowParams)
-
 	if err != nil {
 		return nil, huma.Error500InternalServerError("Failed to start workflow", err)
 	}
+
+	h.RequestService.UpdateFlowData(ctx, requestId, run.GetID(), run.GetRunID())
 
 	var result types.WorkflowResult
 	if err := run.Get(ctx, &result); err != nil {
 		return nil, huma.Error500InternalServerError("Workflow execution failed", err)
 	}
 
-	h.Logger.Info(string(result.Status))
-
-	response := syncResponse{}
+	response := syncResponse{
+		Body: result,
+	}
 
 	return &response, nil
 }
