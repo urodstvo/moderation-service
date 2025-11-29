@@ -2,10 +2,18 @@ import io
 import cv2
 import numpy as np
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from temporalio import activity
 from PIL import Image
 import easyocr
+
+from .get_from_minio import get_images_from_minio
+
+@dataclass
+class Input:
+    id: int
+    original_filename: str
+    filename: str
 
 @dataclass
 class OCRInput:
@@ -87,8 +95,21 @@ def _postprocess_text(text: str) -> str:
     return text.strip()
 
 @activity.defn
-async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
+async def process_ocr(items: List[Input]) -> List[OCRResult]:
     try:
+        image_results = await get_images_from_minio(items)
+
+        images = [
+            OCRInput(
+                id=result.id,
+                original_filename=result.original_filename,
+                filename=result.filename,
+                image_bytes=result.image_bytes
+            )
+            for result in image_results
+            if not result.error and result.image_bytes
+        ]
+    
         results = []
         reader = OCRProcessor.get_reader(['ru', 'en'])
         
@@ -98,6 +119,8 @@ async def process_ocr(images: List[OCRInput]) -> List[OCRResult]:
                     raise ValueError("Empty image data")
                 
                 processed_image = _preprocess_image(image_input.image_bytes)
+                
+                # TODO: moved to batched
                 ocr_results = reader.readtext(
                     processed_image,
                     paragraph=True,

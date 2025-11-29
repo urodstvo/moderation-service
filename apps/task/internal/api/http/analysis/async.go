@@ -114,7 +114,7 @@ func (h *handler) Async(ctx context.Context, input *asyncRequest) (*asyncRespons
 
 	wg.Wait()
 
-	workflowID := fmt.Sprintf("request-%d-%d", requestId, time.Now().UnixNano())
+	workflowID := fmt.Sprintf("async-request-%d-%d", requestId, time.Now().UnixNano())
 	
 	if successFilesCount == 0 {
 		h.Logger.Error("All files failed to process")

@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 from temporalio import activity
 from src.models import rubertconv
+from .classify import truncate_text, estimate_token_count
 
 @dataclass
 class TextInput:
@@ -60,9 +61,18 @@ async def retrieve_words(texts: List[TextInput]) -> TextRetrievingResult:
     
     for text_input in texts:
         try:
-            predictions = rubertconv.predict(text_input.text)
+            # Проверка и обрезка длинных текстов
+            processed_text = text_input.text
+            token_count = estimate_token_count(processed_text)
+            if token_count > 512:
+                activity.logger.warning(
+                    f"Text ID {text_input.id} too long: {token_count} tokens, truncating..."
+                )
+                processed_text = truncate_text(processed_text, max_length=500)
+            
+            predictions = rubertconv.predict(processed_text)
             delete_predictions = [p for p in predictions if p.get('label') == 'delete']
-            merged_predictions = merge_adjacent_ranges(delete_predictions, text_input.text)
+            merged_predictions = merge_adjacent_ranges(delete_predictions, processed_text)
             
             deleted_words = []
             for prediction in merged_predictions:

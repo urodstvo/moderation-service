@@ -25,22 +25,11 @@ class Workflow:
     @workflow.run
     async def run(self, workflow_id: int, user_id: int, items: List[Item]) -> List[ResultItem]:
         try:
-            image_results = await activities.get_images_from_minio(items)
-
-            ocr_inputs = [
-                activities.OCRInput(
-                    id=result.id,
-                    original_filename=result.original_filename,
-                    filename=result.filename,
-                    image_bytes=result.image_bytes
-                )
-                for result in image_results
-                if not result.error and result.image_bytes
-            ]
+            
 
             ocr_results = await workflow.execute_activity(
                 activities.process_ocr,
-                ocr_inputs,
+                items,
                 start_to_close_timeout=timedelta(minutes=10),
                 retry_policy=RetryPolicy(maximum_attempts=3),
             )

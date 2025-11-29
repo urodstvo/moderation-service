@@ -170,10 +170,10 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		return nil, err
 	}
 
-	if err := workflow.ExecuteActivity(ctx, w.Activity.SaveRawResults, params.RequestId, combined).Get(ctx, nil); err != nil {
-		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
-		return nil, err
-	}
+	// if err := workflow.ExecuteActivity(ctx, w.Activity.SaveRawResults, params.RequestId, combined).Get(ctx, nil); err != nil {
+	// 	w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
+	// 	return nil, err
+	// }
 
 	var blacklist []string
 	if err := workflow.ExecuteActivity(ctx, w.Activity.GetBlacklist, params.UserId).Get(ctx, &blacklist); err != nil {
@@ -199,15 +199,15 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		return nil, err
 	}
 
-	if err := workflow.ExecuteActivity(ctx, w.Activity.SaveFormattedResults, params.RequestId, finalResult).Get(ctx, nil); err != nil {
-		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
-		return nil, err
-	}
+	// if err := workflow.ExecuteActivity(ctx, w.Activity.SaveFormattedResults, params.RequestId, finalResult).Get(ctx, nil); err != nil {
+	// 	w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
+	// 	return nil, err
+	// }
 
 	if params.IsAsync {
-		if err := workflow.ExecuteActivity(ctx, w.Activity.CallWebhook, params.UserId, finalResult).Get(ctx, nil); err != nil {
-			return nil, err
-		}
+		// if err := workflow.ExecuteActivity(ctx, w.Activity.CallWebhook, params.UserId, finalResult).Get(ctx, nil); err != nil {
+		// 	return nil, err
+		// }
 		stopCh.Send(ctx, true)
 		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusCompleted)
 
