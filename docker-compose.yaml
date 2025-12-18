@@ -51,73 +51,73 @@ services:
     depends_on:
       - postgres
 
-  # auth:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/auth/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - "8001:8000"
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+    ports:
+      - "8001:8000"
 
-  # task-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/task/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
-  #   ports:
-  #     - "8000:8000"
+  task:
+    build:
+      context: .
+      dockerfile: ./apps/task/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "8000:8000"
 
-  # webhook:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/webhook/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
-  #   ports:
-  #     - "8002:8000"
+  webhook:
+    build:
+      context: .
+      dockerfile: ./apps/webhook/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "8002:8000"
 
-  # text-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/text/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  text-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/text/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
 
-  # image-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/image/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  image-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/image/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
 
-  # audio-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/audio/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  audio-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/audio/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
 
-  # video-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/video/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  video-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/video/Dockerfile
+    env_file: [local.env, .env]
+    depends_on:
+      - postgres
+      - minio
 
   temporal:
     image: temporalio/auto-setup:1.20.0
