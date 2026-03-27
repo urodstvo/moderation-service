@@ -8,7 +8,7 @@ optional = false
 python-versions = ">=3.11,<4"
 groups = ["main"]
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 dotenv = ">=0.9.9,<0.10.0"
@@ -25,7 +25,7 @@ optional = false
 python-versions = ">=3.11,<4"
 groups = ["main"]
 files = []
-develop = true
+develop = false
 
 [package.source]
 type = "directory"
@@ -682,7 +682,7 @@ optional = false
 python-versions = ">=3.11,<4"
 groups = ["main"]
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 app_config = {path = "../config-python", develop = true}
@@ -2163,4 +2163,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "4a26b88c3484b64de90d671b0cff65a90e032510fb6d903cc18c014b1cbd104d"
+content-hash = "aeb4c852bb4b93e886d7fd905dbc32314a33ea3e59ae19c4921036ad14f70506"

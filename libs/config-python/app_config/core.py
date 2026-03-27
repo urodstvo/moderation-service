@@ -17,6 +17,9 @@ class Config:
     S3Region: str = None
     NatsUrl: str = "localhost:4222"
     TemporalClientUrl: str = "localhost:7233"
+    DetoxifyUrl: str = "localhost:4001"
+    RubertUrl: str = "localhost:4002"
+    ClassifierUrl: str = "localhost:4003"
 
 def _find_env_file(start_dir: Path) -> Optional[Path]:
     """Ищет .env, начиная с текущей папки и поднимаясь до корня."""
@@ -60,6 +63,9 @@ def get_config() -> Config:
         S3SecretToken=os.getenv("S3_SECRET_TOKEN"),
         NatsUrl=os.getenv("NATS_URL", "localhost:4222"),
         TemporalClientUrl=os.getenv("TEMPORAL_CLIENT_URL", "localhost:7233"),
+        DetoxifyUrl=os.getenv("DETOXIFY_URL", "http://localhost:4001"),
+        RubertUrl=os.getenv("RUBERT_URL", "http://localhost:4002"),
+        ClassifierUrl=os.getenv("CLASSIFIER_URL", "http://localhost:4003"),
     )
 
     validate_config(config)

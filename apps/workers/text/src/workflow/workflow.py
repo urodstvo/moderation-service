@@ -60,7 +60,10 @@ class Workflow:
 
             texts_predictions_task = workflow.execute_activity(
                 activities.classify_texts,
-                items_with_data,
+                args=[
+                    items_with_data,
+                    settings.toxicity_classification_model_name,
+                ],
                 start_to_close_timeout=timedelta(seconds=60),
                 retry_policy=RetryPolicy(maximum_attempts=3),
             )
