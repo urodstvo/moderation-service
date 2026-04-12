@@ -19,5 +19,6 @@ func (i *Impl) GetUserSettings(ctx context.Context, req *proto.GetUserSettingsRe
 	return &proto.GetUserSettingsResponse{
 		UserId:                          req.UserId,
 		ToxicityClassificationModelName: settings.ToxicityClassificationModelName,
+		NsfwClassificationModelName:     settings.NsfwClassificationModelName,
 	}, nil
 }

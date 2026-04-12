@@ -15,6 +15,7 @@ func (a *Activity) GetSettings(ctx context.Context, userId int) (gomodels.Settin
 	var userSettings gomodels.Settings
 	userSettings.UserId = userId
 	userSettings.ToxicityClassificationModelName = settings.ToxicityClassificationModelName
+	userSettings.NsfwClassificationModelName = settings.NsfwClassificationModelName
 
 	return userSettings, nil
 }

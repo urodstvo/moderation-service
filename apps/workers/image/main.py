@@ -15,7 +15,7 @@ async def main():
         task_queue=task_queue,
         workflows=[Workflow],
         activities=[
-            activities.process_ocr,
+            activities.process_images,
             activities.assemble_result,
         ],
         workflow_runner=UnsandboxedWorkflowRunner(),

@@ -12,7 +12,7 @@ type service struct {
 }
 
 type SettingsService interface {
-	UpdateModel(ctx context.Context, userId int, model string) error
+	UpdateModels(ctx context.Context, userId int, toxicityModel string, nsfwModel string) error
 	GetByUserId(ctx context.Context, userId int) (gomodels.Settings, error)
 }
 
@@ -24,6 +24,6 @@ func (s *service) GetByUserId(ctx context.Context, userId int) (gomodels.Setting
 	return s.repo.GetByUserId(ctx, userId)
 }
 
-func (s *service) UpdateModel(ctx context.Context, userId int, model string) error {
-	return s.repo.UpdateModel(ctx, userId, model)
+func (s *service) UpdateModels(ctx context.Context, userId int, toxicityModel string, nsfwModel string) error {
+	return s.repo.UpdateModels(ctx, userId, toxicityModel, nsfwModel)
 }

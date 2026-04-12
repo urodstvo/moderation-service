@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from datetime import timedelta
 import datetime
-from typing import List
+from typing import List, Optional
 from temporalio import workflow
 from temporalio.exceptions import FailureError
 from temporalio.common import RetryPolicy
@@ -14,7 +14,8 @@ class Item:
     id: int
     original_filename: str
     filename: str
-    recognized_text: str   
+    recognized_text: str
+    nsfw_classification: Optional["activities.NsfwClassification"] = None
 
 @dataclass
 class ResultItem:
@@ -24,11 +25,13 @@ class ResultItem:
     recognized_text: str
     classification: activities.Classification
     words: List[activities.DeletedWord]
+    nsfw_classification: Optional["activities.NsfwClassification"] = None
 
 @dataclass
 class Settings:
     user_id: int
     toxicity_classification_model_name: str
+    nsfw_classification_model_name: str
 
 @workflow.defn(name="text_workflow")
 class Workflow:    

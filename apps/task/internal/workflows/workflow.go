@@ -39,7 +39,7 @@ func New(opts Opts) *Workflow {
 
 func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*types.WorkflowResult, error) {
 	w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusProcessing)
-	
+
 	ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
 		StartToCloseTimeout:    time.Minute * 10,
 		ScheduleToCloseTimeout: time.Minute * 15, // опционально, но надёжнее
@@ -66,6 +66,12 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 	})
 
 	var videoExtractedAudios []types.FileTypeParams
+	var settings gomodels.Settings
+	if err := workflow.ExecuteActivity(ctx, w.Activity.GetSettings, params.UserId).Get(ctx, &settings); err != nil {
+		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
+		return nil, err
+	}
+
 	if len(params.Files.Videos) > 0 {
 		videoCtx, cancel := createChildContext(ctx, constants.VideoWorkflowQueueName)
 		defer cancel()
@@ -116,8 +122,26 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		children = append(children, &child{f, ctx, cancel, res})
 	}
 
-	addChild(params.Files.Images, constants.ImageWorkflowQueueName, constants.ImageWorkflowName, &imageRes)
 	addChild(audioInputFiles, constants.AudioWorkflowQueueName, constants.AudioWorkflowName, &audioRes)
+
+	if len(params.Files.Images) == 0 {
+		imageRes = []types.ResultItem{}
+	} else {
+		imageCtx, cancel := createChildContext(ctx, constants.ImageWorkflowQueueName)
+		children = append(children, &child{
+			future: workflow.ExecuteChildWorkflow(
+				imageCtx,
+				constants.ImageWorkflowName,
+				params.RequestId,
+				params.UserId,
+				params.Files.Images,
+				settings.NsfwClassificationModelName,
+			),
+			ctx:    imageCtx,
+			cancel: cancel,
+			result: &imageRes,
+		})
+	}
 
 	if len(children) > 0 {
 		errCh := workflow.NewChannel(ctx)
@@ -177,12 +201,6 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 
 	var blacklist []string
 	if err := workflow.ExecuteActivity(ctx, w.Activity.GetBlacklist, params.UserId).Get(ctx, &blacklist); err != nil {
-		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
-		return nil, err
-	}
-
-	var settings gomodels.Settings
-	if err := workflow.ExecuteActivity(ctx, w.Activity.GetSettings, params.UserId).Get(ctx, &settings); err != nil {
 		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}

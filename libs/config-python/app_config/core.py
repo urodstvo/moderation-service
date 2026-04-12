@@ -20,6 +20,8 @@ class Config:
     DetoxifyUrl: str = "localhost:4001"
     RubertUrl: str = "localhost:4002"
     ClassifierUrl: str = "localhost:4003"
+    ClipNsfwUrl: str = "localhost:4004"
+    FalconsaiNsfwUrl: str = "localhost:4005"
 
 def _find_env_file(start_dir: Path) -> Optional[Path]:
     """Ищет .env, начиная с текущей папки и поднимаясь до корня."""
@@ -66,6 +68,8 @@ def get_config() -> Config:
         DetoxifyUrl=os.getenv("DETOXIFY_URL", "http://localhost:4001"),
         RubertUrl=os.getenv("RUBERT_URL", "http://localhost:4002"),
         ClassifierUrl=os.getenv("CLASSIFIER_URL", "http://localhost:4003"),
+        ClipNsfwUrl=os.getenv("CLIP_NSFW_URL", "http://localhost:4004"),
+        FalconsaiNsfwUrl=os.getenv("FALCONSAI_NSFW_URL", "http://localhost:4005"),
     )
 
     validate_config(config)

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 from temporalio import activity
 import enum
+from src.models import NsfwClassification
 
 class ContentType(enum.Enum):
     AUDIO = "audio"
@@ -15,6 +16,7 @@ class ResultItem:
     original_filename: str
     filename: str
     recognized_text: str
+    nsfw_classification: Optional[NsfwClassification] = None
 
 @dataclass
 class OCRResult:
@@ -24,6 +26,7 @@ class OCRResult:
     text: str
     confidence: float
     language: str
+    nsfw_classification: Optional[NsfwClassification] = None
     error: Optional[str] = None
 
 @activity.defn
@@ -40,6 +43,7 @@ async def assemble_result(ocr_results: List[OCRResult]) -> List[ResultItem]:
                 original_filename=ocr_result.original_filename,
                 filename=ocr_result.filename,
                 recognized_text=recognized_text,
+                nsfw_classification=ocr_result.nsfw_classification,
             )
             results.append(result_item)
             

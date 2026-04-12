@@ -13,13 +13,21 @@ import (
 func (r *repository) GetByUserId(ctx context.Context, userId int) (gomodels.Settings, error) {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Select("*").From("user_settings").Where(squirrel.Eq{"user_id": userId}).ToSql()
+	query, args, err := sq.
+		Select("user_id", "toxicity_classification_model_name", "nsfw_classification_model_name").
+		From("user_settings").
+		Where(squirrel.Eq{"user_id": userId}).
+		ToSql()
 	if err != nil {
 		return gomodels.Settings{}, fmt.Errorf("failed to build query: %w", err)
 	}
 
 	settings := gomodels.Settings{}
-	err = conn.QueryRow(ctx, query, args...).Scan(&settings.UserId, &settings.ToxicityClassificationModelName)
+	err = conn.QueryRow(ctx, query, args...).Scan(
+		&settings.UserId,
+		&settings.ToxicityClassificationModelName,
+		&settings.NsfwClassificationModelName,
+	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return gomodels.Settings{}, fmt.Errorf("settings not found")

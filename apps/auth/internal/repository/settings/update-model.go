@@ -5,10 +5,14 @@ import (
 	"fmt"
 )
 
-func (r *repository) UpdateModel(ctx context.Context, userId int, model string) error {
+func (r *repository) UpdateModels(ctx context.Context, userId int, toxicityModel string, nsfwModel string) error {
 	conn := r.getter.DefaultTrOrDB(ctx, r.db)
 
-	query, args, err := sq.Update("user_settings").Set("toxicity_classification_model_name", model).Where("user_id", userId).ToSql()
+	query, args, err := sq.Update("user_settings").
+		Set("toxicity_classification_model_name", toxicityModel).
+		Set("nsfw_classification_model_name", nsfwModel).
+		Where("user_id", userId).
+		ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}

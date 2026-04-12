@@ -35,12 +35,19 @@ type WorkflowResult struct {
 }
 
 type WorkflowResultFile struct {
-	FileId         int                  `json:"file_id"`
-	Filename       string               `json:"filename"` //original
-	ContentType    gomodels.ContentType `json:"content_type"`
-	RecognizedText *string              `json:"recognized_text"`
-	Classification Classification       `json:"classification"`
-	Words          []DeletedWord        `json:"words,omitempty"`
+	FileId             int                  `json:"file_id"`
+	Filename           string               `json:"filename"` //original
+	ContentType        gomodels.ContentType `json:"content_type"`
+	RecognizedText     *string              `json:"recognized_text"`
+	Classification     Classification       `json:"classification"`
+	NsfwClassification *NsfwClassification  `json:"nsfw_classification,omitempty"`
+	Words              []DeletedWord        `json:"words,omitempty"`
+}
+
+type NsfwClassification struct {
+	Score  float64 `json:"score"`
+	IsNsfw bool    `json:"is_nsfw"`
+	Model  string  `json:"model"`
 }
 
 type DeletedWord struct {
@@ -52,12 +59,13 @@ type DeletedWord struct {
 }
 
 type TextResultItem struct {
-	Id               int            `json:"id"`
-	OriginalFilename string         `json:"original_filename"`
-	Filename         string         `json:"filename"`
-	RecognizedText   string         `json:"recognized_text"`
-	Classification   Classification `json:"classification"`
-	Words            []DeletedWord  `json:"words,omitempty"`
+	Id                 int                 `json:"id"`
+	OriginalFilename   string              `json:"original_filename"`
+	Filename           string              `json:"filename"`
+	RecognizedText     string              `json:"recognized_text"`
+	Classification     Classification      `json:"classification"`
+	NsfwClassification *NsfwClassification `json:"nsfw_classification,omitempty"`
+	Words              []DeletedWord       `json:"words,omitempty"`
 }
 
 type Classification struct {
@@ -70,10 +78,11 @@ type Classification struct {
 }
 
 type ResultItem struct {
-	Id               int    `json:"id"`
-	OriginalFilename string `json:"original_filename"`
-	Filename         string `json:"filename"`
-	RecognizedText   string `json:"recognized_text"`
+	Id                 int                 `json:"id"`
+	OriginalFilename   string              `json:"original_filename"`
+	Filename           string              `json:"filename"`
+	RecognizedText     string              `json:"recognized_text"`
+	NsfwClassification *NsfwClassification `json:"nsfw_classification,omitempty"`
 }
 
 type ActivityStatus struct {

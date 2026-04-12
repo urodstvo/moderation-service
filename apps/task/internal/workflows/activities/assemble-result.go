@@ -19,11 +19,12 @@ func (a *Activity) AssembleResult(ctx context.Context, requestId int, text []typ
 	result.TotalFiles = len(text)
 	for _, t := range text {
 		result.Files = append(result.Files, types.WorkflowResultFile{
-			FileId:         t.Id,
-			Filename:       t.OriginalFilename,
-			RecognizedText: &t.RecognizedText,
-			Classification: t.Classification,
-			Words:          t.Words,
+			FileId:             t.Id,
+			Filename:           t.OriginalFilename,
+			RecognizedText:     &t.RecognizedText,
+			Classification:     t.Classification,
+			NsfwClassification: t.NsfwClassification,
+			Words:              t.Words,
 		})
 	}
 

@@ -71,6 +71,7 @@ export type SyncAnalysisFile = {
   content_type: string;
   recognized_text?: string | null;
   classification: Classification;
+  nsfw_classification?: NsfwClassification | null;
   words: DeletedWord[];
 };
 
@@ -98,6 +99,12 @@ export type Classification = {
   threat: number;
   insult: number;
   identity_attack: number;
+};
+
+export type NsfwClassification = {
+  score: number;
+  is_nsfw: boolean;
+  model: string;
 };
 
 export type AsyncAnalysisResponse = {

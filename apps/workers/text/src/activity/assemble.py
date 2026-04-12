@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from temporalio import activity
-from typing import List
+from typing import List, Optional
 from .retrieve import DeletedWord, TextRetrievingResult
 from .classify import ClassificationResult, Classification as ItemClassification
 
@@ -12,13 +12,21 @@ class TextResultItem:
     recognized_text: str
     classification: ItemClassification
     words: List[DeletedWord]
+    nsfw_classification: Optional["NsfwClassification"] = None
+
+@dataclass
+class NsfwClassification:
+    score: float
+    is_nsfw: bool
+    model: str
 
 @dataclass
 class Item:
     id: int
     original_filename: str
     filename: str
-    recognized_text: str  
+    recognized_text: str
+    nsfw_classification: Optional[NsfwClassification] = None
 
 @activity.defn
 def assemble_result(
@@ -39,6 +47,7 @@ def assemble_result(
             recognized_text=item.recognized_text,
             classification=cls,
             words=deleted_words,
+            nsfw_classification=item.nsfw_classification,
         ))
 
     return result_items

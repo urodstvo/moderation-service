@@ -14,4 +14,5 @@ message GetUserSettingsRequest {
 message GetUserSettingsResponse {
   int32 userId = 1;
   string ToxicityClassificationModelName = 2;
+  string NsfwClassificationModelName = 3;
 }

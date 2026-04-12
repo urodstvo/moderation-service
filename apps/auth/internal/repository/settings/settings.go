@@ -15,7 +15,7 @@ type repository struct {
 }
 
 type SettingsRepository interface {
-	UpdateModel(ctx context.Context, userId int, model string) error
+	UpdateModels(ctx context.Context, userId int, toxicityModel string, nsfwModel string) error
 	GetByUserId(ctx context.Context, userId int) (gomodels.Settings, error)
 }
 

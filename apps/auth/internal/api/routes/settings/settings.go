@@ -27,8 +27,13 @@ type Opts struct {
 }
 
 type updateSettingsRequest struct {
-	UserId    int    `header:"X-User-Id"`
-	ModelName string `path:"modelName"`
+	UserId int `header:"X-User-Id"`
+	Body   updateSettingsBody
+}
+
+type updateSettingsBody struct {
+	ToxicityClassificationModelName *string `json:"toxicity_classification_model_name"`
+	NsfwClassificationModelName     *string `json:"nsfw_classification_model_name"`
 }
 
 func NewUserRoutes(opts Opts) Settings {
@@ -43,13 +48,33 @@ func NewUserRoutes(opts Opts) Settings {
 		huma.Operation{
 			OperationID: "updateSettings",
 			Method:      http.MethodPatch,
-			Path:        "/user/settings/{modelName}",
+			Path:        "/user/settings",
 			Tags:        []string{"Settings"},
 			Summary:     "Update Settings",
 		},
 		func(ctx context.Context, i *updateSettingsRequest) (*struct{}, error) {
 			userId := i.UserId
-			err := u.SettingsService.UpdateModel(ctx, userId, i.ModelName)
+			currentSettings, err := u.SettingsService.GetByUserId(ctx, userId)
+			if err != nil {
+				return &struct{}{}, huma.Error500InternalServerError("")
+			}
+
+			toxicityModel := currentSettings.ToxicityClassificationModelName
+			if i.Body.ToxicityClassificationModelName != nil {
+				toxicityModel = *i.Body.ToxicityClassificationModelName
+			}
+
+			nsfwModel := currentSettings.NsfwClassificationModelName
+			if i.Body.NsfwClassificationModelName != nil {
+				nsfwModel = *i.Body.NsfwClassificationModelName
+			}
+
+			err = u.SettingsService.UpdateModels(
+				ctx,
+				userId,
+				toxicityModel,
+				nsfwModel,
+			)
 			if err != nil {
 				return &struct{}{}, huma.Error500InternalServerError("")
 			}
