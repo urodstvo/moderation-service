@@ -48,7 +48,7 @@ func isValidURL(rawURL, appEnv string) bool {
 
 	for _, ip := range ips {
 		if ip.IsLoopback() || ip.IsPrivate() {
-			return appEnv == "development"
+			return appEnv == "development" || appEnv == "docker"
 		}
 	}
 

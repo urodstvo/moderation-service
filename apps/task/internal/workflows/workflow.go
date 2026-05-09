@@ -2,6 +2,8 @@ package workflows
 
 import (
 	"context"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/urodstvo/moderation-service/apps/task/internal/service/request"
@@ -65,7 +67,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 		}
 	})
 
-	var videoExtractedAudios []types.FileTypeParams
+	var videoResults []types.VideoWorkflowResult
 	var settings gomodels.Settings
 	if err := workflow.ExecuteActivity(ctx, w.Activity.GetSettings, params.UserId).Get(ctx, &settings); err != nil {
 		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
@@ -82,20 +84,64 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 			params.RequestId,
 			params.UserId,
 			params.Files.Videos,
+			settings.NsfwClassificationModelName,
 		)
 
-		err := future.Get(ctx, &videoExtractedAudios)
+		err := future.Get(ctx, &videoResults)
 		if err != nil {
 			w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 			return nil, err
 		}
 	} else {
-		videoExtractedAudios = []types.FileTypeParams{}
+		videoResults = []types.VideoWorkflowResult{}
+	}
+
+	videoExtractedAudios := make([]types.FileTypeParams, 0, len(videoResults))
+	for _, video := range videoResults {
+		if video.AudioFilename == "" || video.AudioError != nil {
+			continue
+		}
+
+		videoExtractedAudios = append(videoExtractedAudios, types.FileTypeParams{
+			Id:               video.Id,
+			OriginalFilename: video.OriginalFilename,
+			Filename:         video.AudioFilename,
+		})
+	}
+
+	videoExtractedFrames := make([]types.FileTypeParams, 0)
+	for _, video := range videoResults {
+		for _, kf := range video.Keyframes {
+			if kf.Filename == "" {
+				continue
+			}
+			// FrameId format: "video_id:prefix:index" - extract video_id as int
+			frameIdStr := kf.FrameId
+			var frameId int
+			if len(frameIdStr) > 0 {
+				parts := strings.Split(frameIdStr, ":")
+				if len(parts) > 0 {
+					id, err := strconv.Atoi(parts[0])
+					if err == nil {
+						frameId = id
+					}
+				}
+			}
+			videoExtractedFrames = append(videoExtractedFrames, types.FileTypeParams{
+				Id:               frameId,
+				OriginalFilename: video.OriginalFilename,
+				Filename:         kf.Filename,
+			})
+		}
 	}
 
 	audioInputFiles := make([]types.FileTypeParams, 0, len(params.Files.Audios)+len(videoExtractedAudios))
 	audioInputFiles = append(audioInputFiles, params.Files.Audios...)
 	audioInputFiles = append(audioInputFiles, videoExtractedAudios...)
+
+	imageInputFiles := make([]types.FileTypeParams, 0, len(params.Files.Images)+len(videoExtractedFrames))
+	imageInputFiles = append(imageInputFiles, params.Files.Images...)
+	imageInputFiles = append(imageInputFiles, videoExtractedFrames...)
 
 	var (
 		imageRes []types.ResultItem
@@ -124,7 +170,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 
 	addChild(audioInputFiles, constants.AudioWorkflowQueueName, constants.AudioWorkflowName, &audioRes)
 
-	if len(params.Files.Images) == 0 {
+	if len(imageInputFiles) == 0 {
 		imageRes = []types.ResultItem{}
 	} else {
 		imageCtx, cancel := createChildContext(ctx, constants.ImageWorkflowQueueName)
@@ -134,7 +180,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 				constants.ImageWorkflowName,
 				params.RequestId,
 				params.UserId,
-				params.Files.Images,
+				imageInputFiles,
 				settings.NsfwClassificationModelName,
 			),
 			ctx:    imageCtx,
@@ -212,7 +258,7 @@ func (w *Workflow) Flow(ctx workflow.Context, params types.WorkflowParams) (*typ
 	}
 
 	var finalResult types.WorkflowResult
-	if err := workflow.ExecuteActivity(ctx, w.Activity.AssembleResult, params.RequestId, textRes).Get(ctx, &finalResult); err != nil {
+	if err := workflow.ExecuteActivity(ctx, w.Activity.AssembleResult, params.RequestId, textRes, videoResults, imageRes).Get(ctx, &finalResult); err != nil {
 		w.Request.UpdateStatus(context.Background(), params.RequestId, gomodels.NodeStatusFailed)
 		return nil, err
 	}

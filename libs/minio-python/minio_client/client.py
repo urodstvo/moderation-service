@@ -1,5 +1,6 @@
 import json
 import logging
+from io import BytesIO
 
 from minio import Minio
 from minio.error import S3Error
@@ -74,5 +75,14 @@ class MinioClient:
             return url
         except S3Error as e:
             self.logger.error(f"Occurred error while getting public url for {filename}: {e}")
+            raise
+
+    def put_object(self, bucket: str, object_name: str, data, length: int, content_type: str):
+        try:
+            if isinstance(data, bytes):
+                data = BytesIO(data)
+            self.client.put_object(bucket, object_name, data, length, content_type=content_type)
+        except S3Error as e:
+            self.logger.error(f"Occurred error while putting {object_name} to minIO: {e}")
             raise
 

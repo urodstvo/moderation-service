@@ -11,7 +11,7 @@ import src.activity as activities
 async def main():
     client = await Client.connect(CONFIG.TemporalClientUrl, namespace="default")
     task_queue = "video_workflow_queue"
-    executor = ThreadPoolExecutor(max_workers=10)
+    executor = ThreadPoolExecutor(max_workers=CONFIG.VideoActivityMaxConcurrency)
 
     worker = Worker(
         client,
@@ -19,6 +19,11 @@ async def main():
         workflows=[Workflow],
         activities=[
             activities.extract_audio_from_video,
+            activities.extract_keyframes,
+            activities.nsfw_batch_check,
+            activities.aggregate_moderation_result,
+            activities.refine_segments,
+            activities.upload_frames_to_minio,
         ],
         workflow_runner=UnsandboxedWorkflowRunner(),
         activity_executor=executor,

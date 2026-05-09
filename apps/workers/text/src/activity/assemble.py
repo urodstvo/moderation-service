@@ -38,8 +38,15 @@ def assemble_result(
     result_items: List[TextResultItem] = []
 
     for item in items:
-        cls = classifications[item.id]
-        deleted_words = words[item.id].deleted_words if item.id in words and words[item.id] is not None else []
+        cls = classifications.get(item.id, ItemClassification(
+            toxicity=0.0,
+            severe_toxicity=0.0,
+            obscene=0.0,
+            threat=0.0,
+            insult=0.0,
+            identity_attack=0.0,
+        ))
+        deleted_words = words.get(item.id).deleted_words if item.id in words and words[item.id] is not None else []
         result_items.append(TextResultItem(
             id=item.id,
             original_filename=item.original_filename,

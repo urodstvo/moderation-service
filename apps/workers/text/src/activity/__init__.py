@@ -1,7 +1,7 @@
 from .classify import classify_texts, Classification
 from .get_from_minio import get_texts_from_minio
 from .retrieve import retrieve_words, DeletedWord
-from .assemble import assemble_result
+from .assemble import assemble_result, NsfwClassification
 
 __all__ = [
     "classify_texts",
@@ -10,4 +10,5 @@ __all__ = [
     "assemble_result",
     "Classification",
     "DeletedWord",
+    "NsfwClassification",
 ]

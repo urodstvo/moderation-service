@@ -3,7 +3,7 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.8.3 \
     POETRY_VIRTUALENVS_CREATE=false \
-    PATH="/root/.local/bin:$PATH"
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/* \
-    && pip install --user poetry==$POETRY_VERSION \
+    && pip install "poetry==$POETRY_VERSION" \
     && poetry --version
 
 # Копирование локальных библиотек (для path-зависимостей)
@@ -43,4 +43,4 @@ RUN useradd -m appuser && \
 
 USER appuser
 
-CMD ["poetry", "run", "python", "main.py"]
+CMD ["python", "main.py"]

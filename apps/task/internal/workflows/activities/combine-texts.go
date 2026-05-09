@@ -7,9 +7,11 @@ import (
 )
 
 func (a *Activity) CombineTexts(ctx context.Context, input [][]types.ResultItem) ([]types.ResultItem, error) {
-    var result []types.ResultItem
+    result := []types.ResultItem{}
     for _, part := range input {
-        result = append(result, part...)
+        if part != nil {
+            result = append(result, part...)
+        }
     }
-    return result, nil // ← всегда nil, если нет ошибок
+    return result, nil
 }

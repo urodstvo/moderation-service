@@ -35,13 +35,15 @@ type WorkflowResult struct {
 }
 
 type WorkflowResultFile struct {
-	FileId             int                  `json:"file_id"`
-	Filename           string               `json:"filename"` //original
-	ContentType        gomodels.ContentType `json:"content_type"`
-	RecognizedText     *string              `json:"recognized_text"`
-	Classification     Classification       `json:"classification"`
-	NsfwClassification *NsfwClassification  `json:"nsfw_classification,omitempty"`
-	Words              []DeletedWord        `json:"words,omitempty"`
+	FileId             int                    `json:"file_id"`
+	Filename           string                 `json:"filename"` //original
+	ContentType        gomodels.ContentType   `json:"content_type"`
+	RecognizedText     *string                `json:"recognized_text"`
+	Classification     Classification         `json:"classification"`
+	NsfwClassification *NsfwClassification    `json:"nsfw_classification,omitempty"`
+	VideoModeration    *VideoModerationResult `json:"video_moderation,omitempty"`
+	Keyframes          []KeyframeInfo         `json:"keyframes,omitempty"`
+	Words              []DeletedWord          `json:"words,omitempty"`
 }
 
 type NsfwClassification struct {
@@ -83,6 +85,41 @@ type ResultItem struct {
 	Filename           string              `json:"filename"`
 	RecognizedText     string              `json:"recognized_text"`
 	NsfwClassification *NsfwClassification `json:"nsfw_classification,omitempty"`
+}
+
+type FlaggedSegment struct {
+	StartSeconds float64 `json:"start_seconds"`
+	EndSeconds   float64 `json:"end_seconds"`
+	MaxScore     float64 `json:"max_score"`
+	FrameCount   int     `json:"frame_count"`
+}
+
+type VideoModerationResult struct {
+	VideoId         int              `json:"video_id"`
+	NsfwRatio       float64          `json:"nsfw_ratio"`
+	MaxScore        float64          `json:"max_score"`
+	FlaggedSegments []FlaggedSegment `json:"flagged_segments"`
+	FinalLabel      string           `json:"final_label"`
+	Model           string           `json:"model"`
+}
+
+type KeyframeInfo struct {
+	FrameId          string  `json:"frame_id"`
+	TimestampSeconds float64 `json:"timestamp_seconds"`
+	Filename         string  `json:"filename"`
+	NsfwScore        float64 `json:"nsfw_score,omitempty"`
+	IsNsfw           bool    `json:"is_nsfw,omitempty"`
+}
+
+type VideoWorkflowResult struct {
+	Id               int                    `json:"id"`
+	OriginalFilename string                 `json:"original_filename"`
+	Filename         string                 `json:"filename"`
+	AudioFilename    string                 `json:"audio_filename,omitempty"`
+	AudioError       *string                `json:"audio_error,omitempty"`
+	VideoModeration  *VideoModerationResult `json:"video_moderation,omitempty"`
+	VideoError       *string                `json:"video_error,omitempty"`
+	Keyframes        []KeyframeInfo         `json:"keyframes,omitempty"`
 }
 
 type ActivityStatus struct {

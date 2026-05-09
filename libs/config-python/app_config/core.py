@@ -22,6 +22,17 @@ class Config:
     ClassifierUrl: str = "localhost:4003"
     ClipNsfwUrl: str = "localhost:4004"
     FalconsaiNsfwUrl: str = "localhost:4005"
+    VideoSceneThreshold: float = 0.01
+    VideoMaxKeyframes: int = 100
+    VideoRefineFps: int = 3
+    VideoSuspiciousScore: float = 0.6
+    VideoFlagScore: float = 0.8
+    VideoFlagRatio: float = 0.1
+    VideoSegmentGapSeconds: float = 1.0
+    VideoRefinedSegmentPaddingSeconds: float = 1.5
+    VideoActivityMaxConcurrency: int = 4
+    VideoFrameWidth: int = 320
+    VideoNsfwBatchConcurrency: int = 8
 
 def _find_env_file(start_dir: Path) -> Optional[Path]:
     """Ищет .env, начиная с текущей папки и поднимаясь до корня."""
@@ -70,6 +81,17 @@ def get_config() -> Config:
         ClassifierUrl=os.getenv("CLASSIFIER_URL", "http://localhost:4003"),
         ClipNsfwUrl=os.getenv("CLIP_NSFW_URL", "http://localhost:4004"),
         FalconsaiNsfwUrl=os.getenv("FALCONSAI_NSFW_URL", "http://localhost:4005"),
+        VideoSceneThreshold=float(os.getenv("VIDEO_SCENE_THRESHOLD", "0.3")),
+        VideoMaxKeyframes=int(os.getenv("VIDEO_MAX_KEYFRAMES", "100")),
+        VideoRefineFps=int(os.getenv("VIDEO_REFINE_FPS", "3")),
+        VideoSuspiciousScore=float(os.getenv("VIDEO_SUSPICIOUS_SCORE", "0.6")),
+        VideoFlagScore=float(os.getenv("VIDEO_FLAG_SCORE", "0.8")),
+        VideoFlagRatio=float(os.getenv("VIDEO_FLAG_RATIO", "0.1")),
+        VideoSegmentGapSeconds=float(os.getenv("VIDEO_SEGMENT_GAP_SECONDS", "1.0")),
+        VideoRefinedSegmentPaddingSeconds=float(os.getenv("VIDEO_REFINED_SEGMENT_PADDING_SECONDS", "1.5")),
+        VideoActivityMaxConcurrency=int(os.getenv("VIDEO_ACTIVITY_MAX_CONCURRENCY", "4")),
+        VideoFrameWidth=int(os.getenv("VIDEO_FRAME_WIDTH", "320")),
+        VideoNsfwBatchConcurrency=int(os.getenv("VIDEO_NSFW_BATCH_CONCURRENCY", "8")),
     )
 
     validate_config(config)

@@ -11,6 +11,9 @@ services:
       - postgres
       - minio
       - adminer
+      - auth
+      - task
+      - webhook
     environment:
       - NGINX_HOST=localhost
     networks:
@@ -51,73 +54,122 @@ services:
     depends_on:
       - postgres
 
-  # auth:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/auth/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - "8001:8000"
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+    ports:
+      - "8001:8000"
 
-  # task:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/task/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
-  #   ports:
-  #     - "8000:8000"
+  task:
+    build:
+      context: .
+      dockerfile: ./apps/task/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+      - temporal
+      - auth
+      - webhook
+    ports:
+      - "8000:8000"
 
-  # webhook:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/webhook/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
-  #   ports:
-  #     - "8002:8000"
+  webhook:
+    build:
+      context: .
+      dockerfile: ./apps/webhook/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "8002:8000"
 
-  # text-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/text/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  detoxify:
+    build:
+      context: .
+      dockerfile: ./apps/models/detoxify/Dockerfile
+    ports:
+      - "4001:8000"
 
-  # image-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/image/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  rubert-toxic:
+    build:
+      context: .
+      dockerfile: ./apps/models/rubert-toxic/Dockerfile
+    ports:
+      - "4002:8000"
 
-  # audio-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/audio/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  russian-classifier:
+    build:
+      context: .
+      dockerfile: ./apps/models/russian-classifier/Dockerfile
+    ports:
+      - "4003:8000"
 
-  # video-worker:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/workers/video/Dockerfile
-  #   env_file: [local.env, .env]
-  #   depends_on:
-  #     - postgres
-  #     - minio
+  nsfw-clip:
+    build:
+      context: .
+      dockerfile: ./apps/models/nsfw-clip/Dockerfile
+    ports:
+      - "4004:8000"
+
+  nsfw-falconsai:
+    build:
+      context: .
+      dockerfile: ./apps/models/nsfw-falconsai/Dockerfile
+    ports:
+      - "4005:8000"
+
+  text-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/text/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+      - temporal
+      - detoxify
+      - rubert-toxic
+      - russian-classifier
+
+  image-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/image/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+      - temporal
+      - nsfw-clip
+      - nsfw-falconsai
+
+  audio-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/audio/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+      - temporal
+
+  video-worker:
+    build:
+      context: .
+      dockerfile: ./apps/workers/video/Dockerfile
+    env_file: [.env.docker]
+    depends_on:
+      - postgres
+      - minio
+      - temporal
+      - nsfw-clip
+      - nsfw-falconsai
 
   temporal:
     image: temporalio/auto-setup:1.20.0
